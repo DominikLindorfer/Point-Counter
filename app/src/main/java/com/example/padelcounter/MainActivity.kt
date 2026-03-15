@@ -32,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -56,9 +57,13 @@ class MainActivity : ComponentActivity() {
             ScoreBoard(
                 state = viewModel.state,
                 canUndo = viewModel.canUndo,
+                goldenPoint = viewModel.goldenPoint,
+                setsToWin = viewModel.setsToWin,
                 onScore = { team -> viewModel.scorePoint(team) },
                 onUndo = { viewModel.undo() },
                 onReset = { viewModel.resetMatch() },
+                onToggleGoldenPoint = { viewModel.toggleGoldenPoint() },
+                onCycleSetsToWin = { viewModel.cycleSetsToWin() },
             )
         }
     }
@@ -78,21 +83,30 @@ class MainActivity : ComponentActivity() {
 }
 
 // -- Colors --
-private val DarkBg = Color(0xFF0A0A14)
-private val Team1Bg = Color(0xFF0D1B2A)
-private val Team2Bg = Color(0xFF1B0D1A)
-private val AccentColor = Color(0xFFE0E0E0)
-private val DimColor = Color(0xFF888888)
+private val DarkBg = Color(0xFF0D0D0D)
+private val Team1Bg = Color(0xFF091426)       // deep navy blue
+private val Team2Bg = Color(0xFF260808)       // deep dark red
+private val Team1Accent = Color(0xFF5BA8FF)   // vivid blue for labels
+private val Team2Accent = Color(0xFFFF5555)   // vivid red for labels
+private val Team1Point = Color(0xFFFFFFFF)    // pure white on blue — max contrast
+private val Team2Point = Color(0xFFFFFFFF)    // pure white on red — max contrast
+private val TextWhite = Color(0xFFFFFFFF)
+private val DimColor = Color(0xFF999999)      // brighter gray for opponent scores
+private val GoldColor = Color(0xFFFFD700)
 
 @Composable
 fun ScoreBoard(
     state: MatchState,
     canUndo: Boolean,
+    goldenPoint: Boolean,
+    setsToWin: Int,
     onScore: (Int) -> Unit,
     onUndo: () -> Unit,
     onReset: () -> Unit,
+    onToggleGoldenPoint: () -> Unit,
+    onCycleSetsToWin: () -> Unit,
 ) {
-    val (display1, display2) = PadelScoring.displayPoints(state)
+    val (display1, display2) = PadelScoring.displayPoints(state, goldenPoint)
 
     Box(
         modifier = Modifier
@@ -101,14 +115,13 @@ fun ScoreBoard(
     ) {
         // Main content: two halves
         Row(modifier = Modifier.fillMaxSize()) {
-            // Team 1 - left half
+            // Team 1 - left half (Blue)
             TeamPanel(
                 teamLabel = "TEAM 1",
-                sets = state.team1Sets,
-                games = state.team1Games,
-                opponentGames = state.team2Games,
                 pointDisplay = display1,
                 backgroundColor = Team1Bg,
+                accentColor = Team1Accent,
+                pointColor = Team1Point,
                 modifier = Modifier.weight(1f),
                 onClick = { onScore(1) },
             )
@@ -118,92 +131,172 @@ fun ScoreBoard(
                 modifier = Modifier
                     .fillMaxHeight()
                     .width(2.dp)
-                    .background(Color(0xFF333333)),
+                    .background(Color(0xFF222222)),
             )
 
-            // Team 2 - right half
+            // Team 2 - right half (Red)
             TeamPanel(
                 teamLabel = "TEAM 2",
-                sets = state.team2Sets,
-                games = state.team2Games,
-                opponentGames = state.team1Games,
                 pointDisplay = display2,
                 backgroundColor = Team2Bg,
+                accentColor = Team2Accent,
+                pointColor = Team2Point,
                 modifier = Modifier.weight(1f),
                 onClick = { onScore(2) },
             )
         }
 
-        // Top bar with Undo and New Match
+        // Top bar: Undo | Sets tracker | New Match
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(12.dp),
+                .padding(16.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Button(
-                onClick = onUndo,
-                enabled = canUndo,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF333333),
-                    contentColor = AccentColor,
-                ),
-            ) {
-                Text("UNDO", fontSize = 14.sp)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(
+                    onClick = onUndo,
+                    enabled = canUndo,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF1A1A1A),
+                        contentColor = TextWhite,
+                        disabledContainerColor = Color(0xFF111111),
+                        disabledContentColor = Color(0xFF444444),
+                    ),
+                ) {
+                    Text("UNDO", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                }
+
+                Button(
+                    onClick = onToggleGoldenPoint,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = if (goldenPoint) GoldColor else Color(0xFF1A1A1A),
+                        contentColor = if (goldenPoint) Color.Black else DimColor,
+                    ),
+                ) {
+                    Text(
+                        text = if (goldenPoint) "GOLDEN PT" else "ADVANTAGE",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
             }
 
-            if (state.isTiebreak) {
-                Text(
-                    text = "TIEBREAK",
-                    color = Color(0xFFFFD700),
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.align(Alignment.CenterVertically),
-                )
+            // Central sets & games tracker box
+            Box(
+                modifier = Modifier
+                    .background(
+                        color = Color(0xFF1A1A1A),
+                        shape = RoundedCornerShape(12.dp),
+                    )
+                    .padding(horizontal = 24.dp, vertical = 12.dp),
+                contentAlignment = Alignment.Center,
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    // Set scores header
+                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                        state.team1Games.forEachIndexed { index, g ->
+                            // Blue score
+                            Text(
+                                text = g.toString(),
+                                color = Team1Accent,
+                                fontSize = 36.sp,
+                                fontWeight = FontWeight.Bold,
+                            )
+                            Text(
+                                text = "-",
+                                color = DimColor,
+                                fontSize = 36.sp,
+                                fontWeight = FontWeight.Bold,
+                            )
+                            // Red score
+                            Text(
+                                text = state.team2Games[index].toString(),
+                                color = Team2Accent,
+                                fontSize = 36.sp,
+                                fontWeight = FontWeight.Bold,
+                            )
+                            // Separator between sets
+                            if (index < state.team1Games.lastIndex) {
+                                Text(
+                                    text = "  ",
+                                    fontSize = 36.sp,
+                                )
+                            }
+                        }
+                    }
+                    if (state.isTiebreak) {
+                        Text(
+                            text = "TIEBREAK",
+                            color = GoldColor,
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+                }
             }
 
-            Button(
-                onClick = onReset,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF333333),
-                    contentColor = AccentColor,
-                ),
-            ) {
-                Text("NEW MATCH", fontSize = 14.sp)
+            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                Button(
+                    onClick = onCycleSetsToWin,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF1A1A1A),
+                        contentColor = TextWhite,
+                    ),
+                ) {
+                    Text(
+                        text = if (setsToWin == 0) "SETS: \u221E" else "SETS: $setsToWin",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
+
+                Button(
+                    onClick = onReset,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF1A1A1A),
+                        contentColor = TextWhite,
+                    ),
+                ) {
+                    Text("NEW MATCH", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                }
             }
         }
 
         // Match over overlay
         if (state.isMatchOver) {
+            val winnerColor = if (state.winner == 1) Team1Accent else Team2Accent
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .background(Color(0xCC000000))
+                    .background(Color(0xDD000000))
                     .clickable { /* absorb taps */ },
                 contentAlignment = Alignment.Center,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
                     Text(
                         text = "MATCH OVER",
-                        color = Color.White,
-                        fontSize = 48.sp,
+                        color = TextWhite,
+                        fontSize = 52.sp,
                         fontWeight = FontWeight.Bold,
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "Team ${state.winner} wins!",
-                        color = Color(0xFFFFD700),
-                        fontSize = 32.sp,
+                        color = winnerColor,
+                        fontSize = 36.sp,
+                        fontWeight = FontWeight.Bold,
                     )
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(40.dp))
                     Button(
                         onClick = onReset,
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFFFFD700),
-                            contentColor = Color.Black,
+                            containerColor = winnerColor,
+                            contentColor = Color.White,
                         ),
                     ) {
-                        Text("NEW MATCH", fontSize = 20.sp)
+                        Text("NEW MATCH", fontSize = 20.sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -214,11 +307,10 @@ fun ScoreBoard(
 @Composable
 fun TeamPanel(
     teamLabel: String,
-    sets: Int,
-    games: List<Int>,
-    opponentGames: List<Int>,
     pointDisplay: String,
     backgroundColor: Color,
+    accentColor: Color,
+    pointColor: Color,
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
@@ -235,53 +327,21 @@ fun TeamPanel(
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(16.dp),
         ) {
             // Team name
             Text(
                 text = teamLabel,
-                color = DimColor,
-                fontSize = 22.sp,
-                fontWeight = FontWeight.Medium,
+                color = accentColor,
+                fontSize = 36.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 3.sp,
             )
-
-            Spacer(modifier = Modifier.height(8.dp))
-
-            // Sets won
-            Text(
-                text = "SETS: $sets",
-                color = AccentColor,
-                fontSize = 20.sp,
-            )
-
-            Spacer(modifier = Modifier.height(4.dp))
-
-            // Games per set (e.g., "6  4  2")
-            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                games.forEachIndexed { index, g ->
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text(
-                            text = g.toString(),
-                            color = AccentColor,
-                            fontSize = 24.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
-                        Text(
-                            text = opponentGames[index].toString(),
-                            color = DimColor,
-                            fontSize = 16.sp,
-                        )
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(16.dp))
 
             // Current game score — THE BIG NUMBER
             Text(
                 text = pointDisplay,
-                color = Color.White,
-                fontSize = 120.sp,
+                color = pointColor,
+                fontSize = 480.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
             )

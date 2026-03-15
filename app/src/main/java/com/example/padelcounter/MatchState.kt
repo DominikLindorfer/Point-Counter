@@ -25,23 +25,23 @@ data class MatchState(
 /** Pure scoring logic — no Android dependencies, easy to test. */
 object PadelScoring {
 
-    fun scorePoint(state: MatchState, team: Int): MatchState {
+    fun scorePoint(state: MatchState, team: Int, goldenPoint: Boolean, setsToWin: Int): MatchState {
         if (state.isMatchOver) return state
 
         val t1 = if (team == 1) state.team1Points + 1 else state.team1Points
         val t2 = if (team == 2) state.team2Points + 1 else state.team2Points
 
-        val gameWinner = checkGameWinner(t1, t2, state.isTiebreak)
+        val gameWinner = checkGameWinner(t1, t2, state.isTiebreak, goldenPoint)
 
         return if (gameWinner == 0) {
             state.copy(team1Points = t1, team2Points = t2)
         } else {
-            scoreGame(state, gameWinner)
+            scoreGame(state, gameWinner, setsToWin)
         }
     }
 
     /** Display the current point score as padel-style strings. */
-    fun displayPoints(state: MatchState): Pair<String, String> {
+    fun displayPoints(state: MatchState, goldenPoint: Boolean): Pair<String, String> {
         if (state.isTiebreak) {
             return Pair(state.team1Points.toString(), state.team2Points.toString())
         }
@@ -59,19 +59,35 @@ object PadelScoring {
         }
 
         // Deuce territory (both reached 40 at some point)
+        if (goldenPoint) {
+            // Golden point: at 40-40, just show 40-40 (next point wins)
+            return Pair("40", "40")
+        }
         if (t1 == t2) return Pair("40", "40") // Deuce
         if (t1 > t2) return Pair("AD", "-")   // Advantage team 1
         return Pair("-", "AD")                  // Advantage team 2
     }
 
-    private fun checkGameWinner(t1: Int, t2: Int, isTiebreak: Boolean): Int {
-        val minPoints = if (isTiebreak) 7 else 4
-        if (t1 >= minPoints && t1 - t2 >= 2) return 1
-        if (t2 >= minPoints && t2 - t1 >= 2) return 2
+    private fun checkGameWinner(t1: Int, t2: Int, isTiebreak: Boolean, goldenPoint: Boolean): Int {
+        if (isTiebreak) {
+            // Tiebreak: always need 7+ with 2-point lead
+            if (t1 >= 7 && t1 - t2 >= 2) return 1
+            if (t2 >= 7 && t2 - t1 >= 2) return 2
+            return 0
+        }
+        if (goldenPoint) {
+            // Golden point: first to 4 wins, no deuce/advantage
+            if (t1 >= 4) return 1
+            if (t2 >= 4) return 2
+            return 0
+        }
+        // Standard advantage scoring: need 4+ with 2-point lead
+        if (t1 >= 4 && t1 - t2 >= 2) return 1
+        if (t2 >= 4 && t2 - t1 >= 2) return 2
         return 0
     }
 
-    private fun scoreGame(state: MatchState, winner: Int): MatchState {
+    private fun scoreGame(state: MatchState, winner: Int, setsToWin: Int): MatchState {
         val set = state.currentSet
         val t1Games = state.team1Games.toMutableList()
         val t2Games = state.team2Games.toMutableList()
@@ -95,6 +111,7 @@ object PadelScoring {
                     team1Games = t1Games, team2Games = t2Games,
                 ),
                 setWinner,
+                setsToWin,
             )
         }
     }
@@ -108,16 +125,16 @@ object PadelScoring {
         return 0
     }
 
-    private fun scoreSet(state: MatchState, winner: Int): MatchState {
+    private fun scoreSet(state: MatchState, winner: Int, setsToWin: Int): MatchState {
         val t1Sets = if (winner == 1) state.team1Sets + 1 else state.team1Sets
         val t2Sets = if (winner == 2) state.team2Sets + 1 else state.team2Sets
 
-        // Best of 3: first to 2 sets wins
-        if (t1Sets == 2 || t2Sets == 2) {
+        // Check if match is won (0 = infinite, no match end)
+        if (setsToWin > 0 && (t1Sets >= setsToWin || t2Sets >= setsToWin)) {
             return state.copy(
                 team1Sets = t1Sets, team2Sets = t2Sets,
                 isMatchOver = true,
-                winner = if (t1Sets == 2) 1 else 2,
+                winner = if (t1Sets >= setsToWin) 1 else 2,
                 isTiebreak = false,
             )
         }
@@ -139,12 +156,33 @@ class MatchViewModel : ViewModel() {
     var state by mutableStateOf(MatchState())
         private set
 
+    var goldenPoint by mutableStateOf(false)
+        private set
+
+    // 0 = infinite (no match end), 1 = first to 1 set, 2 = first to 2, 3 = first to 3
+    var setsToWin by mutableStateOf(0)
+        private set
+
     private val history = mutableListOf<MatchState>()
 
     fun scorePoint(team: Int) {
         if (state.isMatchOver) return
         history.add(state)
-        state = PadelScoring.scorePoint(state, team)
+        state = PadelScoring.scorePoint(state, team, goldenPoint, setsToWin)
+    }
+
+    fun toggleGoldenPoint() {
+        goldenPoint = !goldenPoint
+    }
+
+    /** Cycle through: infinite → 1 → 2 → 3 → infinite */
+    fun cycleSetsToWin() {
+        setsToWin = when (setsToWin) {
+            0 -> 1
+            1 -> 2
+            2 -> 3
+            else -> 0
+        }
     }
 
     fun undo() {
