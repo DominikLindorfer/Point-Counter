@@ -10,7 +10,10 @@
       "Bash(reg query:*)",
       "Bash(where java:*)",
       "Read(//c/Program Files \\(x86\\)/Android/**)",
-      "Read(//c/Users/Dominik/AppData/Local/**)"
+      "Read(//c/Users/Dominik/AppData/Local/**)",
+      "Bash(for dir:*)",
+      "Bash(do rmdir:*)",
+      "Bash(done)"
     ]
   }
 }
