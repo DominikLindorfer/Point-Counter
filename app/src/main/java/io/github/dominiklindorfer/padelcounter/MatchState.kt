@@ -1,6 +1,7 @@
 package io.github.dominiklindorfer.padelcounter
 
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
@@ -151,57 +152,163 @@ object PadelScoring {
     }
 }
 
+/** Preset color options for team customization. */
+data class TeamColor(val name: String, val bg: Long, val accent: Long)
+
+val teamColorPresets = listOf(
+    TeamColor("Blue", 0xFF091426, 0xFF5BA8FF),
+    TeamColor("Red", 0xFF2A1215, 0xFFFF7A7A),
+    TeamColor("Green", 0xFF0A2614, 0xFF5BFF8A),
+    TeamColor("Purple", 0xFF1A0A26, 0xFFBB7AFF),
+    TeamColor("Orange", 0xFF261A0A, 0xFFFFAA5B),
+    TeamColor("Cyan", 0xFF0A2626, 0xFF5BFFEE),
+    TeamColor("Pink", 0xFF260A1A, 0xFFFF7ABB),
+    TeamColor("Yellow", 0xFF26260A, 0xFFFFEE5B),
+)
+
 /** ViewModel that holds the match state and an undo history stack. */
-class MatchViewModel : ViewModel() {
+class MatchViewModel(private val storage: MatchStorage? = null) : ViewModel() {
     var state by mutableStateOf(MatchState())
         private set
 
     var goldenPoint by mutableStateOf(false)
         private set
 
-    // When true, Team 1 is on the right and Team 2 on the left
     var sidesSwapped by mutableStateOf(false)
         private set
 
-    // 0 = infinite (no match end), 1 = first to 1 set, 2 = first to 2, 3 = first to 3
     var setsToWin by mutableStateOf(0)
         private set
 
+    var team1Name by mutableStateOf("TEAM 1")
+        private set
+    var team2Name by mutableStateOf("TEAM 2")
+        private set
+
+    var team1ColorIndex by mutableStateOf(0)
+        private set
+    var team2ColorIndex by mutableStateOf(1)
+        private set
+
+    var servingTeam by mutableStateOf(1)
+        private set
+
+    var matchStartTimeMs by mutableStateOf(0L)
+        private set
+    var matchRunning by mutableStateOf(false)
+        private set
+
+    var team1PointsWon by mutableIntStateOf(0)
+        private set
+    var team2PointsWon by mutableIntStateOf(0)
+        private set
+
+    // Match history — loaded from SharedPreferences
+    var matchHistory by mutableStateOf(storage?.loadAll() ?: emptyList())
+        private set
+
     private val history = mutableListOf<MatchState>()
+    private val servingHistory = mutableListOf<Int>()
+    private val pointsHistory = mutableListOf<Pair<Int, Int>>()
 
     fun scorePoint(team: Int) {
         if (state.isMatchOver) return
+        if (!matchRunning) {
+            matchStartTimeMs = System.currentTimeMillis()
+            matchRunning = true
+        }
         history.add(state)
+        servingHistory.add(servingTeam)
+        pointsHistory.add(Pair(team1PointsWon, team2PointsWon))
+
+        if (team == 1) team1PointsWon++ else team2PointsWon++
+
+        val oldGames = state.team1Games[state.currentSet] + state.team2Games[state.currentSet]
         state = PadelScoring.scorePoint(state, team, goldenPoint, setsToWin)
-    }
-
-    fun toggleGoldenPoint() {
-        goldenPoint = !goldenPoint
-    }
-
-    fun swapSides() {
-        sidesSwapped = !sidesSwapped
-    }
-
-    /** Cycle through: infinite → 1 → 2 → 3 → infinite */
-    fun cycleSetsToWin() {
-        setsToWin = when (setsToWin) {
-            0 -> 1
-            1 -> 2
-            2 -> 3
-            else -> 0
+        val newGames = if (!state.isMatchOver) {
+            state.team1Games[state.currentSet] + state.team2Games[state.currentSet]
+        } else {
+            oldGames + 1
+        }
+        if (newGames != oldGames) {
+            servingTeam = if (servingTeam == 1) 2 else 1
+        }
+        if (state.isMatchOver) {
+            matchRunning = false
+            saveMatch()
         }
     }
+
+    fun toggleGoldenPoint() { goldenPoint = !goldenPoint }
+    fun swapSides() { sidesSwapped = !sidesSwapped }
+
+    fun cycleSetsToWin() {
+        setsToWin = when (setsToWin) {
+            0 -> 1; 1 -> 2; 2 -> 3; else -> 0
+        }
+    }
+
+    fun updateTeam1Name(name: String) { team1Name = name }
+    fun updateTeam2Name(name: String) { team2Name = name }
+    fun updateTeam1Color(index: Int) { team1ColorIndex = index }
+    fun updateTeam2Color(index: Int) { team2ColorIndex = index }
+    fun updateServingTeam(team: Int) { servingTeam = team }
 
     fun undo() {
         if (history.isNotEmpty()) {
             state = history.removeLast()
+            if (servingHistory.isNotEmpty()) servingTeam = servingHistory.removeLast()
+            if (pointsHistory.isNotEmpty()) {
+                val (t1, t2) = pointsHistory.removeLast()
+                team1PointsWon = t1
+                team2PointsWon = t2
+            }
         }
     }
 
     fun resetMatch() {
         history.clear()
+        servingHistory.clear()
+        pointsHistory.clear()
         state = MatchState()
+        servingTeam = 1
+        matchStartTimeMs = 0L
+        matchRunning = false
+        team1PointsWon = 0
+        team2PointsWon = 0
+    }
+
+    private fun saveMatch() {
+        val s = storage ?: return
+        val duration = if (matchStartTimeMs > 0) System.currentTimeMillis() - matchStartTimeMs else 0L
+        s.save(
+            SavedMatch(
+                id = 0,
+                timestamp = System.currentTimeMillis(),
+                team1Name = team1Name,
+                team2Name = team2Name,
+                team1Sets = state.team1Sets,
+                team2Sets = state.team2Sets,
+                team1Games = state.team1Games,
+                team2Games = state.team2Games,
+                winner = state.winner,
+                durationMs = duration,
+                goldenPoint = goldenPoint,
+                team1PointsWon = team1PointsWon,
+                team2PointsWon = team2PointsWon,
+            )
+        )
+        matchHistory = s.loadAll()
+    }
+
+    fun deleteMatch(id: Long) {
+        storage?.delete(id)
+        matchHistory = storage?.loadAll() ?: emptyList()
+    }
+
+    fun deleteAllHistory() {
+        storage?.deleteAll()
+        matchHistory = emptyList()
     }
 
     val canUndo: Boolean get() = history.isNotEmpty()
