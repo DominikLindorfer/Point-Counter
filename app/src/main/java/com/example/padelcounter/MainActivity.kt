@@ -88,7 +88,6 @@ class MainActivity : ComponentActivity() {
                 canUndo = viewModel.canUndo,
                 goldenPoint = viewModel.goldenPoint,
                 setsToWin = viewModel.setsToWin,
-                lastKeyCode = viewModel.lastKeyCode,
                 onScore = { team -> viewModel.scorePoint(team) },
                 onUndo = { viewModel.undo() },
                 onReset = { viewModel.resetMatch() },
@@ -104,9 +103,6 @@ class MainActivity : ComponentActivity() {
      * Change these mappings to match your specific button!
      */
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-        // Show last key code for debugging — helps identify your Bluetooth button
-        viewModel.updateLastKeyCode(keyCode)
-
         return when (keyCode) {
             // Team 1 (blue): volume up, media next, or media play/pause
             KeyEvent.KEYCODE_VOLUME_UP,
@@ -147,7 +143,6 @@ fun ScoreBoard(
     canUndo: Boolean,
     goldenPoint: Boolean,
     setsToWin: Int,
-    lastKeyCode: Int,
     onScore: (Int) -> Unit,
     onUndo: () -> Unit,
     onReset: () -> Unit,
@@ -434,18 +429,6 @@ fun ScoreBoard(
                     }
                 }
             }
-        }
-
-        // Debug: shows last key code from Bluetooth button (bottom center)
-        if (lastKeyCode >= 0) {
-            Text(
-                text = "Key: $lastKeyCode",
-                color = DimColor,
-                fontSize = 14.sp,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = 4.dp),
-            )
         }
 
         // Match over overlay with animation

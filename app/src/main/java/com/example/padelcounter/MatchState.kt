@@ -163,14 +163,6 @@ class MatchViewModel : ViewModel() {
     var setsToWin by mutableStateOf(0)
         private set
 
-    // Debug: shows last received key code so you can identify your Bluetooth button
-    var lastKeyCode by mutableStateOf(-1)
-        private set
-
-    fun updateLastKeyCode(code: Int) {
-        lastKeyCode = code
-    }
-
     private val history = mutableListOf<MatchState>()
 
     fun scorePoint(team: Int) {
