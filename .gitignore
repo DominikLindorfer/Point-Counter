@@ -13,6 +13,8 @@
 .externalNativeBuild
 .cxx
 local.properties
+.claude
+.idea
 *.apk
 *.aab
 *.jks
