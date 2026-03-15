@@ -159,6 +159,10 @@ class MatchViewModel : ViewModel() {
     var goldenPoint by mutableStateOf(false)
         private set
 
+    // When true, Team 1 is on the right and Team 2 on the left
+    var sidesSwapped by mutableStateOf(false)
+        private set
+
     // 0 = infinite (no match end), 1 = first to 1 set, 2 = first to 2, 3 = first to 3
     var setsToWin by mutableStateOf(0)
         private set
@@ -173,6 +177,10 @@ class MatchViewModel : ViewModel() {
 
     fun toggleGoldenPoint() {
         goldenPoint = !goldenPoint
+    }
+
+    fun swapSides() {
+        sidesSwapped = !sidesSwapped
     }
 
     /** Cycle through: infinite → 1 → 2 → 3 → infinite */

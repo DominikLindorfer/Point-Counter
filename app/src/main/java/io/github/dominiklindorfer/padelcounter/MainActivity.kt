@@ -35,14 +35,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowLeft
+import androidx.compose.material.icons.automirrored.filled.ArrowRight
 import androidx.compose.material.icons.automirrored.filled.Undo
-import androidx.compose.material.icons.filled.ArrowLeft
-import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Repeat
 import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -91,11 +92,13 @@ class MainActivity : ComponentActivity() {
                 canUndo = viewModel.canUndo,
                 goldenPoint = viewModel.goldenPoint,
                 setsToWin = viewModel.setsToWin,
+                sidesSwapped = viewModel.sidesSwapped,
                 onScore = { team -> viewModel.scorePoint(team) },
                 onUndo = { viewModel.undo() },
                 onReset = { viewModel.resetMatch() },
                 onToggleGoldenPoint = { viewModel.toggleGoldenPoint() },
                 onCycleSetsToWin = { viewModel.cycleSetsToWin() },
+                onSwapSides = { viewModel.swapSides() },
             )
         }
     }
@@ -146,13 +149,27 @@ fun ScoreBoard(
     canUndo: Boolean,
     goldenPoint: Boolean,
     setsToWin: Int,
+    sidesSwapped: Boolean,
     onScore: (Int) -> Unit,
     onUndo: () -> Unit,
     onReset: () -> Unit,
     onToggleGoldenPoint: () -> Unit,
     onCycleSetsToWin: () -> Unit,
+    onSwapSides: () -> Unit,
 ) {
     val (display1, display2) = PadelScoring.displayPoints(state, goldenPoint)
+
+    // Determine which team shows on which side
+    val leftLabel = if (sidesSwapped) "TEAM 2" else "TEAM 1"
+    val rightLabel = if (sidesSwapped) "TEAM 1" else "TEAM 2"
+    val leftDisplay = if (sidesSwapped) display2 else display1
+    val rightDisplay = if (sidesSwapped) display1 else display2
+    val leftBg = if (sidesSwapped) Team2Bg else Team1Bg
+    val rightBg = if (sidesSwapped) Team1Bg else Team2Bg
+    val leftAccent = if (sidesSwapped) Team2Accent else Team1Accent
+    val rightAccent = if (sidesSwapped) Team1Accent else Team2Accent
+    val leftTeam = if (sidesSwapped) 2 else 1
+    val rightTeam = if (sidesSwapped) 1 else 2
 
     Box(
         modifier = Modifier
@@ -161,15 +178,14 @@ fun ScoreBoard(
     ) {
         // Main content: two halves
         Row(modifier = Modifier.fillMaxSize()) {
-            // Team 1 - left half (Blue)
             TeamPanel(
-                teamLabel = "TEAM 1",
-                pointDisplay = display1,
-                backgroundColor = Team1Bg,
-                accentColor = Team1Accent,
+                teamLabel = leftLabel,
+                pointDisplay = leftDisplay,
+                backgroundColor = leftBg,
+                accentColor = leftAccent,
                 pointColor = Team1Point,
                 modifier = Modifier.weight(1f),
-                onClick = { onScore(1) },
+                onClick = { onScore(leftTeam) },
             )
 
             // Vertical divider
@@ -180,15 +196,14 @@ fun ScoreBoard(
                     .background(Color(0xFF222222)),
             )
 
-            // Team 2 - right half (Red)
             TeamPanel(
-                teamLabel = "TEAM 2",
-                pointDisplay = display2,
-                backgroundColor = Team2Bg,
-                accentColor = Team2Accent,
+                teamLabel = rightLabel,
+                pointDisplay = rightDisplay,
+                backgroundColor = rightBg,
+                accentColor = rightAccent,
                 pointColor = Team2Point,
                 modifier = Modifier.weight(1f),
-                onClick = { onScore(2) },
+                onClick = { onScore(rightTeam) },
             )
         }
 
@@ -247,6 +262,22 @@ fun ScoreBoard(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             Button(
+                onClick = onSwapSides,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = ButtonBg,
+                    contentColor = TextWhite,
+                ),
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.SwapHoriz,
+                    contentDescription = "Swap sides",
+                    modifier = Modifier.size(20.dp),
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text("SWAP", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            }
+
+            Button(
                 onClick = onCycleSetsToWin,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = ButtonBg,
@@ -299,9 +330,11 @@ fun ScoreBoard(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(2.dp),
             ) {
-                state.team1Games.forEachIndexed { index, g ->
+                val leftGames = if (sidesSwapped) state.team2Games else state.team1Games
+                val rightGames = if (sidesSwapped) state.team1Games else state.team2Games
+
+                leftGames.forEachIndexed { index, g ->
                     val isCurrentSet = index == state.currentSet && !state.isMatchOver
-                    // Animate new set rows appearing
                     AnimatedVisibility(
                         visible = true,
                         enter = fadeIn(tween(300)) + slideInVertically(tween(300)),
@@ -317,18 +350,17 @@ fun ScoreBoard(
                                 fontWeight = FontWeight.Medium,
                             )
                             Spacer(modifier = Modifier.width(4.dp))
-                            // Animate game score changes
                             AnimatedContent(
                                 targetState = g,
                                 transitionSpec = {
                                     (slideInVertically { -it } + fadeIn()) togetherWith
                                             (slideOutVertically { it } + fadeOut())
                                 },
-                                label = "team1games$index",
+                                label = "leftGames$index",
                             ) { games ->
                                 Text(
                                     text = games.toString(),
-                                    color = Team1Accent,
+                                    color = leftAccent,
                                     fontSize = 40.sp,
                                     fontWeight = FontWeight.Bold,
                                 )
@@ -340,16 +372,16 @@ fun ScoreBoard(
                                 fontWeight = FontWeight.Bold,
                             )
                             AnimatedContent(
-                                targetState = state.team2Games[index],
+                                targetState = rightGames[index],
                                 transitionSpec = {
                                     (slideInVertically { -it } + fadeIn()) togetherWith
                                             (slideOutVertically { it } + fadeOut())
                                 },
-                                label = "team2games$index",
+                                label = "rightGames$index",
                             ) { games ->
                                 Text(
                                     text = games.toString(),
-                                    color = Team2Accent,
+                                    color = rightAccent,
                                     fontSize = 40.sp,
                                     fontWeight = FontWeight.Bold,
                                 )
@@ -403,7 +435,7 @@ fun ScoreBoard(
                     ) {
                         if (!isRight) {
                             Icon(
-                                imageVector = Icons.Filled.ArrowLeft,
+                                imageVector = Icons.AutoMirrored.Filled.ArrowLeft,
                                 contentDescription = "Serve left",
                                 tint = GoldColor,
                                 modifier = Modifier.size(48.dp),
@@ -423,7 +455,7 @@ fun ScoreBoard(
                         )
                         if (isRight) {
                             Icon(
-                                imageVector = Icons.Filled.ArrowRight,
+                                imageVector = Icons.AutoMirrored.Filled.ArrowRight,
                                 contentDescription = "Serve right",
                                 tint = GoldColor,
                                 modifier = Modifier.size(48.dp),
