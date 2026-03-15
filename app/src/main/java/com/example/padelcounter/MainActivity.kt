@@ -6,6 +6,19 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -16,7 +29,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -34,10 +46,16 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -93,10 +111,10 @@ class MainActivity : ComponentActivity() {
 
 // -- Colors --
 private val DarkBg = Color(0xFF0D0D0D)
-private val Team1Bg = Color(0xFF091426)       // deep navy blue
-private val Team2Bg = Color(0xFF2A1215)       // lighter warm dark red
-private val Team1Accent = Color(0xFF5BA8FF)   // vivid blue
-private val Team2Accent = Color(0xFFFF7A7A)   // lighter, warmer red
+private val Team1Bg = Color(0xFF091426)
+private val Team2Bg = Color(0xFF2A1215)
+private val Team1Accent = Color(0xFF5BA8FF)
+private val Team2Accent = Color(0xFFFF7A7A)
 private val Team1Point = Color(0xFFFFFFFF)
 private val Team2Point = Color(0xFFFFFFFF)
 private val TextWhite = Color(0xFFFFFFFF)
@@ -266,38 +284,67 @@ fun ScoreBoard(
             ) {
                 state.team1Games.forEachIndexed { index, g ->
                     val isCurrentSet = index == state.currentSet && !state.isMatchOver
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    // Animate new set rows appearing
+                    AnimatedVisibility(
+                        visible = true,
+                        enter = fadeIn(tween(300)) + slideInVertically(tween(300)),
                     ) {
-                        Text(
-                            text = "S${index + 1}",
-                            color = if (isCurrentSet) TextWhite else DimColor,
-                            fontSize = 28.sp,
-                            fontWeight = FontWeight.Medium,
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text(
-                            text = g.toString(),
-                            color = Team1Accent,
-                            fontSize = 40.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
-                        Text(
-                            text = ":",
-                            color = if (isCurrentSet) TextWhite else DimColor,
-                            fontSize = 40.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
-                        Text(
-                            text = state.team2Games[index].toString(),
-                            color = Team2Accent,
-                            fontSize = 40.sp,
-                            fontWeight = FontWeight.Bold,
-                        )
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(6.dp),
+                        ) {
+                            Text(
+                                text = "S${index + 1}",
+                                color = if (isCurrentSet) TextWhite else DimColor,
+                                fontSize = 28.sp,
+                                fontWeight = FontWeight.Medium,
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            // Animate game score changes
+                            AnimatedContent(
+                                targetState = g,
+                                transitionSpec = {
+                                    (slideInVertically { -it } + fadeIn()) togetherWith
+                                            (slideOutVertically { it } + fadeOut())
+                                },
+                                label = "team1games$index",
+                            ) { games ->
+                                Text(
+                                    text = games.toString(),
+                                    color = Team1Accent,
+                                    fontSize = 40.sp,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            }
+                            Text(
+                                text = ":",
+                                color = if (isCurrentSet) TextWhite else DimColor,
+                                fontSize = 40.sp,
+                                fontWeight = FontWeight.Bold,
+                            )
+                            AnimatedContent(
+                                targetState = state.team2Games[index],
+                                transitionSpec = {
+                                    (slideInVertically { -it } + fadeIn()) togetherWith
+                                            (slideOutVertically { it } + fadeOut())
+                                },
+                                label = "team2games$index",
+                            ) { games ->
+                                Text(
+                                    text = games.toString(),
+                                    color = Team2Accent,
+                                    fontSize = 40.sp,
+                                    fontWeight = FontWeight.Bold,
+                                )
+                            }
+                        }
                     }
                 }
-                if (state.isTiebreak) {
+                AnimatedVisibility(
+                    visible = state.isTiebreak,
+                    enter = fadeIn(tween(300)) + scaleIn(tween(300)),
+                    exit = fadeOut(tween(200)) + scaleOut(tween(200)),
+                ) {
                     Text(
                         text = "TIEBREAK",
                         color = GoldColor,
@@ -308,8 +355,13 @@ fun ScoreBoard(
             }
         }
 
-        // Match over overlay
-        if (state.isMatchOver) {
+        // Match over overlay with animation
+        AnimatedVisibility(
+            visible = state.isMatchOver,
+            enter = fadeIn(tween(500)),
+            exit = fadeOut(tween(300)),
+            modifier = Modifier.fillMaxSize(),
+        ) {
             val winnerColor = if (state.winner == 1) Team1Accent else Team2Accent
             Box(
                 modifier = Modifier
@@ -319,11 +371,24 @@ fun ScoreBoard(
                 contentAlignment = Alignment.Center,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    // Trophy with bounce animation
+                    val trophyScale = remember { Animatable(0f) }
+                    LaunchedEffect(Unit) {
+                        trophyScale.animateTo(
+                            targetValue = 1f,
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow,
+                            ),
+                        )
+                    }
                     Icon(
                         imageVector = Icons.Filled.EmojiEvents,
                         contentDescription = "Trophy",
                         tint = GoldColor,
-                        modifier = Modifier.size(80.dp),
+                        modifier = Modifier
+                            .size(80.dp)
+                            .scale(trophyScale.value),
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                     Text(
@@ -371,6 +436,23 @@ fun TeamPanel(
     modifier: Modifier = Modifier,
     onClick: () -> Unit,
 ) {
+    // Pulse animation on score change
+    val scale = remember { Animatable(1f) }
+    var scoreVersion by remember { mutableIntStateOf(0) }
+    LaunchedEffect(pointDisplay) {
+        scoreVersion++
+        if (scoreVersion > 1) { // skip the initial composition
+            scale.snapTo(1.08f)
+            scale.animateTo(
+                targetValue = 1f,
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessMedium,
+                ),
+            )
+        }
+    }
+
     Box(
         modifier = modifier
             .fillMaxHeight()
@@ -385,13 +467,26 @@ fun TeamPanel(
             modifier = Modifier.fillMaxSize(),
             contentAlignment = Alignment.Center,
         ) {
-            Text(
-                text = pointDisplay,
-                color = pointColor,
-                fontSize = 480.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center,
-            )
+            AnimatedContent(
+                targetState = pointDisplay,
+                transitionSpec = {
+                    (slideInVertically { -it / 3 } + fadeIn(tween(200))) togetherWith
+                            (slideOutVertically { it / 3 } + fadeOut(tween(150)))
+                },
+                label = "pointScore",
+            ) { display ->
+                Text(
+                    text = display,
+                    color = pointColor,
+                    fontSize = 480.sp,
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.graphicsLayer {
+                        scaleX = scale.value
+                        scaleY = scale.value
+                    },
+                )
+            }
         }
 
         // Team name at the bottom with tennis icon
