@@ -36,6 +36,8 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Undo
+import androidx.compose.material.icons.filled.ArrowLeft
+import androidx.compose.material.icons.filled.ArrowRight
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Refresh
@@ -86,6 +88,7 @@ class MainActivity : ComponentActivity() {
                 canUndo = viewModel.canUndo,
                 goldenPoint = viewModel.goldenPoint,
                 setsToWin = viewModel.setsToWin,
+                lastKeyCode = viewModel.lastKeyCode,
                 onScore = { team -> viewModel.scorePoint(team) },
                 onUndo = { viewModel.undo() },
                 onReset = { viewModel.resetMatch() },
@@ -101,9 +104,24 @@ class MainActivity : ComponentActivity() {
      * Change these mappings to match your specific button!
      */
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
+        // Show last key code for debugging — helps identify your Bluetooth button
+        viewModel.updateLastKeyCode(keyCode)
+
         return when (keyCode) {
-            KeyEvent.KEYCODE_VOLUME_UP -> { viewModel.scorePoint(1); true }
-            KeyEvent.KEYCODE_VOLUME_DOWN -> { viewModel.scorePoint(2); true }
+            // Team 1 (blue): volume up, media next, or media play/pause
+            KeyEvent.KEYCODE_VOLUME_UP,
+            KeyEvent.KEYCODE_MEDIA_NEXT -> {
+                viewModel.scorePoint(1); true
+            }
+            // Team 2 (red): volume down or media previous
+            KeyEvent.KEYCODE_VOLUME_DOWN,
+            KeyEvent.KEYCODE_MEDIA_PREVIOUS -> {
+                viewModel.scorePoint(2); true
+            }
+            // Undo: media play/pause (center button)
+            KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE -> {
+                viewModel.undo(); true
+            }
             else -> super.onKeyDown(keyCode, event)
         }
     }
@@ -129,6 +147,7 @@ fun ScoreBoard(
     canUndo: Boolean,
     goldenPoint: Boolean,
     setsToWin: Int,
+    lastKeyCode: Int,
     onScore: (Int) -> Unit,
     onUndo: () -> Unit,
     onReset: () -> Unit,
@@ -353,6 +372,80 @@ fun ScoreBoard(
                     )
                 }
             }
+        }
+
+        // Serve side indicator — bottom center
+        if (!state.isMatchOver) {
+            val totalPoints = state.team1Points + state.team2Points
+            val serveRight = totalPoints % 2 == 0
+
+            AnimatedContent(
+                targetState = serveRight,
+                transitionSpec = {
+                    (fadeIn(tween(200)) + scaleIn(tween(200))) togetherWith
+                            (fadeOut(tween(150)) + scaleOut(tween(150)))
+                },
+                label = "serveSide",
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 16.dp),
+            ) { isRight ->
+                Box(
+                    modifier = Modifier
+                        .background(
+                            color = ButtonBg,
+                            shape = RoundedCornerShape(16.dp),
+                        )
+                        .padding(horizontal = 24.dp, vertical = 12.dp),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    ) {
+                        if (!isRight) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowLeft,
+                                contentDescription = "Serve left",
+                                tint = GoldColor,
+                                modifier = Modifier.size(48.dp),
+                            )
+                        }
+                        Icon(
+                            imageVector = Icons.Filled.SportsTennis,
+                            contentDescription = "Serve",
+                            tint = GoldColor,
+                            modifier = Modifier.size(44.dp),
+                        )
+                        Text(
+                            text = if (isRight) "RIGHT" else "LEFT",
+                            color = GoldColor,
+                            fontSize = 36.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        if (isRight) {
+                            Icon(
+                                imageVector = Icons.Filled.ArrowRight,
+                                contentDescription = "Serve right",
+                                tint = GoldColor,
+                                modifier = Modifier.size(48.dp),
+                            )
+                        }
+                    }
+                }
+            }
+        }
+
+        // Debug: shows last key code from Bluetooth button (bottom center)
+        if (lastKeyCode >= 0) {
+            Text(
+                text = "Key: $lastKeyCode",
+                color = DimColor,
+                fontSize = 14.sp,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 4.dp),
+            )
         }
 
         // Match over overlay with animation
