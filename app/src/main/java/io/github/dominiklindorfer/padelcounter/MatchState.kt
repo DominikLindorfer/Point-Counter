@@ -1,4 +1,4 @@
-package com.example.padelcounter
+package io.github.dominiklindorfer.padelcounter
 
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf

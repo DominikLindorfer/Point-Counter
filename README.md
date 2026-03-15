@@ -57,7 +57,7 @@ If your controller sends different key codes, edit the `onKeyDown` method in `Ma
 
 1. Open the project in Android Studio
 2. Sync Gradle
-3. Run on a device or emulator (minimum SDK 24 / Android 7.0)
+3. Run on a device or emulator (minimum SDK 26 / Android 8.0)
 
 ## Tech Stack
 
@@ -69,10 +69,14 @@ If your controller sends different key codes, edit the `onKeyDown` method in `Ma
 ## Project Structure
 
 ```
-app/src/main/java/com/example/padelcounter/
+app/src/main/java/io/github/dominiklindorfer/padelcounter/
   MainActivity.kt   -- UI (ScoreBoard + TeamPanel composables, key event handling)
   MatchState.kt      -- Scoring logic (MatchState, PadelScoring, MatchViewModel)
 ```
+
+## Privacy Policy
+
+This app collects no data. See [PRIVACY_POLICY.md](PRIVACY_POLICY.md) for details.
 
 ## License
 

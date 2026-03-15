@@ -1,4 +1,4 @@
-package com.example.padelcounter
+package io.github.dominiklindorfer.padelcounter
 
 import android.os.Bundle
 import android.view.KeyEvent

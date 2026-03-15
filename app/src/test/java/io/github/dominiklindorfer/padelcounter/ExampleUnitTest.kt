@@ -1,4 +1,4 @@
-package com.example.padelcounter
+package io.github.dominiklindorfer.padelcounter
 
 import org.junit.Test
 
