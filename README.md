@@ -8,13 +8,22 @@ Supports **Bluetooth media controller buttons** so you can score points without 
 
 - Full-screen scoreboard with huge, readable score numbers
 - Proper padel scoring: points (0/15/30/40/deuce/AD), games, sets, tiebreaks
-- **Golden Point** mode (no advantage at 40-40) — toggle on/off mid-match
+- **Golden Point** mode (no advantage at 40-40) — toggle on/off
+- **Tiebreak** — automatic tiebreak scoring at 6-6
 - Configurable sets to win (infinite, 1, 2, or 3)
-- Serve side indicator (right/left) — alternates every point
+- **Serve side indicator** (right/left) — alternates every point
+- **Serving team indicator** — shows which team serves, auto-rotates each game
+- **Match timer** — elapsed time display, starts on first point
+- **Settings sidebar** — customize team names, team colors (8 presets), scoring mode, sets, and serving team
+- **Swap sides** — switch team positions on screen when teams change court sides
+- **Match history** — completed matches auto-save with scores, duration, and statistics
+- **Share/export** — share match results via WhatsApp, email, or any app
+- **Match statistics** — points won per team shown as percentages
 - Undo button for mistakes
 - Bluetooth HID button support (media controllers, camera shutters)
-- Animated score transitions
+- Animated score transitions with bounce effects
 - Immersive full-screen, landscape-locked, screen stays on
+- Match over overlay with trophy animation
 
 ## Screenshots
 
@@ -22,12 +31,34 @@ Supports **Bluetooth media controller buttons** so you can score points without 
 
 ## How to Use
 
-1. **Touch controls**: Tap the left (blue) half to score for Team 1, tap the right (red) half for Team 2
-2. **Buttons at the top**:
+1. **Touch controls**: Tap the left half to score for Team 1, tap the right half for Team 2
+2. **Top-left buttons**:
    - **UNDO** — undo the last point
-   - **ADVANTAGE / GOLDEN PT** — toggle between standard deuce/advantage scoring and golden point (next point wins at 40-40)
-   - **SETS** — cycle through infinite / 1 / 2 / 3 sets to win
+   - **SWAP** — switch team positions on screen
+3. **Top-right buttons**:
+   - **Timer** — shows elapsed match time
    - **NEW MATCH** — reset everything
+   - **Settings (gear icon)** — open the settings sidebar
+4. **Center-top**: Set scores displayed vertically (S1, S2, S3...)
+5. **Bottom-center**: Serve side indicator (LEFT/RIGHT arrow)
+6. **Bottom**: Team names with serving indicator (gold tennis racket)
+
+## Settings Sidebar
+
+Tap the gear icon (top-right) to access:
+- **Team names** — customize up to 16 characters each
+- **Team colors** — choose from 8 presets (Blue, Red, Green, Purple, Orange, Cyan, Pink, Yellow)
+- **Scoring mode** — toggle between Advantage and Golden Point
+- **Sets to win** — cycle through infinite / 1 / 2 / 3
+- **Serving team** — tap to toggle which team serves
+- **Match History** — view all completed matches
+
+## Match History
+
+When a match ends (sets to win > 0), it's automatically saved. From the history screen you can:
+- View all past matches with scores, duration, and stats
+- Share any match result via Android's share menu
+- Delete individual matches or clear all history
 
 ## Bluetooth Setup
 
@@ -43,10 +74,10 @@ The app works with cheap Bluetooth media controllers (like wrist-mounted remotes
 
 | Button | Action |
 |--------|--------|
-| Volume Up | Team 1 (blue) scores |
-| Volume Down | Team 2 (red) scores |
-| Next Track (>>) | Team 1 (blue) scores |
-| Previous Track (<<) | Team 2 (red) scores |
+| Volume Up | Team 1 scores |
+| Volume Down | Team 2 scores |
+| Next Track (>>) | Team 1 scores |
+| Previous Track (<<) | Team 2 scores |
 | Play/Pause | Undo |
 
 ### Customizing Button Mapping
@@ -64,14 +95,17 @@ If your controller sends different key codes, edit the `onKeyDown` method in `Ma
 - Kotlin
 - Jetpack Compose with Material 3
 - Single-activity architecture
-- ~500 lines of code total
+- SharedPreferences + JSON for match history (no Room/KSP needed)
 
 ## Project Structure
 
 ```
 app/src/main/java/io/github/dominiklindorfer/padelcounter/
-  MainActivity.kt   -- UI (ScoreBoard + TeamPanel composables, key event handling)
-  MatchState.kt      -- Scoring logic (MatchState, PadelScoring, MatchViewModel)
+  MainActivity.kt          -- UI (ScoreBoard, TeamPanel, SettingsSidebar, MatchTimer)
+  MatchState.kt            -- Scoring logic (MatchState, PadelScoring, MatchViewModel)
+  MatchStorage.kt          -- Match history persistence (SharedPreferences + JSON)
+  MatchHistoryScreen.kt    -- Match history UI with share/export
+  MatchViewModelFactory.kt -- ViewModel factory for dependency injection
 ```
 
 ## Privacy Policy
