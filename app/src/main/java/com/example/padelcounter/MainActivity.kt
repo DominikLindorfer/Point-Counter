@@ -19,9 +19,19 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Undo
+import androidx.compose.material.icons.filled.AutoAwesome
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.Repeat
+import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
@@ -32,7 +42,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -85,14 +94,16 @@ class MainActivity : ComponentActivity() {
 // -- Colors --
 private val DarkBg = Color(0xFF0D0D0D)
 private val Team1Bg = Color(0xFF091426)       // deep navy blue
-private val Team2Bg = Color(0xFF260808)       // deep dark red
-private val Team1Accent = Color(0xFF5BA8FF)   // vivid blue for labels
-private val Team2Accent = Color(0xFFFF5555)   // vivid red for labels
-private val Team1Point = Color(0xFFFFFFFF)    // pure white on blue — max contrast
-private val Team2Point = Color(0xFFFFFFFF)    // pure white on red — max contrast
+private val Team2Bg = Color(0xFF2A1215)       // lighter warm dark red
+private val Team1Accent = Color(0xFF5BA8FF)   // vivid blue
+private val Team2Accent = Color(0xFFFF7A7A)   // lighter, warmer red
+private val Team1Point = Color(0xFFFFFFFF)
+private val Team2Point = Color(0xFFFFFFFF)
 private val TextWhite = Color(0xFFFFFFFF)
-private val DimColor = Color(0xFF999999)      // brighter gray for opponent scores
+private val DimColor = Color(0xFF999999)
 private val GoldColor = Color(0xFFFFD700)
+private val ButtonBg = Color(0xFF1A1A1A)
+private val ButtonBgDisabled = Color(0xFF111111)
 
 @Composable
 fun ScoreBoard(
@@ -154,27 +165,40 @@ fun ScoreBoard(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically,
         ) {
+            // Left buttons
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
                     onClick = onUndo,
                     enabled = canUndo,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF1A1A1A),
+                        containerColor = ButtonBg,
                         contentColor = TextWhite,
-                        disabledContainerColor = Color(0xFF111111),
+                        disabledContainerColor = ButtonBgDisabled,
                         disabledContentColor = Color(0xFF444444),
                     ),
                 ) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Undo,
+                        contentDescription = "Undo",
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text("UNDO", fontSize = 14.sp, fontWeight = FontWeight.Bold)
                 }
 
                 Button(
                     onClick = onToggleGoldenPoint,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = if (goldenPoint) GoldColor else Color(0xFF1A1A1A),
+                        containerColor = if (goldenPoint) GoldColor else ButtonBg,
                         contentColor = if (goldenPoint) Color.Black else DimColor,
                     ),
                 ) {
+                    Icon(
+                        imageVector = Icons.Filled.AutoAwesome,
+                        contentDescription = "Golden Point",
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = if (goldenPoint) "GOLDEN PT" else "ADVANTAGE",
                         fontSize = 14.sp,
@@ -187,42 +211,35 @@ fun ScoreBoard(
             Box(
                 modifier = Modifier
                     .background(
-                        color = Color(0xFF1A1A1A),
-                        shape = RoundedCornerShape(12.dp),
+                        color = ButtonBg,
+                        shape = RoundedCornerShape(16.dp),
                     )
-                    .padding(horizontal = 24.dp, vertical = 12.dp),
+                    .padding(horizontal = 32.dp, vertical = 16.dp),
                 contentAlignment = Alignment.Center,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    // Set scores header
-                    Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                         state.team1Games.forEachIndexed { index, g ->
-                            // Blue score
                             Text(
                                 text = g.toString(),
                                 color = Team1Accent,
-                                fontSize = 36.sp,
+                                fontSize = 56.sp,
                                 fontWeight = FontWeight.Bold,
                             )
                             Text(
                                 text = "-",
                                 color = DimColor,
-                                fontSize = 36.sp,
+                                fontSize = 56.sp,
                                 fontWeight = FontWeight.Bold,
                             )
-                            // Red score
                             Text(
                                 text = state.team2Games[index].toString(),
                                 color = Team2Accent,
-                                fontSize = 36.sp,
+                                fontSize = 56.sp,
                                 fontWeight = FontWeight.Bold,
                             )
-                            // Separator between sets
                             if (index < state.team1Games.lastIndex) {
-                                Text(
-                                    text = "  ",
-                                    fontSize = 36.sp,
-                                )
+                                Text(text = "  ", fontSize = 56.sp)
                             }
                         }
                     }
@@ -230,21 +247,28 @@ fun ScoreBoard(
                         Text(
                             text = "TIEBREAK",
                             color = GoldColor,
-                            fontSize = 18.sp,
+                            fontSize = 22.sp,
                             fontWeight = FontWeight.Bold,
                         )
                     }
                 }
             }
 
+            // Right buttons
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 Button(
                     onClick = onCycleSetsToWin,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF1A1A1A),
+                        containerColor = ButtonBg,
                         contentColor = TextWhite,
                     ),
                 ) {
+                    Icon(
+                        imageVector = Icons.Filled.Repeat,
+                        contentDescription = "Sets to win",
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text(
                         text = if (setsToWin == 0) "SETS: \u221E" else "SETS: $setsToWin",
                         fontSize = 14.sp,
@@ -255,10 +279,16 @@ fun ScoreBoard(
                 Button(
                     onClick = onReset,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF1A1A1A),
+                        containerColor = ButtonBg,
                         contentColor = TextWhite,
                     ),
                 ) {
+                    Icon(
+                        imageVector = Icons.Filled.Refresh,
+                        contentDescription = "New Match",
+                        modifier = Modifier.size(20.dp),
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
                     Text("NEW MATCH", fontSize = 14.sp, fontWeight = FontWeight.Bold)
                 }
             }
@@ -275,13 +305,20 @@ fun ScoreBoard(
                 contentAlignment = Alignment.Center,
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Icon(
+                        imageVector = Icons.Filled.EmojiEvents,
+                        contentDescription = "Trophy",
+                        tint = GoldColor,
+                        modifier = Modifier.size(80.dp),
+                    )
+                    Spacer(modifier = Modifier.height(16.dp))
                     Text(
                         text = "MATCH OVER",
                         color = TextWhite,
                         fontSize = 52.sp,
                         fontWeight = FontWeight.Bold,
                     )
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
                     Text(
                         text = "Team ${state.winner} wins!",
                         color = winnerColor,
@@ -296,6 +333,12 @@ fun ScoreBoard(
                             contentColor = Color.White,
                         ),
                     ) {
+                        Icon(
+                            imageVector = Icons.Filled.Refresh,
+                            contentDescription = "New Match",
+                            modifier = Modifier.size(24.dp),
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
                         Text("NEW MATCH", fontSize = 20.sp, fontWeight = FontWeight.Bold)
                     }
                 }
@@ -320,30 +363,43 @@ fun TeamPanel(
             .background(backgroundColor)
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
-                indication = null, // no ripple — cleaner for a scoreboard
+                indication = null,
             ) { onClick() },
-        contentAlignment = Alignment.Center,
     ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center,
+        // Current game score — THE BIG NUMBER, centered
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center,
         ) {
-            // Team name
-            Text(
-                text = teamLabel,
-                color = accentColor,
-                fontSize = 36.sp,
-                fontWeight = FontWeight.Bold,
-                letterSpacing = 3.sp,
-            )
-
-            // Current game score — THE BIG NUMBER
             Text(
                 text = pointDisplay,
                 color = pointColor,
                 fontSize = 480.sp,
                 fontWeight = FontWeight.Bold,
                 textAlign = TextAlign.Center,
+            )
+        }
+
+        // Team name at the bottom with tennis icon
+        Row(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 24.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Icon(
+                imageVector = Icons.Filled.SportsTennis,
+                contentDescription = null,
+                tint = accentColor,
+                modifier = Modifier.size(28.dp),
+            )
+            Text(
+                text = teamLabel,
+                color = accentColor,
+                fontSize = 36.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 3.sp,
             )
         }
     }
