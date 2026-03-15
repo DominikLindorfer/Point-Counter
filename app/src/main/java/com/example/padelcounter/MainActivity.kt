@@ -157,139 +157,153 @@ fun ScoreBoard(
             )
         }
 
-        // Top bar: Undo | Sets tracker | New Match
+        // Top-left buttons
         Row(
             modifier = Modifier
-                .fillMaxWidth()
+                .align(Alignment.TopStart)
                 .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
-            // Left buttons
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(
-                    onClick = onUndo,
-                    enabled = canUndo,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = ButtonBg,
-                        contentColor = TextWhite,
-                        disabledContainerColor = ButtonBgDisabled,
-                        disabledContentColor = Color(0xFF444444),
-                    ),
-                ) {
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.Undo,
-                        contentDescription = "Undo",
-                        modifier = Modifier.size(20.dp),
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("UNDO", fontSize = 14.sp, fontWeight = FontWeight.Bold)
-                }
-
-                Button(
-                    onClick = onToggleGoldenPoint,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = if (goldenPoint) GoldColor else ButtonBg,
-                        contentColor = if (goldenPoint) Color.Black else DimColor,
-                    ),
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.AutoAwesome,
-                        contentDescription = "Golden Point",
-                        modifier = Modifier.size(20.dp),
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text(
-                        text = if (goldenPoint) "GOLDEN PT" else "ADVANTAGE",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Bold,
-                    )
-                }
+            Button(
+                onClick = onUndo,
+                enabled = canUndo,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = ButtonBg,
+                    contentColor = TextWhite,
+                    disabledContainerColor = ButtonBgDisabled,
+                    disabledContentColor = Color(0xFF444444),
+                ),
+            ) {
+                Icon(
+                    imageVector = Icons.AutoMirrored.Filled.Undo,
+                    contentDescription = "Undo",
+                    modifier = Modifier.size(20.dp),
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text("UNDO", fontSize = 14.sp, fontWeight = FontWeight.Bold)
             }
 
-            // Central sets & games tracker box
-            Box(
-                modifier = Modifier
-                    .background(
-                        color = ButtonBg,
-                        shape = RoundedCornerShape(16.dp),
-                    )
-                    .padding(horizontal = 32.dp, vertical = 16.dp),
-                contentAlignment = Alignment.Center,
+            Button(
+                onClick = onToggleGoldenPoint,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (goldenPoint) GoldColor else ButtonBg,
+                    contentColor = if (goldenPoint) Color.Black else DimColor,
+                ),
             ) {
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
-                        state.team1Games.forEachIndexed { index, g ->
-                            Text(
-                                text = g.toString(),
-                                color = Team1Accent,
-                                fontSize = 56.sp,
-                                fontWeight = FontWeight.Bold,
-                            )
-                            Text(
-                                text = "-",
-                                color = DimColor,
-                                fontSize = 56.sp,
-                                fontWeight = FontWeight.Bold,
-                            )
-                            Text(
-                                text = state.team2Games[index].toString(),
-                                color = Team2Accent,
-                                fontSize = 56.sp,
-                                fontWeight = FontWeight.Bold,
-                            )
-                            if (index < state.team1Games.lastIndex) {
-                                Text(text = "  ", fontSize = 56.sp)
-                            }
-                        }
-                    }
-                    if (state.isTiebreak) {
+                Icon(
+                    imageVector = Icons.Filled.AutoAwesome,
+                    contentDescription = "Golden Point",
+                    modifier = Modifier.size(20.dp),
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = if (goldenPoint) "GOLDEN PT" else "ADVANTAGE",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+        }
+
+        // Top-right buttons
+        Row(
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Button(
+                onClick = onCycleSetsToWin,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = ButtonBg,
+                    contentColor = TextWhite,
+                ),
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Repeat,
+                    contentDescription = "Sets to win",
+                    modifier = Modifier.size(20.dp),
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text(
+                    text = if (setsToWin == 0) "SETS: \u221E" else "SETS: $setsToWin",
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+
+            Button(
+                onClick = onReset,
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = ButtonBg,
+                    contentColor = TextWhite,
+                ),
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Refresh,
+                    contentDescription = "New Match",
+                    modifier = Modifier.size(20.dp),
+                )
+                Spacer(modifier = Modifier.width(6.dp))
+                Text("NEW MATCH", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            }
+        }
+
+        // Center-top: sets & games tracker — grows downward
+        Box(
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 16.dp)
+                .background(
+                    color = ButtonBg,
+                    shape = RoundedCornerShape(16.dp),
+                )
+                .padding(horizontal = 28.dp, vertical = 12.dp),
+            contentAlignment = Alignment.Center,
+        ) {
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(2.dp),
+            ) {
+                state.team1Games.forEachIndexed { index, g ->
+                    val isCurrentSet = index == state.currentSet && !state.isMatchOver
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp),
+                    ) {
                         Text(
-                            text = "TIEBREAK",
-                            color = GoldColor,
-                            fontSize = 22.sp,
+                            text = "S${index + 1}",
+                            color = if (isCurrentSet) TextWhite else DimColor,
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.Medium,
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = g.toString(),
+                            color = Team1Accent,
+                            fontSize = 40.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Text(
+                            text = ":",
+                            color = if (isCurrentSet) TextWhite else DimColor,
+                            fontSize = 40.sp,
+                            fontWeight = FontWeight.Bold,
+                        )
+                        Text(
+                            text = state.team2Games[index].toString(),
+                            color = Team2Accent,
+                            fontSize = 40.sp,
                             fontWeight = FontWeight.Bold,
                         )
                     }
                 }
-            }
-
-            // Right buttons
-            Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                Button(
-                    onClick = onCycleSetsToWin,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = ButtonBg,
-                        contentColor = TextWhite,
-                    ),
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Repeat,
-                        contentDescription = "Sets to win",
-                        modifier = Modifier.size(20.dp),
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
+                if (state.isTiebreak) {
                     Text(
-                        text = if (setsToWin == 0) "SETS: \u221E" else "SETS: $setsToWin",
-                        fontSize = 14.sp,
+                        text = "TIEBREAK",
+                        color = GoldColor,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
                     )
-                }
-
-                Button(
-                    onClick = onReset,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = ButtonBg,
-                        contentColor = TextWhite,
-                    ),
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Refresh,
-                        contentDescription = "New Match",
-                        modifier = Modifier.size(20.dp),
-                    )
-                    Spacer(modifier = Modifier.width(6.dp))
-                    Text("NEW MATCH", fontSize = 14.sp, fontWeight = FontWeight.Bold)
                 }
             }
         }
