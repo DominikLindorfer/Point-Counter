@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(find /c/Users/Dominik/Programs/Padelcounter/app/src -type f -name *.kt -o -name *.java -o -name *.xml)",
+      "Bash(grep -E \"\\\\.\\(kt|java|xml\\)$\")",
+      "Bash(./gradlew assembleDebug)",
+      "Read(//c/Program Files/Android/Android Studio/**)",
+      "Read(//c/Program Files/**)",
+      "Read(//c/Users/Dominik/Programs/Padelcounter/$LOCALAPPDATA/**)",
+      "Bash(reg query:*)",
+      "Bash(where java:*)",
+      "Read(//c/Program Files \\(x86\\)/Android/**)",
+      "Read(//c/Users/Dominik/AppData/Local/**)"
+    ]
+  }
+}
