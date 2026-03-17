@@ -1,10 +1,15 @@
 package io.github.dominiklindorfer.padelcounter
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.KeyEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
@@ -57,6 +62,7 @@ import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.SportsTennis
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.Videocam
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -77,12 +83,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -182,6 +190,26 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
             (vm.servingTeam == 2 && vm.sidesSwapped)
 
     var showSettings by remember { mutableStateOf(false) }
+    var showCamera by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+
+    val cameraPermissions = remember {
+        buildList {
+            add(Manifest.permission.CAMERA)
+            add(Manifest.permission.RECORD_AUDIO)
+            if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
+                add(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+            }
+        }.toTypedArray()
+    }
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { permissions ->
+        if (permissions.values.all { it }) {
+            showCamera = true
+        }
+    }
 
     Box(
         modifier = Modifier
@@ -250,6 +278,30 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
                 Icon(Icons.Filled.SwapHoriz, "Swap", Modifier.size(20.dp))
                 Spacer(Modifier.width(6.dp))
                 Text("SWAP", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+            }
+
+            Button(
+                onClick = {
+                    if (showCamera) {
+                        showCamera = false
+                    } else {
+                        val allGranted = cameraPermissions.all {
+                            ContextCompat.checkSelfPermission(context, it) ==
+                                PackageManager.PERMISSION_GRANTED
+                        }
+                        if (allGranted) {
+                            showCamera = true
+                        } else {
+                            cameraPermissionLauncher.launch(cameraPermissions)
+                        }
+                    }
+                },
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = if (showCamera) Color(0xFF8B0000) else ButtonBg,
+                    contentColor = TextWhite,
+                ),
+            ) {
+                Icon(Icons.Filled.Videocam, "Camera", Modifier.size(20.dp))
             }
         }
 
@@ -449,6 +501,20 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
                     }
                 }
             }
+        }
+
+        // Camera overlay — bottom left
+        AnimatedVisibility(
+            visible = showCamera,
+            enter = fadeIn(tween(300)) + scaleIn(tween(300)),
+            exit = fadeOut(tween(200)) + scaleOut(tween(200)),
+            modifier = Modifier
+                .align(Alignment.BottomStart)
+                .padding(start = 16.dp, bottom = 80.dp),
+        ) {
+            CameraPreviewOverlay(
+                onClose = { showCamera = false },
+            )
         }
 
         // Settings sidebar
