@@ -85,8 +85,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -795,12 +797,12 @@ fun TeamPanel(
                 .align(if (gamesBoxAtStart) Alignment.TopStart else Alignment.TopEnd)
                 .padding(top = 16.dp, start = 16.dp, end = 16.dp)
                 .background(Color.Black.copy(alpha = 0.3f), RoundedCornerShape(20.dp))
-                .padding(horizontal = 40.dp, vertical = 4.dp),
+                .padding(horizontal = 32.dp, vertical = 8.dp),
             contentAlignment = Alignment.Center,
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy((-16).dp),
+                verticalArrangement = Arrangement.Center,
             ) {
                 Text(
                     "GAMES",
@@ -820,8 +822,9 @@ fun TeamPanel(
                     Text(
                         text = games.toString(),
                         color = TextWhite,
-                        fontSize = 200.sp,
+                        fontSize = 150.sp,
                         fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
                     )
                 }
             }
