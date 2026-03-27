@@ -232,6 +232,7 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
                 isServing = servingOnLeft,
                 setsWon = leftSets,
                 gamesList = leftGamesList,
+                opponentGamesList = rightGamesList,
                 currentSet = state.currentSet,
                 isMatchOver = state.isMatchOver,
                 isTiebreak = state.isTiebreak,
@@ -254,6 +255,7 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
                 isServing = !servingOnLeft,
                 setsWon = rightSets,
                 gamesList = rightGamesList,
+                opponentGamesList = leftGamesList,
                 currentSet = state.currentSet,
                 isMatchOver = state.isMatchOver,
                 isTiebreak = state.isTiebreak,
@@ -352,6 +354,75 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
                 ),
             ) {
                 Icon(Icons.Filled.Settings, "Settings", Modifier.size(20.dp))
+            }
+        }
+
+        // Completed set scores — bottom center
+        if (leftGamesList.size > 1 || (leftGamesList.size == 1 && !state.isMatchOver && state.currentSet > 0)) {
+            Row(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 80.dp),
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                leftGamesList.forEachIndexed { index, _ ->
+                    if (index < state.currentSet || (state.isMatchOver && index <= state.currentSet)) {
+                        val lg = leftGamesList[index]
+                        val rg = rightGamesList[index]
+                        Box(
+                            modifier = Modifier
+                                .background(ButtonBg, RoundedCornerShape(10.dp))
+                                .padding(horizontal = 16.dp, vertical = 8.dp),
+                            contentAlignment = Alignment.Center,
+                        ) {
+                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                Text(
+                                    "SET ${index + 1}",
+                                    color = DimColor,
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    letterSpacing = 1.sp,
+                                )
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                ) {
+                                    Text(
+                                        lg.toString(),
+                                        color = leftAccent,
+                                        fontSize = 28.sp,
+                                        fontWeight = FontWeight.Bold,
+                                    )
+                                    Text(
+                                        ":",
+                                        color = DimColor,
+                                        fontSize = 28.sp,
+                                        fontWeight = FontWeight.Bold,
+                                    )
+                                    Text(
+                                        rg.toString(),
+                                        color = rightAccent,
+                                        fontSize = 28.sp,
+                                        fontWeight = FontWeight.Bold,
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+                AnimatedVisibility(
+                    visible = state.isTiebreak,
+                    enter = fadeIn(tween(300)) + scaleIn(tween(300)),
+                    exit = fadeOut(tween(200)) + scaleOut(tween(200)),
+                ) {
+                    Text(
+                        "TIEBREAK",
+                        color = GoldColor,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                    )
+                }
             }
         }
 
@@ -764,6 +835,7 @@ fun TeamPanel(
     isServing: Boolean,
     setsWon: Int,
     gamesList: List<Int>,
+    opponentGamesList: List<Int>,
     currentSet: Int,
     isMatchOver: Boolean,
     isTiebreak: Boolean,
@@ -878,69 +950,5 @@ fun TeamPanel(
             )
         }
 
-        // Bottom: set-by-set games, stacking horizontally
-        Row(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 24.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
-            gamesList.forEachIndexed { index, games ->
-                val isCurrent = index == currentSet && !isMatchOver
-                AnimatedContent(
-                    targetState = games,
-                    transitionSpec = {
-                        (slideInVertically { -it } + fadeIn()) togetherWith
-                                (slideOutVertically { it } + fadeOut())
-                    },
-                    label = "setGames$index",
-                ) { g ->
-                    Box(
-                        modifier = Modifier
-                            .background(
-                                if (isCurrent) accentColor.copy(alpha = 0.2f)
-                                else Color.Black.copy(alpha = 0.3f),
-                                RoundedCornerShape(8.dp),
-                            )
-                            .then(
-                                if (isCurrent) Modifier.border(
-                                    2.dp, accentColor, RoundedCornerShape(8.dp)
-                                )
-                                else Modifier
-                            )
-                            .padding(horizontal = 14.dp, vertical = 6.dp),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Text(
-                                "S${index + 1}",
-                                color = if (isCurrent) accentColor else DimColor,
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Medium,
-                            )
-                            Text(
-                                g.toString(),
-                                color = if (isCurrent) accentColor else TextWhite,
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.Bold,
-                            )
-                        }
-                    }
-                }
-            }
-            AnimatedVisibility(
-                visible = isTiebreak,
-                enter = fadeIn(tween(300)) + scaleIn(tween(300)),
-                exit = fadeOut(tween(200)) + scaleOut(tween(200)),
-            ) {
-                Text(
-                    "TB",
-                    color = GoldColor,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                )
-            }
-        }
     }
 }
