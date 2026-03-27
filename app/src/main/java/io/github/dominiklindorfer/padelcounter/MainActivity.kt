@@ -902,9 +902,9 @@ fun TeamPanel(
             }
         }
 
-        // Big score number — centered
+        // Big score number — centered, nudged down
         Box(
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().padding(top = 40.dp),
             contentAlignment = Alignment.Center,
         ) {
             AnimatedContent(
@@ -918,7 +918,7 @@ fun TeamPanel(
                 Text(
                     text = display,
                     color = TextWhite,
-                    fontSize = 480.sp,
+                    fontSize = 520.sp,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.graphicsLayer {
