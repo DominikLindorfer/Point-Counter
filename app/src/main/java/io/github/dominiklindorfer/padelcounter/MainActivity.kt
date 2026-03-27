@@ -440,7 +440,7 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
                 label = "serveSide",
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 130.dp),
+                    .padding(bottom = 110.dp),
             ) { isRight ->
                 Box(
                     modifier = Modifier
@@ -868,37 +868,35 @@ fun TeamPanel(
             modifier = Modifier
                 .align(if (gamesBoxAtStart) Alignment.TopStart else Alignment.TopEnd)
                 .padding(top = 16.dp, start = 16.dp, end = 16.dp)
-                .background(Color.Black.copy(alpha = 0.3f), RoundedCornerShape(20.dp))
-                .padding(horizontal = 32.dp, vertical = 8.dp),
-            contentAlignment = Alignment.Center,
+                .width(160.dp)
+                .height(200.dp)
+                .background(Color.Black.copy(alpha = 0.3f), RoundedCornerShape(20.dp)),
+            contentAlignment = Alignment.TopCenter,
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
-            ) {
+            Text(
+                "GAMES",
+                color = accentColor,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 3.sp,
+                modifier = Modifier.padding(top = 12.dp),
+            )
+            AnimatedContent(
+                targetState = currentGames,
+                transitionSpec = {
+                    (slideInVertically { -it } + fadeIn()) togetherWith
+                            (slideOutVertically { it } + fadeOut())
+                },
+                label = "currentGames",
+                modifier = Modifier.align(Alignment.Center),
+            ) { games ->
                 Text(
-                    "GAMES",
-                    color = accentColor,
-                    fontSize = 20.sp,
+                    text = games.toString(),
+                    color = TextWhite,
+                    fontSize = 190.sp,
                     fontWeight = FontWeight.Bold,
-                    letterSpacing = 3.sp,
+                    textAlign = TextAlign.Center,
                 )
-                AnimatedContent(
-                    targetState = currentGames,
-                    transitionSpec = {
-                        (slideInVertically { -it } + fadeIn()) togetherWith
-                                (slideOutVertically { it } + fadeOut())
-                    },
-                    label = "currentGames",
-                ) { games ->
-                    Text(
-                        text = games.toString(),
-                        color = TextWhite,
-                        fontSize = 150.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                    )
-                }
             }
         }
 
