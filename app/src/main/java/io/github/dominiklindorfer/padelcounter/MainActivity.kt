@@ -440,7 +440,7 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
                 label = "serveSide",
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 140.dp),
+                    .padding(bottom = 170.dp),
             ) { isRight ->
                 Box(
                     modifier = Modifier
