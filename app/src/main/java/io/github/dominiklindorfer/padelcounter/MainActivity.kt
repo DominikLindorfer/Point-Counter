@@ -372,15 +372,15 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
                         val rg = rightGamesList[index]
                         Box(
                             modifier = Modifier
-                                .background(ButtonBg, RoundedCornerShape(14.dp))
-                                .padding(horizontal = 24.dp, vertical = 10.dp),
+                                .background(ButtonBg, RoundedCornerShape(10.dp))
+                                .padding(horizontal = 16.dp, vertical = 6.dp),
                             contentAlignment = Alignment.Center,
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
                                     "SET ${index + 1}",
                                     color = DimColor,
-                                    fontSize = 24.sp,
+                                    fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium,
                                     letterSpacing = 1.sp,
                                 )
@@ -391,19 +391,19 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
                                     Text(
                                         lg.toString(),
                                         color = leftAccent,
-                                        fontSize = 64.sp,
+                                        fontSize = 40.sp,
                                         fontWeight = FontWeight.Bold,
                                     )
                                     Text(
                                         ":",
                                         color = DimColor,
-                                        fontSize = 64.sp,
+                                        fontSize = 40.sp,
                                         fontWeight = FontWeight.Bold,
                                     )
                                     Text(
                                         rg.toString(),
                                         color = rightAccent,
-                                        fontSize = 64.sp,
+                                        fontSize = 40.sp,
                                         fontWeight = FontWeight.Bold,
                                     )
                                 }
@@ -440,7 +440,7 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
                 label = "serveSide",
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 170.dp),
+                    .padding(bottom = 130.dp),
             ) { isRight ->
                 Box(
                     modifier = Modifier
