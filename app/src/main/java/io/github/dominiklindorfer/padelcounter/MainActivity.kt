@@ -390,7 +390,7 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
                                 ) {
                                     Text(
                                         lg.toString(),
-                                        color = leftAccent,
+                                        color = leftBg,
                                         fontSize = 40.sp,
                                         fontWeight = FontWeight.Bold,
                                     )
@@ -402,7 +402,7 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
                                     )
                                     Text(
                                         rg.toString(),
-                                        color = rightAccent,
+                                        color = rightBg,
                                         fontSize = 40.sp,
                                         fontWeight = FontWeight.Bold,
                                     )
@@ -815,7 +815,7 @@ private fun ColorPicker(selectedIndex: Int, onSelect: (Int) -> Unit) {
                 modifier = Modifier
                     .size(40.dp)
                     .clip(CircleShape)
-                    .background(Color(preset.accent))
+                    .background(Color(preset.bg))
                     .then(
                         if (isSelected) Modifier.border(3.dp, TextWhite, CircleShape)
                         else Modifier
@@ -875,7 +875,7 @@ fun TeamPanel(
         ) {
             Text(
                 "GAMES",
-                color = accentColor,
+                color = backgroundColor,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 3.sp,

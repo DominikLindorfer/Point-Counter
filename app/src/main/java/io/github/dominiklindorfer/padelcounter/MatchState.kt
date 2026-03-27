@@ -156,14 +156,14 @@ object PadelScoring {
 data class TeamColor(val name: String, val bg: Long, val accent: Long)
 
 val teamColorPresets = listOf(
-    TeamColor("Blue", 0xFF091426, 0xFF5BA8FF),
-    TeamColor("Red", 0xFF2A1215, 0xFFFF7A7A),
-    TeamColor("Green", 0xFF0A2614, 0xFF5BFF8A),
-    TeamColor("Purple", 0xFF1A0A26, 0xFFBB7AFF),
-    TeamColor("Orange", 0xFF261A0A, 0xFFFFAA5B),
-    TeamColor("Cyan", 0xFF0A2626, 0xFF5BFFEE),
-    TeamColor("Pink", 0xFF260A1A, 0xFFFF7ABB),
-    TeamColor("Yellow", 0xFF26260A, 0xFFFFEE5B),
+    TeamColor("Blue", 0xFF1565C0, 0xFFFFFFFF),
+    TeamColor("Red", 0xFFC62828, 0xFFFFFFFF),
+    TeamColor("Green", 0xFF2E7D32, 0xFFFFFFFF),
+    TeamColor("Purple", 0xFF6A1B9A, 0xFFFFFFFF),
+    TeamColor("Orange", 0xFFE65100, 0xFFFFFFFF),
+    TeamColor("Cyan", 0xFF00838F, 0xFFFFFFFF),
+    TeamColor("Pink", 0xFFAD1457, 0xFFFFFFFF),
+    TeamColor("Yellow", 0xFFC88600, 0xFFFFFFFF),
 )
 
 /** ViewModel that holds the match state and an undo history stack. */
