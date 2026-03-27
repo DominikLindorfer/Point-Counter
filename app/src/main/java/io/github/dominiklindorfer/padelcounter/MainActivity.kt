@@ -499,7 +499,43 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
                     Text("MATCH OVER", color = TextWhite, fontSize = 52.sp, fontWeight = FontWeight.Bold)
                     Spacer(Modifier.height(12.dp))
                     Text("$winnerName wins!", color = winnerColor, fontSize = 36.sp, fontWeight = FontWeight.Bold)
-                    Spacer(Modifier.height(40.dp))
+                    Spacer(Modifier.height(24.dp))
+                    Row(
+                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        leftGamesList.forEachIndexed { index, _ ->
+                            if (index <= state.currentSet) {
+                                val lg = leftGamesList[index]
+                                val rg = rightGamesList[index]
+                                Box(
+                                    modifier = Modifier
+                                        .background(ButtonBg, RoundedCornerShape(12.dp))
+                                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                                    contentAlignment = Alignment.Center,
+                                ) {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Text(
+                                            "SET ${index + 1}",
+                                            color = DimColor,
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.Medium,
+                                            letterSpacing = 1.sp,
+                                        )
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically,
+                                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                        ) {
+                                            Text(lg.toString(), color = leftBg, fontSize = 36.sp, fontWeight = FontWeight.Bold)
+                                            Text(":", color = DimColor, fontSize = 36.sp, fontWeight = FontWeight.Bold)
+                                            Text(rg.toString(), color = rightBg, fontSize = 36.sp, fontWeight = FontWeight.Bold)
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    Spacer(Modifier.height(32.dp))
                     Button(
                         onClick = { vm.resetMatch() },
                         colors = ButtonDefaults.buttonColors(
