@@ -929,11 +929,11 @@ fun TeamPanel(
             }
         }
 
-        // Team name — bottom center (above set boxes)
+        // Team name — top corner opposite to GAMES box
         Row(
             modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 80.dp),
+                .align(if (gamesBoxAtStart) Alignment.TopEnd else Alignment.TopStart)
+                .padding(top = 125.dp, start = 86.dp, end = 86.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
@@ -944,7 +944,7 @@ fun TeamPanel(
             Text(
                 text = teamLabel,
                 color = accentColor,
-                fontSize = 36.sp,
+                fontSize = 56.sp,
                 fontWeight = FontWeight.Bold,
                 letterSpacing = 3.sp,
             )
