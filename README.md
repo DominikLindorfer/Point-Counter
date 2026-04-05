@@ -6,7 +6,7 @@
 
 <p align="center">
   <b>A courtside scoreboard for padel & tennis — big scores, Bluetooth remote control, zero setup.</b><br><br>
-  <b>No ads. Free and open source!</b>
+  <b>No ads. No logins. Free and open source!</b>
 </p>
 
 <p align="center">
