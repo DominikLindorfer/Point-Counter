@@ -15,7 +15,8 @@ This app does **not** collect, store, or transmit any personal data. Specificall
 
 ## Permissions
 
-The app requires no special permissions. Bluetooth HID devices work through standard Android system pairing without any app-level Bluetooth permissions.
+- **Camera**: Used solely for recording games on-device. Video recordings are stored locally on your device and are never uploaded or shared by the app.
+- **Bluetooth**: HID devices work through standard Android system pairing without any app-level Bluetooth permissions.
 
 ## Third-Party Services
 
@@ -29,4 +30,4 @@ If this policy changes, updates will be posted in this file in the app's source 
 
 If you have questions about this privacy policy, please open an issue on the [GitHub repository](https://github.com/dominiklindorfer/Padelcounter).
 
-*Last updated: March 2026*
+*Last updated: April 2026*
