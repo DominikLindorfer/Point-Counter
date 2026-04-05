@@ -32,6 +32,16 @@ https://github.com/user-attachments/assets/ad0aed53-c02c-48b0-93c0-9c121f993f9b
   </a>
 </p>
 
+## Setup that I use personally
+
+All you need is a tablet, a stand, and a Bluetooth remote:
+
+| Item | Link |
+|------|------|
+| **Android Tablet** — Xiaomi Redmi Pad Pro | [Amazon.de](https://www.amazon.de/dp/B0FJ9234ZX) |
+| **Tablet Stand** | [Amazon.de](https://www.amazon.de/dp/B0DRXP3V6W) |
+| **Bluetooth Remote** | [Amazon.de](https://www.amazon.de/dp/B08MKJX4MH) |
+
 ## Features
 
 | | |
