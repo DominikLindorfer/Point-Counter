@@ -1,95 +1,120 @@
-# Padel & Tennis Point Counter
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/5d866f24-f629-4d10-b6ff-5cc8576e2cc9" alt="Point Counter — courtside scoreboard" width="720" />
+</p>
 
-A simple, full-screen scoreboard app for Android tablets. Designed to be placed courtside so everyone can see the score during a match. 
+<h1 align="center">Point Counter</h1>
 
-Works with **Bluetooth media controller buttons** so you can score points without touching the screen.
+<p align="center">
+  <b>A courtside scoreboard for padel & tennis — big scores, Bluetooth remote control, zero setup.</b>
+</p>
 
-## Screenshots
+<p align="center">
+  <a href="https://github.com/DominikLindorfer/Padelcounter/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
+  <img src="https://img.shields.io/badge/Platform-Android-green.svg" alt="Platform: Android">
+  <img src="https://img.shields.io/badge/Min%20SDK-26%20(Android%208.0)-brightgreen.svg" alt="Min SDK 26">
+  <img src="https://img.shields.io/badge/Kotlin-Jetpack%20Compose-7F52FF.svg" alt="Kotlin + Jetpack Compose">
+</p>
 
-![Courtside_Watch](https://github.com/user-attachments/assets/5d866f24-f629-4d10-b6ff-5cc8576e2cc9)
+---
 
+Place your tablet courtside and everyone can read the score. Pair a cheap Bluetooth remote and score points without leaving the court.
+
+<p align="center">
 
 https://github.com/user-attachments/assets/ad0aed53-c02c-48b0-93c0-9c121f993f9b
 
+</p>
+
+<p align="center">
+  <a href="https://play.google.com/store/apps/details?id=io.github.dominiklindorfer.padelcounter">
+    <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="80">
+  </a>
+</p>
+
+## Features
+
+| | |
+|---|---|
+| **Full padel/tennis scoring** | 0 / 15 / 30 / 40 / Deuce / AD — games, sets, and tiebreaks |
+| **Golden Point mode** | No advantage at 40-40 — toggle on or off |
+| **Automatic tiebreaks** | Kicks in at 6-6 with proper tiebreak scoring |
+| **Configurable sets** | Play to 1, 2, or 3 sets (or infinite) |
+| **Bluetooth remote** | Score with a wrist-mounted media controller — no screen touch needed |
+| **Serve indicator** | Shows serving team and serve side (L/R), auto-rotates each game |
+| **Match timer** | Elapsed time starts on the first point |
+| **Team customization** | Custom names and 8 color presets per team |
+| **Swap sides** | One tap to mirror teams when you switch court ends |
+| **Match history** | Auto-saves completed matches with scores, duration, and stats |
+| **Share results** | Export match results via WhatsApp, email, or any app |
+| **Undo** | Made a mistake? One button to go back |
+| **Immersive display** | Full-screen, landscape-locked, screen stays on |
+| **Animated transitions** | Score changes with smooth bounce effects and a trophy on match point |
+
 ## Bluetooth Setup
 
-The app works with cheap Bluetooth media controllers (like wrist-mounted remotes). These pair as standard HID devices — no special app permissions needed.
+The app works with cheap Bluetooth media controllers (like wrist-mounted remotes). They pair as standard HID devices — no special permissions needed.
 
-### Default Button Mapping
+<p align="center">
+  <img src="https://github.com/user-attachments/assets/a66de593-18af-417a-b510-c643b2aa0ab2" alt="Bluetooth remote control" width="600" />
+</p>
+
+### Button Mapping
 
 | Button | Action |
 |--------|--------|
 | Volume Up | Team 1 scores |
 | Volume Down | Team 2 scores |
-| Next Track (>>) | Team 1 scores |
-| Previous Track (<<) | Team 2 scores |
-| Play/Pause | Undo |
-
-<img width="1779" height="1194" alt="Control" src="https://github.com/user-attachments/assets/a66de593-18af-417a-b510-c643b2aa0ab2" />
-
+| Next Track `>>` | Team 1 scores |
+| Previous Track `<<` | Team 2 scores |
+| Play / Pause | Undo |
 
 ### Pairing
 
 1. Put your Bluetooth controller in pairing mode
 2. Open Android **Settings > Bluetooth** and pair the device
-3. Open Padel Counter — button presses are automatically captured
+3. Open Point Counter — button presses are captured automatically
 
-## Features
+> **Tip:** If your controller sends different key codes, you can customize the mapping in `MainActivity.kt` — see the [KeyEvent docs](https://developer.android.com/reference/android/view/KeyEvent).
 
-- Full-screen scoreboard with huge, readable score numbers
-- Proper padel scoring: points (0/15/30/40/deuce/AD), games, sets, tiebreaks
-- Undo button for mistakes
-- Bluetooth HID button support (media controllers, camera shutters)
-- **Golden Point** mode (no advantage at 40-40) — toggle on/off
-- **Tiebreak** — automatic tiebreak scoring at 6-6
-- Configurable sets to win (infinite, 1, 2, or 3)
-- **Serve side indicator** (right/left) — alternates every point
-- **Serving team indicator** — shows which team serves, auto-rotates each game
-- **Match timer** — elapsed time display, starts on first point
-- **Settings sidebar** — customize team names, team colors (8 presets), scoring mode, sets, and serving team
-- **Swap sides** — switch team positions on screen when teams change court sides
-- **Match history** — completed matches auto-save with scores, duration, and statistics
-- **Share/export** — share match results via WhatsApp, email, or any app
-- **Match statistics** — points won per team shown as percentages
-- Animated score transitions with bounce effects
-- Immersive full-screen, landscape-locked, screen stays on
-- Match over overlay with trophy animation
+## Building from Source
 
-## Settings Sidebar
+```bash
+# Clone the repository
+git clone https://github.com/DominikLindorfer/Padelcounter.git
 
-Tap the gear icon (top-right) to access:
-- **Team names** — customize up to 16 characters each
-- **Team colors** — choose from 8 presets (Blue, Red, Green, Purple, Orange, Cyan, Pink, Yellow)
-- **Scoring mode** — toggle between Advantage and Golden Point
-- **Sets to win** — cycle through infinite / 1 / 2 / 3
-- **Serving team** — tap to toggle which team serves
-- **Match History** — view all completed matches
-
-### Customizing Button Mapping (Dev-Mode)
-
-If your controller sends different key codes, edit the `onKeyDown` method in `MainActivity.kt`. Android key code constants are listed in the [KeyEvent documentation](https://developer.android.com/reference/android/view/KeyEvent).
-
-## Building
-
-1. Open the project in Android Studio
-2. Sync Gradle
-3. Run on a device or emulator (minimum SDK 26 / Android 8.0)
+# Open in Android Studio, sync Gradle, and run
+# Min SDK 26 (Android 8.0) · Target SDK 36 (Android 15)
+```
 
 ## Project Structure
 
 ```
 app/src/main/java/io/github/dominiklindorfer/padelcounter/
-  MainActivity.kt          -- UI (ScoreBoard, TeamPanel, SettingsSidebar, MatchTimer)
-  MatchState.kt            -- Scoring logic (MatchState, PadelScoring, MatchViewModel)
-  MatchStorage.kt          -- Match history persistence (SharedPreferences + JSON)
-  MatchHistoryScreen.kt    -- Match history UI with share/export
-  MatchViewModelFactory.kt -- ViewModel factory for dependency injection
+├── MainActivity.kt            UI — ScoreBoard, TeamPanel, SettingsSidebar, MatchTimer
+├── MatchState.kt              Scoring logic — MatchState, PadelScoring, MatchViewModel
+├── MatchStorage.kt            Match history persistence (SharedPreferences + JSON)
+├── MatchHistoryScreen.kt      Match history UI with share/export
+├── CameraOverlay.kt           Camera preview & video recording overlay
+└── MatchViewModelFactory.kt   ViewModel factory
 ```
 
-## Privacy Policy
+## Tech Stack
 
-This app collects no data. See [PRIVACY_POLICY.md](PRIVACY_POLICY.md) for details.
+- **Kotlin** + **Jetpack Compose** (Material 3)
+- **CameraX** for optional video capture
+- **AndroidX Lifecycle** + ViewModel
+- No network calls, no third-party analytics, no ads
+
+## Privacy
+
+This app collects **zero data**. No accounts, no analytics, no internet access. See [PRIVACY_POLICY.md](PRIVACY_POLICY.md).
 
 ## License
 
-MIT License — see [LICENSE](LICENSE) for details.
+MIT — see [LICENSE](LICENSE) for details.
+
+---
+
+<p align="center">
+  Built for the court, not the cloud.
+</p>
