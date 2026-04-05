@@ -5,7 +5,8 @@
 <h1 align="center">Point Counter</h1>
 
 <p align="center">
-  <b>A courtside scoreboard for padel & tennis — big scores, Bluetooth remote control, zero setup.</b>
+  <b>A courtside scoreboard for padel & tennis — big scores, Bluetooth remote control, zero setup.</b><br><br>
+  <b>No ads. Free and open source!</b>
 </p>
 
 <p align="center">
@@ -80,7 +81,7 @@ The app works with cheap Bluetooth media controllers (like wrist-mounted remotes
 
 ```bash
 # Clone the repository
-git clone https://github.com/DominikLindorfer/Padelcounter.git
+git clone https://github.com/DominikLindorfer/Point-Counter.git
 
 # Open in Android Studio, sync Gradle, and run
 # Min SDK 26 (Android 8.0) · Target SDK 36 (Android 15)
