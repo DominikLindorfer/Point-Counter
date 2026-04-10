@@ -156,13 +156,15 @@ struct ScoreBoardView: View {
             }
 
             // Serve side indicator — bottom center above set scores
-            VStack {
-                Spacer()
-                ServeSideIndicatorView(
-                    totalPoints: state.team1Points + state.team2Points,
-                    isMatchOver: state.isMatchOver
-                )
-                .padding(.bottom, 110)
+            if vm.showServeSide {
+                VStack {
+                    Spacer()
+                    ServeSideIndicatorView(
+                        totalPoints: state.team1Points + state.team2Points,
+                        isMatchOver: state.isMatchOver
+                    )
+                    .padding(.bottom, 110)
+                }
             }
 
             // Camera overlay — bottom left

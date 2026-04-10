@@ -116,6 +116,17 @@ struct SettingsSidebarView: View {
                             valueColor: serveColor
                         ) { vm.updateServingTeam(vm.servingTeam == 1 ? 2 : 1) }
 
+                        Spacer().frame(height: 8)
+
+                        // Serve side indicator toggle
+                        settingsRow(
+                            icon: "arrow.left.arrow.right",
+                            iconColor: vm.showServeSide ? GoldColor : DimColor,
+                            label: "Serve Side (L/R)",
+                            value: vm.showServeSide ? "ON" : "OFF",
+                            valueColor: vm.showServeSide ? GoldColor : DimColor
+                        ) { vm.showServeSide.toggle() }
+
                         Spacer().frame(height: 24)
                         Divider().background(Color(white: 0.2))
                         Spacer().frame(height: 20)

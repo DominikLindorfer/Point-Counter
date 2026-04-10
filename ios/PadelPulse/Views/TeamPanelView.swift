@@ -42,21 +42,17 @@ struct TeamPanelView: View {
                 Spacer()
             }
 
-            // Giant score — centered
-            VStack {
-                Spacer()
-                    .frame(height: 40)
-                Text(pointDisplay)
-                    .font(.system(size: 400, weight: .bold))
-                    .foregroundColor(.white)
-                    .minimumScaleFactor(0.3)
-                    .lineLimit(1)
-                    .scaleEffect(scoreScale)
-                    .contentTransition(.numericText())
-                    .animation(.spring(response: 0.4, dampingFraction: 0.55), value: pointDisplay)
-                Spacer()
-            }
-            .padding(.horizontal, 20)
+            // Giant score — centered vertically, nudged down to avoid overlap
+            Text(pointDisplay)
+                .font(.system(size: 400, weight: .bold))
+                .foregroundColor(.white)
+                .minimumScaleFactor(0.3)
+                .lineLimit(1)
+                .scaleEffect(scoreScale)
+                .contentTransition(.numericText())
+                .animation(.spring(response: 0.4, dampingFraction: 0.55), value: pointDisplay)
+                .padding(.horizontal, 20)
+                .padding(.top, 60)
 
             // Team name — top corner opposite to games box
             VStack {

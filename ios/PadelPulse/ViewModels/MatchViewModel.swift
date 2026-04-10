@@ -14,6 +14,7 @@ final class MatchViewModel {
     var team1ColorIndex = 0
     var team2ColorIndex = 1
     var servingTeam = 1
+    var showServeSide = true
     var matchStartTimeMs: Int64 = 0
     var matchRunning = false
     var team1PointsWon = 0
