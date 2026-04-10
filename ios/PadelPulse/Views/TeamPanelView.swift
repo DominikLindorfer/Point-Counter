@@ -15,16 +15,23 @@ struct TeamPanelView: View {
     var gamesBoxAtStart: Bool = false
     let onClick: () -> Void
 
+    @Environment(\.layout) private var layout
     @State private var scoreScale: CGFloat = 1.0
     @State private var scoreVersion = 0
+    @State private var gamesScale: CGFloat = 1.0
+    @State private var gamesVersion = 0
 
     var body: some View {
         let currentGames = currentSet < gamesList.count ? gamesList[currentSet] : 0
 
         ZStack {
-            backgroundColor
-                .contentShape(Rectangle())
-                .onTapGesture { onClick() }
+            LinearGradient(
+                colors: [backgroundColor, backgroundColor.opacity(0.85)],
+                startPoint: .top,
+                endPoint: .bottom
+            )
+            .contentShape(Rectangle())
+            .onTapGesture { onClick() }
 
             // Games box — top corner near center
             VStack(spacing: 0) {
@@ -37,38 +44,31 @@ struct TeamPanelView: View {
                         gamesBox(currentGames: currentGames)
                     }
                 }
-                .padding(.top, 16)
-                .padding(.horizontal, 16)
+                .padding(.top, layout.panelPadding)
+                .padding(.horizontal, layout.panelPadding)
                 Spacer()
             }
 
-            // Giant score — centered vertically, nudged down to avoid overlap
-            Text(pointDisplay)
-                .font(.system(size: 400, weight: .bold))
-                .foregroundColor(.white)
-                .minimumScaleFactor(0.3)
-                .lineLimit(1)
-                .scaleEffect(scoreScale)
-                .contentTransition(.numericText())
-                .animation(.spring(response: 0.4, dampingFraction: 0.55), value: pointDisplay)
-                .padding(.horizontal, 20)
-                .padding(.top, 60)
+            // Score + team name — centered
+            VStack(spacing: 0) {
+                Spacer()
 
-            // Team name — top corner opposite to games box
-            VStack {
-                HStack {
-                    if gamesBoxAtStart {
-                        Spacer()
-                        teamNameRow
-                    } else {
-                        teamNameRow
-                        Spacer()
-                    }
-                }
-                .padding(.top, 125)
-                .padding(.horizontal, 86)
+                Text(pointDisplay)
+                    .font(.system(size: layout.scoreFont, weight: .bold))
+                    .foregroundColor(.white)
+                    .minimumScaleFactor(0.3)
+                    .lineLimit(1)
+                    .scaleEffect(scoreScale)
+                    .contentTransition(.numericText())
+                    .animation(.spring(response: 0.4, dampingFraction: 0.55), value: pointDisplay)
+                    .padding(.horizontal, 20)
+
+                teamNameRow
+
                 Spacer()
             }
+            .padding(.top, layout.scorePaddingTop)
+            .padding(.bottom, layout.serveAreaClearance)
         }
         .onChange(of: pointDisplay) { _, _ in
             scoreVersion += 1
@@ -79,6 +79,20 @@ struct TeamPanelView: View {
                 }
             }
         }
+        .onChange(of: currentGames) { _, _ in
+            gamesVersion += 1
+            if gamesVersion > 1 {
+                gamesScale = 1.15
+                withAnimation(.spring(response: 0.5, dampingFraction: 0.5)) {
+                    gamesScale = 1.0
+                }
+            }
+        }
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel("\(teamLabel), score \(pointDisplay), \(currentGames) games")
+        .accessibilityValue(isServing ? "Currently serving" : "")
+        .accessibilityHint("Double tap to score a point for \(teamLabel)")
+        .accessibilityAddTraits(.isButton)
     }
 
     private var teamNameRow: some View {
@@ -86,40 +100,44 @@ struct TeamPanelView: View {
             if isServing {
                 Image(systemName: "tennisball.fill")
                     .foregroundColor(GoldColor)
-                    .font(.system(size: 28))
+                    .font(.system(size: layout.servingBallSize))
             }
             Text(teamLabel)
-                .font(.system(size: 56, weight: .bold))
+                .font(.system(size: layout.teamNameFont, weight: .bold))
                 .foregroundColor(accentColor)
+                .lineLimit(1)
+                .minimumScaleFactor(0.5)
                 .tracking(3)
         }
+        .padding(.horizontal, layout.panelPadding)
     }
 
     private func gamesBox(currentGames: Int) -> some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: layout.gamesBoxCorner)
                 .fill(Color.black.opacity(0.3))
-                .frame(width: 160, height: 200)
+                .frame(width: layout.gamesBoxWidth, height: layout.gamesBoxHeight)
 
-            VStack {
+            VStack(spacing: 0) {
                 Text("GAMES")
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundColor(backgroundColor)
+                    .font(.system(size: layout.gamesLabelFont, weight: .bold))
+                    .foregroundColor(.white.opacity(0.6))
                     .tracking(3)
-                    .padding(.top, 12)
+                    .padding(.top, 10)
 
                 Spacer()
 
                 Text("\(currentGames)")
-                    .font(.system(size: 160, weight: .bold))
+                    .font(.system(size: layout.gamesNumberFont, weight: .bold))
                     .foregroundColor(.white)
                     .minimumScaleFactor(0.5)
+                    .scaleEffect(gamesScale)
                     .contentTransition(.numericText())
                     .animation(.spring(response: 0.3, dampingFraction: 0.7), value: currentGames)
 
                 Spacer()
             }
-            .frame(width: 160, height: 200)
+            .frame(width: layout.gamesBoxWidth, height: layout.gamesBoxHeight)
         }
     }
 }

@@ -3,6 +3,8 @@ import SwiftUI
 struct MatchTimerView: View {
     let vm: MatchViewModel
 
+    @Environment(\.layout) private var layout
+
     var body: some View {
         if vm.matchRunning || vm.matchStartTimeMs > 0 {
             TimelineView(.periodic(from: .now, by: 1.0)) { context in
@@ -16,15 +18,17 @@ struct MatchTimerView: View {
                 HStack(spacing: 6) {
                     Image(systemName: "timer")
                         .foregroundColor(GoldColor)
-                        .font(.system(size: 20))
+                        .font(.system(size: layout.timerIcon))
                     Text(String(format: "%d:%02d", min, sec))
                         .foregroundColor(.white)
-                        .font(.system(size: 14, weight: .bold))
+                        .font(.system(size: layout.timerFont, weight: .bold))
                 }
-                .padding(.horizontal, 16)
-                .padding(.vertical, 10)
+                .padding(.horizontal, layout.toolbarPaddingH)
+                .padding(.vertical, layout.toolbarPaddingV)
                 .background(ButtonBg)
                 .clipShape(Capsule())
+                .accessibilityElement(children: .ignore)
+                .accessibilityLabel("Match timer, \(min) minutes \(sec) seconds")
             }
         }
     }

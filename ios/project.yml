@@ -5,6 +5,11 @@ options:
     iOS: "17.0"
   xcodeVersion: "16.0"
   generateEmptyDirectories: true
+  developmentLanguage: en
+  knownRegions:
+    - en
+    - de
+    - es
 
 settings:
   base:
@@ -37,6 +42,9 @@ targets:
         UISupportedInterfaceOrientations~ipad:
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
+        UILaunchScreen:
+          UIColorName: DarkBg
+          UIImageName: LaunchLogo
 
   PadelPulseTests:
     type: bundle.unit-test

@@ -50,26 +50,32 @@ struct SavedMatch: Codable, Identifiable {
         let totalPoints = team1PointsWon + team2PointsWon
         let pointsLine: String
         if totalPoints > 0 {
-            pointsLine = "\nPoints won: \(team1Name) \(team1PointsWon) - \(team2PointsWon) \(team2Name)"
+            let pointsLabel = String(localized: "Points Won")
+            pointsLine = "\n\(pointsLabel): \(team1Name) \(team1PointsWon) - \(team2PointsWon) \(team2Name)"
         } else {
             pointsLine = ""
         }
 
+        let title = String(localized: "Padel Match Result")
+        let gamesLabel = String(localized: "Game scores:")
+        let winnerLabel = String(localized: "Winner")
+        let durationLabel = String(localized: "Duration")
+
         var text = """
-        Padel Match Result
+        \(title)
         \(dateStr)
 
         \(team1Name)  \(team1Sets) - \(team2Sets)  \(team2Name)
 
-        Game scores:
+        \(gamesLabel)
         \(gameScores)
 
-        Winner: \(winnerName)
-        Duration: \(durationMin)m \(durationSec)s\(pointsLine)
+        \(winnerLabel): \(winnerName)
+        \(durationLabel): \(durationMin)m \(durationSec)s\(pointsLine)
         """
 
         if goldenPoint {
-            text += "\nScoring: Golden Point"
+            text += "\n\(String(localized: "Scoring: Golden Point"))"
         }
 
         return text

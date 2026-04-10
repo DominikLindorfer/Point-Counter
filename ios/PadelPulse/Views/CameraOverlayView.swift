@@ -4,6 +4,7 @@ import AVFoundation
 struct CameraOverlayView: View {
     let onClose: () -> Void
 
+    @Environment(\.layout) private var layout
     @StateObject private var cameraService = CameraService()
     @State private var blinkVisible = true
 
@@ -11,10 +12,10 @@ struct CameraOverlayView: View {
         ZStack {
             // Camera preview
             CameraPreviewRepresentable(session: cameraService.captureSession)
-                .frame(width: 192, height: 108)
-                .clipShape(RoundedRectangle(cornerRadius: 16))
+                .frame(width: layout.cameraWidth, height: layout.cameraHeight)
+                .clipShape(RoundedRectangle(cornerRadius: layout.cameraCorner))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 16)
+                    RoundedRectangle(cornerRadius: layout.cameraCorner)
                         .stroke(cameraService.isRecording ? RecordRed : Color(white: 0.2), lineWidth: 2)
                 )
 
@@ -27,7 +28,7 @@ struct CameraOverlayView: View {
                             HStack(spacing: 6) {
                                 Circle()
                                     .fill(blinkOn ? RecordRed : Color.clear)
-                                    .frame(width: 8, height: 8)
+                                    .frame(width: layout.cameraRecordDot, height: layout.cameraRecordDot)
 
                                 if let start = cameraService.recordingStartTime {
                                     let elapsed = Int(context.date.timeIntervalSince(start))
@@ -48,7 +49,7 @@ struct CameraOverlayView: View {
                     .padding(6)
                     Spacer()
                 }
-                .frame(width: 192, height: 108)
+                .frame(width: layout.cameraWidth, height: layout.cameraHeight)
             }
 
             // Bottom controls
@@ -60,16 +61,17 @@ struct CameraOverlayView: View {
                     // Switch camera
                     Button(action: { cameraService.switchCamera() }) {
                         Image(systemName: "camera.rotate.fill")
-                            .font(.system(size: 16))
+                            .font(.system(size: layout.cameraIconSize))
                             .foregroundColor(cameraService.isRecording ? .gray : .white)
                     }
                     .disabled(cameraService.isRecording)
-                    .frame(width: 32, height: 32)
+                    .frame(width: layout.cameraButtonSize, height: layout.cameraButtonSize)
 
                     Spacer()
 
                     // Record / Stop
                     Button(action: {
+                        HapticService.recordToggle()
                         if cameraService.isRecording {
                             cameraService.stopRecording()
                         } else {
@@ -79,14 +81,14 @@ struct CameraOverlayView: View {
                         if cameraService.isRecording {
                             RoundedRectangle(cornerRadius: 3)
                                 .fill(Color.white)
-                                .frame(width: 16, height: 16)
+                                .frame(width: layout.cameraRecordIcon, height: layout.cameraRecordIcon)
                         } else {
                             Circle()
                                 .fill(RecordRed)
-                                .frame(width: 16, height: 16)
+                                .frame(width: layout.cameraRecordIcon, height: layout.cameraRecordIcon)
                         }
                     }
-                    .frame(width: 32, height: 32)
+                    .frame(width: layout.cameraButtonSize, height: layout.cameraButtonSize)
 
                     Spacer()
 
@@ -99,10 +101,10 @@ struct CameraOverlayView: View {
                         onClose()
                     }) {
                         Image(systemName: "xmark")
-                            .font(.system(size: 16))
+                            .font(.system(size: layout.cameraIconSize))
                             .foregroundColor(.white)
                     }
-                    .frame(width: 32, height: 32)
+                    .frame(width: layout.cameraButtonSize, height: layout.cameraButtonSize)
 
                     Spacer()
                 }
@@ -110,8 +112,8 @@ struct CameraOverlayView: View {
                 .padding(.vertical, 4)
                 .background(Color.black.opacity(0.5))
             }
-            .frame(width: 192, height: 108)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
+            .frame(width: layout.cameraWidth, height: layout.cameraHeight)
+            .clipShape(RoundedRectangle(cornerRadius: layout.cameraCorner))
         }
         .onAppear { cameraService.startSession() }
         .onDisappear {

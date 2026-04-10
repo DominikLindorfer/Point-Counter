@@ -3,17 +3,53 @@ import SwiftUI
 @main
 struct PadelPulseApp: App {
     @State private var viewModel = MatchViewModel(storage: MatchStorage())
+    @Environment(\.scenePhase) private var scenePhase
     private let remoteInput = RemoteInputService()
 
     var body: some Scene {
         WindowGroup {
-            ContentView(vm: viewModel)
-                .statusBarHidden()
-                .persistentSystemOverlays(.hidden)
-                .onAppear {
-                    UIApplication.shared.isIdleTimerDisabled = true
-                    setupRemoteInput()
-                }
+            GeometryReader { geo in
+                ContentView(vm: viewModel)
+                    .environment(\.layout, LayoutMetrics(
+                        screenWidth: geo.size.width,
+                        screenHeight: geo.size.height
+                    ))
+            }
+            .statusBarHidden()
+            .persistentSystemOverlays(.hidden)
+            .onAppear {
+                UIApplication.shared.isIdleTimerDisabled = true
+                setupRemoteInput()
+                viewModel.restoreInProgressMatch()
+            }
+        }
+        .commands {
+            CommandGroup(replacing: .undoRedo) {
+                Button("Undo") { viewModel.undo() }
+                    .keyboardShortcut("z", modifiers: .command)
+                    .disabled(!viewModel.canUndo)
+            }
+            CommandGroup(replacing: .newItem) {
+                Button("New Match") { viewModel.resetMatch() }
+                    .keyboardShortcut("n", modifiers: .command)
+            }
+            CommandMenu("Match") {
+                Button("Swap Sides") { HapticService.settingChanged(); viewModel.swapSides() }
+                    .keyboardShortcut("s", modifiers: .command)
+            }
+        }
+        .onChange(of: scenePhase) { _, newPhase in
+            switch newPhase {
+            case .background:
+                viewModel.pauseTimer()
+                viewModel.saveInProgressMatch()
+            case .inactive:
+                viewModel.saveInProgressMatch()
+            case .active:
+                viewModel.resumeTimer()
+            default:
+                break
+            }
         }
     }
 
@@ -30,10 +66,21 @@ struct ContentView: View {
     @State private var showHistory = false
 
     var body: some View {
-        if showHistory {
-            MatchHistoryView(vm: vm, onBack: { showHistory = false })
-        } else {
-            ScoreBoardView(vm: vm, onShowHistory: { showHistory = true })
+        ZStack {
+            if showHistory {
+                MatchHistoryView(vm: vm, onBack: { showHistory = false })
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .trailing).combined(with: .opacity),
+                        removal: .move(edge: .trailing).combined(with: .opacity)
+                    ))
+            } else {
+                ScoreBoardView(vm: vm, onShowHistory: { showHistory = true })
+                    .transition(.asymmetric(
+                        insertion: .move(edge: .leading).combined(with: .opacity),
+                        removal: .move(edge: .leading).combined(with: .opacity)
+                    ))
+            }
         }
+        .animation(.easeInOut(duration: 0.35), value: showHistory)
     }
 }

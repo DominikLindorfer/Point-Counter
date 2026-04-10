@@ -4,19 +4,21 @@ struct ScoreBoardView: View {
     let vm: MatchViewModel
     var onShowHistory: () -> Void = {}
 
+    @Environment(\.layout) private var layout
     @State private var showSettings = false
     @State private var showCamera = false
+    @State private var showNewMatchConfirmation = false
+    @AppStorage("has_seen_onboarding") private var hasSeenOnboarding = false
+    @AppStorage("camera_overlay_enabled") private var cameraEnabled = false
 
     var body: some View {
         let state = vm.state
         let (display1, display2) = PadelScoring.displayPoints(state: state, goldenPoint: vm.goldenPoint)
 
-        let t1Color = teamColorPresets[vm.team1ColorIndex]
-        let t2Color = teamColorPresets[vm.team2ColorIndex]
-        let team1Bg = t1Color.bg
-        let team1Accent = t1Color.accent
-        let team2Bg = t2Color.bg
-        let team2Accent = t2Color.accent
+        let team1Bg = vm.team1Color
+        let team1Accent = vm.team1Color.contrastingTextColor
+        let team2Bg = vm.team2Color
+        let team2Accent = vm.team2Color.contrastingTextColor
 
         // Determine which team shows on which side
         let leftName = vm.sidesSwapped ? vm.team2Name : vm.team1Name
@@ -58,7 +60,13 @@ struct ScoreBoardView: View {
                 )
 
                 Rectangle()
-                    .fill(Color(red: 0x22 / 255.0, green: 0x22 / 255.0, blue: 0x22 / 255.0))
+                    .fill(
+                        LinearGradient(
+                            colors: [.clear, Color(white: 0.15), Color(white: 0.2), Color(white: 0.15), .clear],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
                     .frame(width: 2)
 
                 TeamPanelView(
@@ -78,84 +86,95 @@ struct ScoreBoardView: View {
                 )
             }
 
-            // Top-left buttons
+            // Top-left buttons (icon-only)
             VStack {
-                HStack(spacing: 8) {
+                HStack(spacing: layout.toolbarSpacing) {
                     scoreBoardButton(
                         icon: "arrow.uturn.backward",
-                        label: "UNDO",
                         disabled: !vm.canUndo
                     ) { vm.undo() }
+                    .accessibilityLabel("UNDO")
 
                     scoreBoardButton(
-                        icon: "arrow.left.arrow.right",
-                        label: "SWAP"
-                    ) { vm.swapSides() }
+                        icon: "arrow.left.arrow.right"
+                    ) { HapticService.settingChanged(); vm.swapSides() }
+                    .accessibilityLabel("SWAP")
 
-                    Button(action: { showCamera.toggle() }) {
-                        Image(systemName: "video.fill")
-                            .font(.system(size: 20))
+                    if cameraEnabled {
+                        Button(action: { showCamera.toggle() }) {
+                            Image(systemName: "video.fill")
+                                .font(.system(size: layout.toolbarIconSize))
+                        }
+                        .buttonStyle(ScoreBoardButtonStyle(
+                            bgColor: showCamera ? Color(red: 0x8B / 255.0, green: 0, blue: 0) : ButtonBg
+                        ))
+                        .accessibilityLabel(showCamera ? "Hide camera" : "Show camera")
                     }
-                    .buttonStyle(ScoreBoardButtonStyle(
-                        bgColor: showCamera ? Color(red: 0x8B / 255.0, green: 0, blue: 0) : ButtonBg
-                    ))
-
-                    Spacer()
-                }
-                .padding(16)
-                Spacer()
-            }
-
-            // Top-right buttons
-            VStack {
-                HStack(spacing: 8) {
-                    Spacer()
-
-                    MatchTimerView(vm: vm)
 
                     scoreBoardButton(
-                        icon: "arrow.clockwise",
-                        label: "NEW MATCH"
-                    ) { vm.resetMatch() }
-
-                    Button(action: { showSettings = true }) {
-                        Image(systemName: "gearshape.fill")
-                            .font(.system(size: 20))
-                    }
-                    .buttonStyle(ScoreBoardButtonStyle())
-                }
-                .padding(16)
-                Spacer()
-            }
-
-            // Completed set scores — bottom center
-            VStack {
-                Spacer()
-                HStack(spacing: 16) {
-                    ForEach(0..<leftGamesList.count, id: \.self) { index in
-                        if index < state.currentSet || (state.isMatchOver && index <= state.currentSet) {
-                            SetScorePill(
-                                setIndex: index,
-                                leftGames: leftGamesList[index],
-                                rightGames: rightGamesList[index],
-                                leftColor: leftBg,
-                                rightColor: rightBg
-                            )
+                        icon: "arrow.clockwise"
+                    ) {
+                        HapticService.buttonPress()
+                        if vm.matchRunning || state.team1Points > 0 || state.team2Points > 0 {
+                            showNewMatchConfirmation = true
+                        } else {
+                            vm.resetMatch()
                         }
                     }
+                    .accessibilityLabel("NEW MATCH")
 
-                    if state.isTiebreak {
-                        Text("TIEBREAK")
-                            .font(.system(size: 18, weight: .bold))
-                            .foregroundColor(GoldColor)
-                            .transition(.scale.combined(with: .opacity))
-                    }
+                    Spacer()
                 }
-                .animation(.easeInOut(duration: 0.3), value: state.isTiebreak)
-                .padding(.bottom, 16)
+                .padding(layout.panelPadding)
+                Spacer()
             }
 
-            // Serve side indicator — bottom center above set scores
+            // Top-right: Settings, Timer + completed set scores
+            VStack {
+                HStack {
+                    Spacer()
+                    VStack(alignment: .trailing, spacing: 8) {
+                        HStack(spacing: layout.toolbarSpacing) {
+                            MatchTimerView(vm: vm)
+
+                            Button(action: { showSettings = true }) {
+                                Image(systemName: "gearshape.fill")
+                                    .font(.system(size: layout.toolbarIconSize))
+                            }
+                            .buttonStyle(ScoreBoardButtonStyle())
+                            .accessibilityLabel("Settings")
+                        }
+
+                        ForEach(0..<leftGamesList.count, id: \.self) { index in
+                            if index < state.currentSet || (state.isMatchOver && index <= state.currentSet) {
+                                compactSetPill(
+                                    setIndex: index,
+                                    leftGames: leftGamesList[index],
+                                    rightGames: rightGamesList[index]
+                                )
+                                .transition(.scale.combined(with: .opacity))
+                            }
+                        }
+
+                        if state.isTiebreak {
+                            Text("TB")
+                                .font(.system(size: layout.compactTiebreakFont, weight: .bold))
+                                .foregroundColor(GoldColor)
+                                .padding(.horizontal, 10)
+                                .padding(.vertical, 6)
+                                .background(GoldColor.opacity(0.15))
+                                .clipShape(RoundedRectangle(cornerRadius: 8))
+                                .transition(.scale.combined(with: .opacity))
+                        }
+                    }
+                    .animation(.easeInOut(duration: 0.3), value: state.currentSet)
+                    .animation(.easeInOut(duration: 0.3), value: state.isTiebreak)
+                }
+                .padding(layout.panelPadding)
+                Spacer()
+            }
+
+            // Serve side indicator — bottom center
             if vm.showServeSide {
                 VStack {
                     Spacer()
@@ -163,7 +182,7 @@ struct ScoreBoardView: View {
                         totalPoints: state.team1Points + state.team2Points,
                         isMatchOver: state.isMatchOver
                     )
-                    .padding(.bottom, 110)
+                    .padding(.bottom, layout.panelPadding)
                 }
             }
 
@@ -201,46 +220,77 @@ struct ScoreBoardView: View {
             SettingsSidebarView(
                 visible: showSettings,
                 vm: vm,
-                team1Accent: team1Accent,
-                team2Accent: team2Accent,
                 onClose: { showSettings = false },
                 onShowHistory: onShowHistory
             )
+
+            // Onboarding overlay (first launch only)
+            if !hasSeenOnboarding {
+                OnboardingOverlayView(onDismiss: {
+                    withAnimation { hasSeenOnboarding = true }
+                })
+            }
+        }
+        .confirmationDialog("Start New Match?", isPresented: $showNewMatchConfirmation) {
+            Button("New Match", role: .destructive) { vm.resetMatch() }
+            Button("Cancel", role: .cancel) {}
+        } message: {
+            Text("Current match progress will be lost.")
+        }
+        .onChange(of: cameraEnabled) { _, newValue in
+            if !newValue { showCamera = false }
         }
     }
 
     private func scoreBoardButton(
         icon: String,
-        label: String? = nil,
         disabled: Bool = false,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
-            HStack(spacing: 6) {
-                Image(systemName: icon)
-                    .font(.system(size: 20))
-                if let label {
-                    Text(label)
-                        .font(.system(size: 14, weight: .bold))
-                }
-            }
+            Image(systemName: icon)
+                .font(.system(size: layout.toolbarIconSize))
         }
         .buttonStyle(ScoreBoardButtonStyle())
         .disabled(disabled)
         .opacity(disabled ? 0.3 : 1.0)
     }
+
+    private func compactSetPill(setIndex: Int, leftGames: Int, rightGames: Int) -> some View {
+        VStack(spacing: 2) {
+            Text("S\(setIndex + 1)")
+                .font(.system(size: layout.compactSetLabelFont, weight: .bold))
+                .foregroundColor(DimColor)
+            HStack(spacing: 3) {
+                Text("\(leftGames)")
+                Text(":")
+                    .foregroundColor(DimColor)
+                Text("\(rightGames)")
+            }
+            .font(.system(size: layout.compactSetScoreFont, weight: .bold))
+            .foregroundColor(.white)
+        }
+        .padding(.horizontal, 12)
+        .padding(.vertical, 6)
+        .background(Color.black.opacity(0.5))
+        .clipShape(RoundedRectangle(cornerRadius: 8))
+    }
 }
 
 struct ScoreBoardButtonStyle: ButtonStyle {
     var bgColor: Color = ButtonBg
+    var size: CGFloat = 44
 
     func makeBody(configuration: Configuration) -> some View {
-        configuration.label
-            .foregroundColor(.white)
-            .padding(.horizontal, 16)
-            .padding(.vertical, 10)
-            .background(bgColor)
-            .clipShape(RoundedRectangle(cornerRadius: 8))
-            .opacity(configuration.isPressed ? 0.7 : 1.0)
+        ZStack {
+            RoundedRectangle(cornerRadius: 8)
+                .fill(bgColor)
+            configuration.label
+                .foregroundColor(.white)
+        }
+        .frame(width: size, height: size)
+        .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
+        .opacity(configuration.isPressed ? 0.8 : 1.0)
+        .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)
     }
 }

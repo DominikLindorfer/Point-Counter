@@ -2,7 +2,7 @@ import Foundation
 
 /// The complete state of a padel match.
 /// Points are stored as raw integers (0,1,2,3,...) and converted to display strings separately.
-struct MatchState: Equatable {
+struct MatchState: Equatable, Codable {
     var team1Sets: Int = 0
     var team2Sets: Int = 0
     var team1Games: [Int] = [0]   // games won per set (index = set number)
