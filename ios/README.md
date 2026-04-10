@@ -9,6 +9,10 @@
 
 Native iPad scoreboard for padel & tennis. Landscape-locked, full-screen, designed for courtside use with touch or Bluetooth remote.
 
+<p align="center">
+  <img src="docs/scoreboard-fresh.png" alt="Padel Pulse iPadOS — main scoreboard" width="720" />
+</p>
+
 ---
 
 ## Quick Start
