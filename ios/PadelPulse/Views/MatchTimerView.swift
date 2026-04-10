@@ -6,13 +6,10 @@ struct MatchTimerView: View {
     var body: some View {
         if vm.matchRunning || vm.matchStartTimeMs > 0 {
             TimelineView(.periodic(from: .now, by: 1.0)) { context in
-                let elapsed: Int64
-                if vm.matchRunning {
-                    elapsed = Int64(context.date.timeIntervalSince1970 * 1000) - vm.matchStartTimeMs
-                } else {
-                    elapsed = 0
-                }
-                let totalSec = max(0, elapsed / 1000)
+                let elapsed = vm.matchRunning
+                    ? max(0, Int64(context.date.timeIntervalSince1970 * 1000) - vm.matchStartTimeMs)
+                    : Int64(0)
+                let totalSec = elapsed / 1000
                 let min = totalSec / 60
                 let sec = totalSec % 60
 
