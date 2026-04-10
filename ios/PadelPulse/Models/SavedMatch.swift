@@ -1,0 +1,77 @@
+import Foundation
+
+/// A saved match record.
+struct SavedMatch: Codable, Identifiable {
+    var id: Int64
+    let timestamp: Int64          // milliseconds since epoch
+    let team1Name: String
+    let team2Name: String
+    let team1Sets: Int
+    let team2Sets: Int
+    let team1Games: [Int]
+    let team2Games: [Int]
+    let winner: Int               // 1 = team1, 2 = team2
+    let durationMs: Int64
+    let goldenPoint: Bool
+    let team1PointsWon: Int
+    let team2PointsWon: Int
+
+    /// Formatted date string for display.
+    var formattedDate: String {
+        let date = Date(timeIntervalSince1970: Double(timestamp) / 1000.0)
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM dd, yyyy  HH:mm"
+        return formatter.string(from: date)
+    }
+
+    /// Duration as formatted string (M:SS).
+    var formattedDuration: String {
+        let min = durationMs / 60000
+        let sec = (durationMs % 60000) / 1000
+        return String(format: "%d:%02d", min, sec)
+    }
+
+    /// Winner's team name.
+    var winnerName: String {
+        winner == 1 ? team1Name : team2Name
+    }
+
+    /// Build a shareable text summary.
+    func shareText() -> String {
+        let dateStr = formattedDate
+        let durationMin = durationMs / 60000
+        let durationSec = (durationMs % 60000) / 1000
+
+        let gameScores = team1Games.enumerated().map { (i, g1) in
+            let g2 = i < team2Games.count ? team2Games[i] : 0
+            return "  Set \(i + 1): \(g1)-\(g2)"
+        }.joined(separator: "\n")
+
+        let totalPoints = team1PointsWon + team2PointsWon
+        let pointsLine: String
+        if totalPoints > 0 {
+            pointsLine = "\nPoints won: \(team1Name) \(team1PointsWon) - \(team2PointsWon) \(team2Name)"
+        } else {
+            pointsLine = ""
+        }
+
+        var text = """
+        Padel Match Result
+        \(dateStr)
+
+        \(team1Name)  \(team1Sets) - \(team2Sets)  \(team2Name)
+
+        Game scores:
+        \(gameScores)
+
+        Winner: \(winnerName)
+        Duration: \(durationMin)m \(durationSec)s\(pointsLine)
+        """
+
+        if goldenPoint {
+            text += "\nScoring: Golden Point"
+        }
+
+        return text
+    }
+}
