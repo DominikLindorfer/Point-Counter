@@ -5,26 +5,32 @@
 <h1 align="center">Padel Pulse</h1>
 
 <p align="center">
-  <b>A premium courtside scoreboard for padel & tennis on iPad.</b><br>
-  <b>Big scores. Bluetooth remote. Zero setup. No ads.</b>
+  <b>A courtside scoreboard for padel & tennis — big scores, Bluetooth remote control, zero setup.</b><br><br>
+  <b>No ads. No logins. Free and open source!</b>
 </p>
 
 <p align="center">
   <a href="https://github.com/DominikLindorfer/Padelcounter/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
-  <img src="https://img.shields.io/badge/iPadOS-17.0+-blue.svg" alt="iPadOS 17.0+">
-  <img src="https://img.shields.io/badge/Swift-SwiftUI-FA7343.svg" alt="Swift + SwiftUI">
-  <img src="https://img.shields.io/badge/Status-Beta-orange.svg" alt="Status: Beta">
   <img src="https://img.shields.io/badge/Platform-Android-green.svg" alt="Platform: Android">
+  <img src="https://img.shields.io/badge/Platform-iPadOS_(beta)-orange.svg" alt="Platform: iPadOS (beta)">
+  <img src="https://img.shields.io/badge/Kotlin-Jetpack%20Compose-7F52FF.svg" alt="Kotlin + Jetpack Compose">
+  <img src="https://img.shields.io/badge/Swift-SwiftUI-FA7343.svg" alt="Swift + SwiftUI">
 </p>
 
 ---
 
-Place your iPad courtside and everyone can read the score from across the court. Pair a cheap Bluetooth remote and score points without touching the screen.
+Place your tablet courtside and everyone can read the score. Pair a cheap Bluetooth remote and score points without leaving the court.
 
 <p align="center">
 
 https://github.com/user-attachments/assets/ad0aed53-c02c-48b0-93c0-9c121f993f9b
 
+</p>
+
+<p align="center">
+  <a href="https://play.google.com/store/apps/details?id=io.github.dominiklindorfer.padelcounter">
+    <img src="https://play.google.com/intl/en_us/badges/static/images/badges/en_badge_web_generic.png" alt="Get it on Google Play" height="80">
+  </a>
 </p>
 
 ## Features
@@ -36,35 +42,40 @@ https://github.com/user-attachments/assets/ad0aed53-c02c-48b0-93c0-9c121f993f9b
 | **Automatic tiebreaks** | Kicks in at 6-6 with proper tiebreak scoring |
 | **Configurable sets** | Play to 1, 2, or 3 sets (or unlimited) |
 | **Bluetooth remote** | Score with a wrist-mounted media controller — hands-free |
-| **Serve indicator** | Shows L/R serve side, auto-rotates each game |
+| **Serve indicator** | Shows serving team and serve side (L/R), auto-rotates each game |
 | **Match timer** | Elapsed time starts on the first point |
-| **Team customization** | Custom names + 8 color presets per team |
+| **Team customization** | Custom names and colors per team |
 | **Swap sides** | One tap to mirror teams when you switch court ends |
 | **Match history** | Auto-saves completed matches with scores, duration, and stats |
-| **Share results** | Export as text or as a rendered score card image |
+| **Share results** | Export match results as text or image via any app |
 | **Undo** | Made a mistake? One button to go back |
-| **Adaptive layout** | Scales to any iPad screen size |
-| **Haptic feedback** | Tactile responses for scoring and UI interactions |
-| **Match persistence** | In-progress match survives app kill and restart |
-| **Keyboard shortcuts** | Cmd+Z (undo), Cmd+N (new match), Cmd+S (swap sides) |
-| **Sound effects** | System sounds for points, games, match over (toggleable) |
-| **Onboarding** | First-launch hints for new users |
-| **Match-over celebration** | Confetti, winner glow, staggered animations |
-| **Camera overlay** | Optional picture-in-picture camera (opt-in via settings) |
-| **Localization** | English, German, Spanish |
 | **Immersive display** | Full-screen, landscape-locked, screen stays on |
+| **Animated transitions** | Score changes with smooth bounce effects and a trophy on match point |
+
+## Platforms
+
+### Android (released)
+
+Available on Google Play. Built with Kotlin + Jetpack Compose.
+
+See [`app/`](app/) for the Android source code.
+
+### iPadOS (beta)
+
+Native iPad app built with Swift + SwiftUI. Feature-complete with additional premium features like haptic feedback, sound effects, match state persistence, keyboard shortcuts, confetti animations, and localization (EN/DE/ES).
+
+See [`ios/README.md`](ios/README.md) for full documentation.
 
 ## Recommended Setup
 
-All you need is an iPad, a stand, and a Bluetooth remote:
+All you need is a tablet, a stand, and a Bluetooth remote:
 
 |  | Link |
 |------|------|
+| **Android Tablet** — Xiaomi Redmi Pad Pro | [Amazon.de](https://www.amazon.de/dp/B0FJ9234ZX) |
 | **iPad** — any iPad running iPadOS 17+ | |
 | **Tablet Stand** | [Amazon.de](https://www.amazon.de/dp/B0DRXP3V6W) |
 | **Bluetooth Remote** | [Amazon.de](https://www.amazon.de/dp/B08MKJX4MH) |
-
-> Also available on **Android** — [Get it on Google Play](https://play.google.com/store/apps/details?id=io.github.dominiklindorfer.padelcounter)
 
 ## Bluetooth Remote
 
@@ -76,61 +87,43 @@ The app works with cheap Bluetooth media controllers (like wrist-mounted remotes
 
 ### Button Mapping
 
-| Button | Action |
-|--------|--------|
-| Next Track `>>` | Team 1 scores |
-| Previous Track `<<` | Team 2 scores |
-| Play / Pause | Undo |
+| Button | Android | iPadOS |
+|--------|---------|--------|
+| Volume Up | Team 1 scores | *(not available — OS restriction)* |
+| Volume Down | Team 2 scores | *(not available — OS restriction)* |
+| Next Track `>>` | Team 1 scores | Team 1 scores |
+| Previous Track `<<` | Team 2 scores | Team 2 scores |
+| Play / Pause | Undo | Undo |
 
-> On Android, Volume Up/Down also work for scoring.
-
-### iPad Keyboard Shortcuts
-
-| Shortcut | Action |
-|----------|--------|
-| `Cmd + Z` | Undo last point |
-| `Cmd + N` | New match |
-| `Cmd + S` | Swap sides |
-| `Cmd + ,` | Open settings |
-| `Space` | Undo (via GCKeyboard) |
-| `Arrow keys` | Score points (via GCKeyboard) |
+> **Tip (Android):** If your controller sends different key codes, you can customize the mapping in `MainActivity.kt` — see the [KeyEvent docs](https://developer.android.com/reference/android/view/KeyEvent).
 
 ## Building from Source
-
-### iPadOS
-
-```bash
-cd ios
-xcodegen generate                    # Generate .xcodeproj from project.yml
-open PadelPulse.xcodeproj            # Open in Xcode 16+, build for iPad
-```
-
-Requires iPadOS 17.0+. Runs on iPad only (landscape-locked). Camera features require a real device.
 
 ### Android
 
 ```bash
 git clone https://github.com/DominikLindorfer/Point-Counter.git
 # Open in Android Studio, sync Gradle, and run
-# Min SDK 26 (Android 8.0) · Target SDK 36
+# Min SDK 26 (Android 8.0) · Target SDK 36 (Android 15)
 ```
 
-## Tech Stack
-
 ### iPadOS
-- **Swift 5.9** + **SwiftUI** with `@Observable` (iOS 17)
-- **AVFoundation** for camera + video recording
-- **UserDefaults + Codable** for match persistence
-- **XcodeGen** for project generation from `project.yml`
-- **ImageRenderer** for share card generation
-- **Canvas + TimelineView** for particle animations
 
-### Android
-- **Kotlin** + **Jetpack Compose** (Material 3)
-- **CameraX** for optional video capture
-- **AndroidX Lifecycle** + ViewModel
+```bash
+cd ios
+xcodegen generate        # Generate .xcodeproj from project.yml
+open PadelPulse.xcodeproj
+# Build for iPad in Xcode 16+ (requires iPadOS 17.0+)
+```
 
-Both platforms: **No network calls, no analytics, no ads.**
+## Project Structure
+
+```
+├── app/                    # Android app (Kotlin + Jetpack Compose)
+├── ios/                    # iPadOS app (Swift + SwiftUI) — see ios/README.md
+├── CLAUDE.md               # Dev context for AI-assisted development
+└── README.md               # This file
+```
 
 ## Privacy
 
