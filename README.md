@@ -2,11 +2,11 @@
   <img src="https://github.com/user-attachments/assets/5d866f24-f629-4d10-b6ff-5cc8576e2cc9" alt="Point Counter — courtside scoreboard" width="720" />
 </p>
 
-<h1 align="center">Point Counter</h1>
+<h1 align="center">Padel & Tennis Point Counter</h1>
 
 <p align="center">
   <b>A courtside scoreboard for padel & tennis — big scores, Bluetooth remote control, zero setup.</b><br><br>
-  <b>No ads. Free and open source!</b>
+  <b>No ads. No logins. Free and open source!</b>
 </p>
 
 <p align="center">

@@ -1,6 +1,6 @@
 # Privacy Policy
 
-**Padel Counter** is a free, open-source Android application.
+**Point-Counter** is a free, open-source Android application.
 
 ## Data Collection
 
@@ -28,6 +28,6 @@ If this policy changes, updates will be posted in this file in the app's source 
 
 ## Contact
 
-If you have questions about this privacy policy, please open an issue on the [GitHub repository](https://github.com/dominiklindorfer/Padelcounter).
+If you have questions about this privacy policy, please open an issue on the [GitHub repository](https://github.com/dominiklindorfer/Point-Counter).
 
 *Last updated: April 2026*
