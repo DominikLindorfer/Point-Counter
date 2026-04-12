@@ -1,0 +1,98 @@
+/* ScoreBoardView */
+"UNDO" = "UNDO";
+"SWAP" = "SWAP";
+"NEW MATCH" = "NEW MATCH";
+"TIEBREAK" = "TIEBREAK";
+"Start New Match?" = "Start New Match?";
+"New Match" = "New Match";
+"Cancel" = "Cancel";
+"Current match progress will be lost." = "Current match progress will be lost.";
+"Hide camera" = "Hide camera";
+"Show camera" = "Show camera";
+"Settings" = "Settings";
+
+/* SettingsSidebarView */
+"SETTINGS" = "SETTINGS";
+"Team 1" = "Team 1";
+"Team 2" = "Team 2";
+"Name" = "Name";
+"Color" = "Color";
+"Match Rules" = "Match Rules";
+"Scoring Mode" = "Scoring Mode";
+"GOLDEN PT" = "GOLDEN PT";
+"ADVANTAGE" = "ADVANTAGE";
+"Sets to Win" = "Sets to Win";
+"NO LIMIT" = "NO LIMIT";
+"Serving" = "Serving";
+"Serve Side (L/R)" = "Serve Side (L/R)";
+"Sound Effects" = "Sound Effects";
+"Camera" = "Camera";
+"Match History" = "Match History";
+"Double tap to change" = "Double tap to change";
+
+/* TeamPanelView */
+"GAMES" = "GAMES";
+"%@, score %@, %lld games" = "%@, score %@, %lld games";
+"Currently serving" = "Currently serving";
+"Double tap to score a point for %@" = "Double tap to score a point for %@";
+
+/* MatchOverOverlayView */
+"MATCH OVER" = "MATCH OVER";
+"%@ wins!" = "%@ wins!";
+"SHARE" = "SHARE";
+"Share match result" = "Share match result";
+"Start new match" = "Start new match";
+"Match over. %@ wins" = "Match over. %@ wins";
+
+/* MatchHistoryView */
+"MATCH HISTORY" = "MATCH HISTORY";
+"No matches yet" = "No matches yet";
+"Completed matches will appear here" = "Completed matches will appear here";
+"Delete All History?" = "Delete All History?";
+"Delete All" = "Delete All";
+"This cannot be undone." = "This cannot be undone.";
+"Share as Text" = "Share as Text";
+"Share as Image" = "Share as Image";
+"Winner" = "Winner";
+"Duration" = "Duration";
+"Points Won" = "Points Won";
+"Back to scoreboard" = "Back to scoreboard";
+"Delete all match history" = "Delete all match history";
+"Delete this match" = "Delete this match";
+
+/* ServeSideIndicatorView */
+"RIGHT" = "RIGHT";
+"LEFT" = "LEFT";
+"Serve from the right side" = "Serve from the right side";
+"Serve from the left side" = "Serve from the left side";
+
+/* MatchTimerView */
+"Match timer, %lld minutes %lld seconds" = "Match timer, %lld minutes %lld seconds";
+
+/* OnboardingOverlayView */
+"PADEL PULSE" = "PADEL PULSE";
+"Tap left or right side to score a point" = "Tap left or right side to score a point";
+"Tap UNDO or press Spacebar to undo" = "Tap UNDO or press Spacebar to undo";
+"Tap the gear icon for settings" = "Tap the gear icon for settings";
+"Tap SWAP to switch court sides" = "Tap SWAP to switch court sides";
+"GOT IT" = "GOT IT";
+
+/* NameFieldView */
+"Max 16 characters" = "Max 16 characters";
+"Team name" = "Team name";
+
+/* SetScorePill / MatchScoreCardView */
+"SET %lld" = "SET %lld";
+"DURATION" = "DURATION";
+"POINTS" = "POINTS";
+"MODE" = "MODE";
+
+/* PadelPulseApp Commands */
+"Undo" = "Undo";
+"Swap Sides" = "Swap Sides";
+"Match" = "Match";
+
+/* ShareText */
+"Padel Match Result" = "Padel Match Result";
+"Game scores:" = "Game scores:";
+"Scoring: Golden Point" = "Scoring: Golden Point";
