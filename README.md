@@ -10,7 +10,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/DominikLindorfer/Padelcounter/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/Android-MIT-blue.svg" alt="License: MIT"></a>
+  <a href="ios/LICENSE"><img src="https://img.shields.io/badge/iOS-Source--Available-orange.svg" alt="License: Source-Available"></a>
   <img src="https://img.shields.io/badge/Platform-Android-green.svg" alt="Platform: Android">
   <img src="https://img.shields.io/badge/Platform-iOS_(iPhone_%26_iPad)-orange.svg" alt="Platform: iOS (iPhone & iPad)">
   <img src="https://img.shields.io/badge/Kotlin-Jetpack%20Compose-7F52FF.svg" alt="Kotlin + Jetpack Compose">
@@ -131,7 +132,8 @@ This app collects **zero data**. No accounts, no analytics, no internet access. 
 
 ## License
 
-MIT — see [LICENSE](LICENSE) for details.
+- **Android app & shared code** — MIT. See [LICENSE](LICENSE).
+- **iOS app** — Source-available, personal use only. See [ios/LICENSE](ios/LICENSE).
 
 ---
 
