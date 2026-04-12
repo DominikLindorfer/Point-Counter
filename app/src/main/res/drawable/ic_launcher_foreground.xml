@@ -5,37 +5,22 @@
     android:viewportWidth="108"
     android:viewportHeight="108">
 
-    <!-- Padel ball body (optic tennis-ball yellow) -->
+    <!-- Padel ball (circle with cross seam) -->
     <path
-        android:fillColor="#D4E157"
+        android:fillColor="#FFD700"
         android:pathData="M54,32 A22,22 0 1,1 53.99,32z" />
 
-    <!-- Thin darker rim for 3D depth -->
-    <path
-        android:fillColor="#AFB42B"
-        android:fillAlpha="0.35"
-        android:fillType="evenOdd"
-        android:pathData="M54,32 A22,22 0 1,1 53.99,32z M54,35 A19,19 0 1,1 53.99,35z" />
-
-    <!-- Highlight on upper-left for glossy sheen -->
-    <path
-        android:fillColor="#F0F4C3"
-        android:fillAlpha="0.75"
-        android:pathData="M47,41 A5.5,5.5 0 1,1 46.99,41z" />
-
-    <!-- Classic padel/tennis ball seam - lens-shaped white curves -->
+    <!-- Ball seam - curved line -->
     <path
         android:fillColor="#00000000"
-        android:pathData="M54,33 C41,41 41,67 54,75"
-        android:strokeWidth="2.2"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round" />
+        android:pathData="M40,34 Q54,48 40,62"
+        android:strokeWidth="2"
+        android:strokeColor="#091426" />
     <path
         android:fillColor="#00000000"
-        android:pathData="M54,33 C67,41 67,67 54,75"
-        android:strokeWidth="2.2"
-        android:strokeColor="#FFFFFF"
-        android:strokeLineCap="round" />
+        android:pathData="M68,34 Q54,48 68,62"
+        android:strokeWidth="2"
+        android:strokeColor="#091426" />
 
     <!-- Score "40" text below the ball -->
     <!-- "4" -->
