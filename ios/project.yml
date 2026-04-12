@@ -14,9 +14,10 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.9"
-    TARGETED_DEVICE_FAMILY: "2"  # iPad only
+    TARGETED_DEVICE_FAMILY: "1,2"  # iPhone + iPad (Universal)
     INFOPLIST_KEY_UIRequiresFullScreen: "YES"
     INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
+    INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
     INFOPLIST_KEY_UILaunchScreen_Generation: "YES"
     INFOPLIST_KEY_NSCameraUsageDescription: "Camera access is needed to record your padel matches from courtside."
     INFOPLIST_KEY_NSMicrophoneUsageDescription: "Microphone access is needed to record audio with your match videos."
@@ -40,6 +41,9 @@ targets:
       properties:
         UIRequiresFullScreen: true
         UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~iphone:
           - UIInterfaceOrientationLandscapeLeft
           - UIInterfaceOrientationLandscapeRight
         UILaunchScreen:
