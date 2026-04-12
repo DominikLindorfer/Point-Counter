@@ -38,7 +38,7 @@ struct OnboardingOverlayView: View {
         .transition(.opacity)
     }
 
-    private func hintRow(icon: String, text: String) -> some View {
+    private func hintRow(icon: String, text: LocalizedStringKey) -> some View {
         HStack(spacing: 16) {
             Image(systemName: icon)
                 .font(.system(size: layout.matchOverButtonIcon))
