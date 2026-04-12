@@ -24,6 +24,7 @@ struct MatchOverOverlayView: View {
         let state = vm.state
         let winnerName = state.winner == 1 ? vm.team1Name : vm.team2Name
         let winnerColor = state.winner == 1 ? team1Accent : team2Accent
+        let winnerBgColor = state.winner == 1 ? vm.team1Color : vm.team2Color
 
         ZStack {
             Color.black.opacity(0.87)
@@ -121,7 +122,7 @@ struct MatchOverOverlayView: View {
                         .foregroundColor(.white)
                         .padding(.horizontal, 24)
                         .padding(.vertical, 12)
-                        .background(winnerColor)
+                        .background(winnerBgColor)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                     }
                     .accessibilityLabel("Start new match")

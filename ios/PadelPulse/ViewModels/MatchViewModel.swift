@@ -50,7 +50,7 @@ final class MatchViewModel {
     var state = MatchState()
     var goldenPoint = false
     var sidesSwapped = false
-    var setsToWin = 0
+    var setsToWin = 2
     var team1Name: String
     var team2Name: String
     var team1Color: Color = defaultTeam1Color

@@ -76,7 +76,7 @@
 		C90556AEAF09A74696D62A98 /* ColorSwatchPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSwatchPicker.swift; sourceTree = "<group>"; };
 		CADF9F0DA638E5BC3AA349CD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		CBA4C1AB66E242E1B9E9D22A /* PadelPulseTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PadelPulseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D20410D3ACC8AF375EFCC69A /* PadelPulse.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PadelPulse.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D20410D3ACC8AF375EFCC69A /* PadelPulse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PadelPulse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBD566DC6819BD59CBADA8AA /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		DFD00A60147F284247981462 /* PadelPulseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PadelPulseApp.swift; sourceTree = "<group>"; };
 		E21E0036B11EBF94582A15A9 /* CameraOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraOverlayView.swift; sourceTree = "<group>"; };
@@ -275,8 +275,6 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
-				TargetAttributes = {
-				};
 			};
 			buildConfigurationList = 367CEDA9A43E39A688CE498A /* Build configuration list for PBXProject "PadelPulse" */;
 			developmentRegion = en;
@@ -553,6 +551,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = P38L5RD8CU;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PadelPulse/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -572,6 +571,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = P38L5RD8CU;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PadelPulse/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
