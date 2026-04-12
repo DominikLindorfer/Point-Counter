@@ -31,9 +31,11 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -68,8 +70,11 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalMinimumInteractiveComponentSize
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
@@ -83,6 +88,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
@@ -162,6 +168,7 @@ private val ButtonBgDisabled = Color(0xFF111111)
 private val SettingsBg = Color(0xFF161616)
 private val SettingsSurface = Color(0xFF222222)
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
     val state = vm.state
@@ -198,6 +205,8 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
     var showSettings by remember { mutableStateOf(false) }
     var showCamera by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    val cfg = LocalConfiguration.current
+    val screenScale = minOf(cfg.screenHeightDp / 800f, cfg.screenWidthDp / 1333f).coerceIn(0.4f, 1f)
 
     val cameraPermissions = remember {
         buildList {
@@ -217,6 +226,9 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
         }
     }
 
+    val scaledButtonPadding = PaddingValues(horizontal = (24 * screenScale).dp, vertical = (8 * screenScale).dp)
+
+    CompositionLocalProvider(LocalMinimumInteractiveComponentSize provides 0.dp) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -269,12 +281,13 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
         Row(
             modifier = Modifier
                 .align(Alignment.TopStart)
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                .padding((16 * screenScale).dp),
+            horizontalArrangement = Arrangement.spacedBy((8 * screenScale).dp),
         ) {
             Button(
                 onClick = { vm.undo() },
                 enabled = vm.canUndo,
+                contentPadding = scaledButtonPadding,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = ButtonBg,
                     contentColor = TextWhite,
@@ -282,21 +295,22 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
                     disabledContentColor = Color(0xFF444444),
                 ),
             ) {
-                Icon(Icons.AutoMirrored.Filled.Undo, "Undo", Modifier.size(20.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("UNDO", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Icon(Icons.AutoMirrored.Filled.Undo, "Undo", Modifier.size((20 * screenScale).dp))
+                Spacer(Modifier.width((6 * screenScale).dp))
+                Text("UNDO", fontSize = (14 * screenScale).sp, fontWeight = FontWeight.Bold)
             }
 
             Button(
                 onClick = { vm.swapSides() },
+                contentPadding = scaledButtonPadding,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = ButtonBg,
                     contentColor = TextWhite,
                 ),
             ) {
-                Icon(Icons.Filled.SwapHoriz, "Swap", Modifier.size(20.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("SWAP", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Icon(Icons.Filled.SwapHoriz, "Swap", Modifier.size((20 * screenScale).dp))
+                Spacer(Modifier.width((6 * screenScale).dp))
+                Text("SWAP", fontSize = (14 * screenScale).sp, fontWeight = FontWeight.Bold)
             }
 
             Button(
@@ -315,12 +329,13 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
                         }
                     }
                 },
+                contentPadding = scaledButtonPadding,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = if (showCamera) Color(0xFF8B0000) else ButtonBg,
                     contentColor = TextWhite,
                 ),
             ) {
-                Icon(Icons.Filled.Videocam, "Camera", Modifier.size(20.dp))
+                Icon(Icons.Filled.Videocam, "Camera", Modifier.size((20 * screenScale).dp))
             }
         }
 
@@ -328,32 +343,34 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
         Row(
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+                .padding((16 * screenScale).dp),
+            horizontalArrangement = Arrangement.spacedBy((8 * screenScale).dp),
         ) {
             // Match timer
-            MatchTimer(vm)
+            MatchTimer(vm, screenScale)
 
             Button(
                 onClick = { vm.resetMatch() },
+                contentPadding = scaledButtonPadding,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = ButtonBg,
                     contentColor = TextWhite,
                 ),
             ) {
-                Icon(Icons.Filled.Refresh, "New Match", Modifier.size(20.dp))
-                Spacer(Modifier.width(6.dp))
-                Text("NEW MATCH", fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                Icon(Icons.Filled.Refresh, "New Match", Modifier.size((20 * screenScale).dp))
+                Spacer(Modifier.width((6 * screenScale).dp))
+                Text("NEW MATCH", fontSize = (14 * screenScale).sp, fontWeight = FontWeight.Bold)
             }
 
             Button(
                 onClick = { showSettings = true },
+                contentPadding = scaledButtonPadding,
                 colors = ButtonDefaults.buttonColors(
                     containerColor = ButtonBg,
                     contentColor = TextWhite,
                 ),
             ) {
-                Icon(Icons.Filled.Settings, "Settings", Modifier.size(20.dp))
+                Icon(Icons.Filled.Settings, "Settings", Modifier.size((20 * screenScale).dp))
             }
         }
 
@@ -362,8 +379,8 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
             Row(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 16.dp),
-                horizontalArrangement = Arrangement.spacedBy(16.dp),
+                    .padding(bottom = (16 * screenScale).dp),
+                horizontalArrangement = Arrangement.spacedBy((16 * screenScale).dp),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 leftGamesList.forEachIndexed { index, _ ->
@@ -372,38 +389,38 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
                         val rg = rightGamesList[index]
                         Box(
                             modifier = Modifier
-                                .background(ButtonBg, RoundedCornerShape(10.dp))
-                                .padding(horizontal = 16.dp, vertical = 6.dp),
+                                .background(ButtonBg, RoundedCornerShape((10 * screenScale).dp))
+                                .padding(horizontal = (16 * screenScale).dp, vertical = (6 * screenScale).dp),
                             contentAlignment = Alignment.Center,
                         ) {
                             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                 Text(
                                     "SET ${index + 1}",
                                     color = DimColor,
-                                    fontSize = 16.sp,
+                                    fontSize = (16 * screenScale).sp,
                                     fontWeight = FontWeight.Medium,
-                                    letterSpacing = 1.sp,
+                                    letterSpacing = (1 * screenScale).sp,
                                 )
                                 Row(
                                     verticalAlignment = Alignment.CenterVertically,
-                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                    horizontalArrangement = Arrangement.spacedBy((4 * screenScale).dp),
                                 ) {
                                     Text(
                                         lg.toString(),
                                         color = leftBg,
-                                        fontSize = 40.sp,
+                                        fontSize = (40 * screenScale).sp,
                                         fontWeight = FontWeight.Bold,
                                     )
                                     Text(
                                         ":",
                                         color = DimColor,
-                                        fontSize = 40.sp,
+                                        fontSize = (40 * screenScale).sp,
                                         fontWeight = FontWeight.Bold,
                                     )
                                     Text(
                                         rg.toString(),
                                         color = rightBg,
-                                        fontSize = 40.sp,
+                                        fontSize = (40 * screenScale).sp,
                                         fontWeight = FontWeight.Bold,
                                     )
                                 }
@@ -419,7 +436,7 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
                     Text(
                         "TIEBREAK",
                         color = GoldColor,
-                        fontSize = 18.sp,
+                        fontSize = (18 * screenScale).sp,
                         fontWeight = FontWeight.Bold,
                     )
                 }
@@ -440,31 +457,31 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
                 label = "serveSide",
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = 110.dp),
+                    .padding(bottom = (110 * screenScale).dp),
             ) { isRight ->
                 Box(
                     modifier = Modifier
-                        .background(ButtonBg, RoundedCornerShape(16.dp))
-                        .padding(horizontal = 24.dp, vertical = 12.dp),
+                        .background(ButtonBg, RoundedCornerShape((16 * screenScale).dp))
+                        .padding(horizontal = (24 * screenScale).dp, vertical = (12 * screenScale).dp),
                     contentAlignment = Alignment.Center,
                 ) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(12.dp),
+                        horizontalArrangement = Arrangement.spacedBy((12 * screenScale).dp),
                     ) {
                         if (!isRight) {
                             Icon(Icons.AutoMirrored.Filled.ArrowLeft, "Left",
-                                tint = GoldColor, modifier = Modifier.size(48.dp))
+                                tint = GoldColor, modifier = Modifier.size((48 * screenScale).dp))
                         }
                         Icon(Icons.Filled.SportsTennis, "Serve",
-                            tint = GoldColor, modifier = Modifier.size(44.dp))
+                            tint = GoldColor, modifier = Modifier.size((44 * screenScale).dp))
                         Text(
                             text = if (isRight) "RIGHT" else "LEFT",
-                            color = GoldColor, fontSize = 36.sp, fontWeight = FontWeight.Bold,
+                            color = GoldColor, fontSize = (36 * screenScale).sp, fontWeight = FontWeight.Bold,
                         )
                         if (isRight) {
                             Icon(Icons.AutoMirrored.Filled.ArrowRight, "Right",
-                                tint = GoldColor, modifier = Modifier.size(48.dp))
+                                tint = GoldColor, modifier = Modifier.size((48 * screenScale).dp))
                         }
                     }
                 }
@@ -494,14 +511,14 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
                             Spring.DampingRatioMediumBouncy, Spring.StiffnessLow))
                     }
                     Icon(Icons.Filled.EmojiEvents, "Trophy", tint = GoldColor,
-                        modifier = Modifier.size(80.dp).scale(trophyScale.value))
-                    Spacer(Modifier.height(16.dp))
-                    Text("MATCH OVER", color = TextWhite, fontSize = 52.sp, fontWeight = FontWeight.Bold)
-                    Spacer(Modifier.height(12.dp))
-                    Text("$winnerName wins!", color = winnerColor, fontSize = 36.sp, fontWeight = FontWeight.Bold)
-                    Spacer(Modifier.height(24.dp))
+                        modifier = Modifier.size((80 * screenScale).dp).scale(trophyScale.value))
+                    Spacer(Modifier.height((16 * screenScale).dp))
+                    Text("MATCH OVER", color = TextWhite, fontSize = (52 * screenScale).sp, fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.height((12 * screenScale).dp))
+                    Text("$winnerName wins!", color = winnerColor, fontSize = (36 * screenScale).sp, fontWeight = FontWeight.Bold)
+                    Spacer(Modifier.height((24 * screenScale).dp))
                     Row(
-                        horizontalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalArrangement = Arrangement.spacedBy((16 * screenScale).dp),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         leftGamesList.forEachIndexed { index, _ ->
@@ -510,40 +527,41 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
                                 val rg = rightGamesList[index]
                                 Box(
                                     modifier = Modifier
-                                        .background(ButtonBg, RoundedCornerShape(12.dp))
-                                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                                        .background(ButtonBg, RoundedCornerShape((12 * screenScale).dp))
+                                        .padding(horizontal = (16 * screenScale).dp, vertical = (8 * screenScale).dp),
                                     contentAlignment = Alignment.Center,
                                 ) {
                                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                                         Text(
                                             "SET ${index + 1}",
                                             color = DimColor,
-                                            fontSize = 14.sp,
+                                            fontSize = (14 * screenScale).sp,
                                             fontWeight = FontWeight.Medium,
-                                            letterSpacing = 1.sp,
+                                            letterSpacing = (1 * screenScale).sp,
                                         )
                                         Row(
                                             verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                            horizontalArrangement = Arrangement.spacedBy((4 * screenScale).dp),
                                         ) {
-                                            Text(lg.toString(), color = leftBg, fontSize = 36.sp, fontWeight = FontWeight.Bold)
-                                            Text(":", color = DimColor, fontSize = 36.sp, fontWeight = FontWeight.Bold)
-                                            Text(rg.toString(), color = rightBg, fontSize = 36.sp, fontWeight = FontWeight.Bold)
+                                            Text(lg.toString(), color = leftBg, fontSize = (36 * screenScale).sp, fontWeight = FontWeight.Bold)
+                                            Text(":", color = DimColor, fontSize = (36 * screenScale).sp, fontWeight = FontWeight.Bold)
+                                            Text(rg.toString(), color = rightBg, fontSize = (36 * screenScale).sp, fontWeight = FontWeight.Bold)
                                         }
                                     }
                                 }
                             }
                         }
                     }
-                    Spacer(Modifier.height(32.dp))
+                    Spacer(Modifier.height((32 * screenScale).dp))
                     Button(
                         onClick = { vm.resetMatch() },
+                        contentPadding = scaledButtonPadding,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = winnerColor, contentColor = Color.White),
                     ) {
-                        Icon(Icons.Filled.Refresh, "New Match", Modifier.size(24.dp))
-                        Spacer(Modifier.width(8.dp))
-                        Text("NEW MATCH", fontSize = 20.sp, fontWeight = FontWeight.Bold)
+                        Icon(Icons.Filled.Refresh, "New Match", Modifier.size((24 * screenScale).dp))
+                        Spacer(Modifier.width((8 * screenScale).dp))
+                        Text("NEW MATCH", fontSize = (20 * screenScale).sp, fontWeight = FontWeight.Bold)
                     }
                 }
             }
@@ -556,7 +574,7 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
             exit = fadeOut(tween(200)) + scaleOut(tween(200)),
             modifier = Modifier
                 .align(Alignment.BottomStart)
-                .padding(start = 16.dp, bottom = 80.dp),
+                .padding(start = (16 * screenScale).dp, bottom = (80 * screenScale).dp),
         ) {
             CameraPreviewOverlay(
                 onClose = { showCamera = false },
@@ -569,14 +587,16 @@ fun ScoreBoard(vm: MatchViewModel, onShowHistory: () -> Unit = {}) {
             vm = vm,
             team1Accent = team1Accent,
             team2Accent = team2Accent,
+            screenScale = screenScale,
             onClose = { showSettings = false },
             onShowHistory = onShowHistory,
         )
     }
+    } // CompositionLocalProvider
 }
 
 @Composable
-fun MatchTimer(vm: MatchViewModel) {
+fun MatchTimer(vm: MatchViewModel, screenScale: Float = 1f) {
     var elapsed by remember { mutableLongStateOf(0L) }
 
     LaunchedEffect(vm.matchRunning) {
@@ -590,6 +610,7 @@ fun MatchTimer(vm: MatchViewModel) {
         val totalSec = elapsed / 1000
         val min = totalSec / 60
         val sec = totalSec % 60
+        // Keep original sizes (10+20+10 = 40dp tall) to match Button's 40dp minHeight
         Box(
             modifier = Modifier
                 .background(ButtonBg, RoundedCornerShape(50))
@@ -616,9 +637,13 @@ fun SettingsSidebar(
     vm: MatchViewModel,
     team1Accent: Color,
     team2Accent: Color,
+    screenScale: Float = 1f,
     onClose: () -> Unit,
     onShowHistory: () -> Unit = {},
 ) {
+    val s = screenScale.coerceAtLeast(0.6f) // gentler minimum for readable settings
+    val sidebarWidth = (400 * s).dp
+
     val offsetX by animateFloatAsState(
         targetValue = if (visible) 0f else 1f,
         animationSpec = tween(300),
@@ -643,10 +668,10 @@ fun SettingsSidebar(
             Box(
                 modifier = Modifier
                     .fillMaxHeight()
-                    .width(400.dp)
-                    .graphicsLayer { translationX = offsetX * 400.dp.toPx() }
+                    .width(sidebarWidth)
+                    .graphicsLayer { translationX = offsetX * sidebarWidth.toPx() }
                     .background(SettingsBg)
-                    .padding(24.dp),
+                    .padding((24 * s).dp),
             ) {
             Column(
                 modifier = Modifier
@@ -660,140 +685,140 @@ fun SettingsSidebar(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(Icons.Filled.Settings, "Settings", tint = TextWhite, modifier = Modifier.size(28.dp))
-                        Spacer(Modifier.width(12.dp))
-                        Text("SETTINGS", color = TextWhite, fontSize = 24.sp, fontWeight = FontWeight.Bold)
+                        Icon(Icons.Filled.Settings, "Settings", tint = TextWhite, modifier = Modifier.size((28 * s).dp))
+                        Spacer(Modifier.width((12 * s).dp))
+                        Text("SETTINGS", color = TextWhite, fontSize = (24 * s).sp, fontWeight = FontWeight.Bold)
                     }
                     IconButton(onClick = onClose) {
-                        Icon(Icons.Filled.Close, "Close", tint = TextWhite, modifier = Modifier.size(28.dp))
+                        Icon(Icons.Filled.Close, "Close", tint = TextWhite, modifier = Modifier.size((28 * s).dp))
                     }
                 }
 
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height((24 * s).dp))
                 HorizontalDivider(color = Color(0xFF333333))
-                Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height((20 * s).dp))
 
                 // --- Team 1 settings ---
-                SectionHeader("Team 1", team1Accent)
-                Spacer(Modifier.height(12.dp))
-                SettingsLabel("Name")
-                NameField(vm.team1Name) { vm.updateTeam1Name(it) }
-                Spacer(Modifier.height(12.dp))
-                SettingsLabel("Color")
-                ColorPicker(vm.team1ColorIndex) { vm.updateTeam1Color(it) }
+                SectionHeader("Team 1", team1Accent, s)
+                Spacer(Modifier.height((12 * s).dp))
+                SettingsLabel("Name", s)
+                NameField(vm.team1Name, s) { vm.updateTeam1Name(it) }
+                Spacer(Modifier.height((12 * s).dp))
+                SettingsLabel("Color", s)
+                ColorPicker(vm.team1ColorIndex, s) { vm.updateTeam1Color(it) }
 
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height((24 * s).dp))
                 HorizontalDivider(color = Color(0xFF333333))
-                Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height((20 * s).dp))
 
                 // --- Team 2 settings ---
-                SectionHeader("Team 2", team2Accent)
-                Spacer(Modifier.height(12.dp))
-                SettingsLabel("Name")
-                NameField(vm.team2Name) { vm.updateTeam2Name(it) }
-                Spacer(Modifier.height(12.dp))
-                SettingsLabel("Color")
-                ColorPicker(vm.team2ColorIndex) { vm.updateTeam2Color(it) }
+                SectionHeader("Team 2", team2Accent, s)
+                Spacer(Modifier.height((12 * s).dp))
+                SettingsLabel("Name", s)
+                NameField(vm.team2Name, s) { vm.updateTeam2Name(it) }
+                Spacer(Modifier.height((12 * s).dp))
+                SettingsLabel("Color", s)
+                ColorPicker(vm.team2ColorIndex, s) { vm.updateTeam2Color(it) }
 
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height((24 * s).dp))
                 HorizontalDivider(color = Color(0xFF333333))
-                Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height((20 * s).dp))
 
                 // --- Match rules ---
-                SectionHeader("Match Rules", GoldColor)
-                Spacer(Modifier.height(16.dp))
+                SectionHeader("Match Rules", GoldColor, s)
+                Spacer(Modifier.height((16 * s).dp))
 
                 // Golden point toggle
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(SettingsSurface, RoundedCornerShape(12.dp))
+                        .background(SettingsSurface, RoundedCornerShape((12 * s).dp))
                         .clickable { vm.toggleGoldenPoint() }
-                        .padding(16.dp),
+                        .padding((16 * s).dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Filled.AutoAwesome, "Scoring",
-                            tint = if (vm.goldenPoint) GoldColor else DimColor, modifier = Modifier.size(24.dp))
-                        Spacer(Modifier.width(12.dp))
-                        Text("Scoring Mode", color = TextWhite, fontSize = 16.sp)
+                            tint = if (vm.goldenPoint) GoldColor else DimColor, modifier = Modifier.size((24 * s).dp))
+                        Spacer(Modifier.width((12 * s).dp))
+                        Text("Scoring Mode", color = TextWhite, fontSize = (16 * s).sp)
                     }
                     Text(
                         text = if (vm.goldenPoint) "GOLDEN PT" else "ADVANTAGE",
                         color = if (vm.goldenPoint) GoldColor else DimColor,
-                        fontSize = 14.sp,
+                        fontSize = (14 * s).sp,
                         fontWeight = FontWeight.Bold,
                     )
                 }
 
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height((8 * s).dp))
 
                 // Sets to win
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(SettingsSurface, RoundedCornerShape(12.dp))
+                        .background(SettingsSurface, RoundedCornerShape((12 * s).dp))
                         .clickable { vm.cycleSetsToWin() }
-                        .padding(16.dp),
+                        .padding((16 * s).dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Filled.Repeat, "Sets",
-                            tint = DimColor, modifier = Modifier.size(24.dp))
-                        Spacer(Modifier.width(12.dp))
-                        Text("Sets to Win", color = TextWhite, fontSize = 16.sp)
+                            tint = DimColor, modifier = Modifier.size((24 * s).dp))
+                        Spacer(Modifier.width((12 * s).dp))
+                        Text("Sets to Win", color = TextWhite, fontSize = (16 * s).sp)
                     }
                     Text(
                         text = if (vm.setsToWin == 0) "\u221E" else "${vm.setsToWin}",
-                        color = TextWhite, fontSize = 18.sp, fontWeight = FontWeight.Bold,
+                        color = TextWhite, fontSize = (18 * s).sp, fontWeight = FontWeight.Bold,
                     )
                 }
 
-                Spacer(Modifier.height(8.dp))
+                Spacer(Modifier.height((8 * s).dp))
 
                 // First serve
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(SettingsSurface, RoundedCornerShape(12.dp))
+                        .background(SettingsSurface, RoundedCornerShape((12 * s).dp))
                         .clickable { vm.updateServingTeam(if (vm.servingTeam == 1) 2 else 1) }
-                        .padding(16.dp),
+                        .padding((16 * s).dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Icon(Icons.Filled.SportsTennis, "Serve",
-                            tint = DimColor, modifier = Modifier.size(24.dp))
-                        Spacer(Modifier.width(12.dp))
-                        Text("Serving", color = TextWhite, fontSize = 16.sp)
+                            tint = DimColor, modifier = Modifier.size((24 * s).dp))
+                        Spacer(Modifier.width((12 * s).dp))
+                        Text("Serving", color = TextWhite, fontSize = (16 * s).sp)
                     }
                     val serveName = if (vm.servingTeam == 1) vm.team1Name else vm.team2Name
                     val serveColor = if (vm.servingTeam == 1) team1Accent else team2Accent
-                    Text(serveName, color = serveColor, fontSize = 14.sp, fontWeight = FontWeight.Bold)
+                    Text(serveName, color = serveColor, fontSize = (14 * s).sp, fontWeight = FontWeight.Bold)
                 }
 
-                Spacer(Modifier.height(24.dp))
+                Spacer(Modifier.height((24 * s).dp))
                 HorizontalDivider(color = Color(0xFF333333))
-                Spacer(Modifier.height(20.dp))
+                Spacer(Modifier.height((20 * s).dp))
 
                 // Match history button
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .background(SettingsSurface, RoundedCornerShape(12.dp))
+                        .background(SettingsSurface, RoundedCornerShape((12 * s).dp))
                         .clickable {
                             onClose()
                             onShowHistory()
                         }
-                        .padding(16.dp),
+                        .padding((16 * s).dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(Icons.Filled.History, "History",
-                        tint = GoldColor, modifier = Modifier.size(24.dp))
-                    Spacer(Modifier.width(12.dp))
-                    Text("Match History", color = TextWhite, fontSize = 16.sp)
+                        tint = GoldColor, modifier = Modifier.size((24 * s).dp))
+                    Spacer(Modifier.width((12 * s).dp))
+                    Text("Match History", color = TextWhite, fontSize = (16 * s).sp)
                 }
             }
             }
@@ -803,57 +828,57 @@ fun SettingsSidebar(
 
 // -- Setting helpers --
 @Composable
-private fun SectionHeader(title: String, color: Color) {
+private fun SectionHeader(title: String, color: Color, s: Float = 1f) {
     Text(
         text = title.uppercase(),
         color = color,
-        fontSize = 18.sp,
+        fontSize = (18 * s).sp,
         fontWeight = FontWeight.Bold,
-        letterSpacing = 2.sp,
+        letterSpacing = (2 * s).sp,
     )
 }
 
 @Composable
-private fun SettingsLabel(label: String) {
-    Text(label, color = DimColor, fontSize = 13.sp, fontWeight = FontWeight.Medium)
-    Spacer(Modifier.height(6.dp))
+private fun SettingsLabel(label: String, s: Float = 1f) {
+    Text(label, color = DimColor, fontSize = (13 * s).sp, fontWeight = FontWeight.Medium)
+    Spacer(Modifier.height((6 * s).dp))
 }
 
 @Composable
-private fun NameField(value: String, onValueChange: (String) -> Unit) {
+private fun NameField(value: String, s: Float = 1f, onValueChange: (String) -> Unit) {
     BasicTextField(
         value = value,
         onValueChange = { if (it.length <= 16) onValueChange(it) },
         singleLine = true,
         textStyle = TextStyle(
             color = TextWhite,
-            fontSize = 18.sp,
+            fontSize = (18 * s).sp,
             fontWeight = FontWeight.Bold,
         ),
         cursorBrush = SolidColor(TextWhite),
         modifier = Modifier
             .fillMaxWidth()
-            .background(SettingsSurface, RoundedCornerShape(12.dp))
-            .padding(16.dp),
+            .background(SettingsSurface, RoundedCornerShape((12 * s).dp))
+            .padding((16 * s).dp),
     )
 }
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-private fun ColorPicker(selectedIndex: Int, onSelect: (Int) -> Unit) {
+private fun ColorPicker(selectedIndex: Int, s: Float = 1f, onSelect: (Int) -> Unit) {
     FlowRow(
-        horizontalArrangement = Arrangement.spacedBy(10.dp),
-        verticalArrangement = Arrangement.spacedBy(10.dp),
+        horizontalArrangement = Arrangement.spacedBy((10 * s).dp),
+        verticalArrangement = Arrangement.spacedBy((10 * s).dp),
     ) {
         teamColorPresets.forEachIndexed { index, preset ->
             val isSelected = index == selectedIndex
             Box(
                 modifier = Modifier
-                    .size(40.dp)
+                    .size((40 * s).dp)
                     .clip(CircleShape)
                     .background(Color(preset.bg))
                     .then(
-                        if (isSelected) Modifier.border(3.dp, TextWhite, CircleShape)
+                        if (isSelected) Modifier.border((3 * s).dp, TextWhite, CircleShape)
                         else Modifier
                     )
                     .clickable { onSelect(index) },
@@ -889,7 +914,7 @@ fun TeamPanel(
         }
     }
 
-    Box(
+    BoxWithConstraints(
         modifier = modifier
             .fillMaxHeight()
             .background(backgroundColor)
@@ -898,24 +923,42 @@ fun TeamPanel(
                 indication = null,
             ) { onClick() },
     ) {
+        // Responsive sizing — reference design: 666dp × 800dp (tablet landscape half-panel)
+        val scoreFontSize = (maxHeight.value * 0.65f).sp
+        val scoreTopPad = (maxHeight.value * 0.05f).dp
+        val gamesBoxW = (maxWidth.value * 0.24f).dp
+        val gamesBoxH = (maxHeight.value * 0.25f).dp
+        val gamesCounterSize = (gamesBoxH.value * 1.0f).sp
+        val gamesLabelSize = (maxHeight.value * 0.025f).sp
+        val teamNameSize = (maxHeight.value * 0.07f).sp
+        val teamNameTopPad = (maxHeight.value * 0.156f).dp
+        val teamNameSidePad = (maxWidth.value * 0.13f).dp
+        val servingIconSize = (maxHeight.value * 0.035f).dp
+        val gamesBoxPad = (maxWidth.value * 0.024f).dp
+        val gamesBoxCorner = (maxHeight.value * 0.025f).dp
+        val gamesLabelPad = (maxHeight.value * 0.015f).dp
+        val gamesLabelSpacing = (maxHeight.value * 0.00375f).sp
+        val teamNameSpacing = (maxHeight.value * 0.01f).dp
+        val teamNameLetterSpacing = (maxHeight.value * 0.00375f).sp
+
         // Current set games — top corner near center
         val currentGames = gamesList.getOrElse(currentSet) { 0 }
         Box(
             modifier = Modifier
                 .align(if (gamesBoxAtStart) Alignment.TopStart else Alignment.TopEnd)
-                .padding(top = 16.dp, start = 16.dp, end = 16.dp)
-                .width(160.dp)
-                .height(200.dp)
-                .background(Color.Black.copy(alpha = 0.3f), RoundedCornerShape(20.dp)),
+                .padding(top = gamesBoxPad, start = gamesBoxPad, end = gamesBoxPad)
+                .width(gamesBoxW)
+                .height(gamesBoxH)
+                .background(Color.Black.copy(alpha = 0.3f), RoundedCornerShape(gamesBoxCorner)),
             contentAlignment = Alignment.TopCenter,
         ) {
             Text(
                 "GAMES",
                 color = backgroundColor,
-                fontSize = 20.sp,
+                fontSize = gamesLabelSize,
                 fontWeight = FontWeight.Bold,
-                letterSpacing = 3.sp,
-                modifier = Modifier.padding(top = 12.dp),
+                letterSpacing = gamesLabelSpacing,
+                modifier = Modifier.padding(top = gamesLabelPad),
             )
             AnimatedContent(
                 targetState = currentGames,
@@ -929,7 +972,7 @@ fun TeamPanel(
                 Text(
                     text = games.toString(),
                     color = TextWhite,
-                    fontSize = 190.sp,
+                    fontSize = gamesCounterSize,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                 )
@@ -938,7 +981,7 @@ fun TeamPanel(
 
         // Big score number — centered, nudged down
         Box(
-            modifier = Modifier.fillMaxSize().padding(top = 40.dp),
+            modifier = Modifier.fillMaxSize().padding(top = scoreTopPad),
             contentAlignment = Alignment.Center,
         ) {
             AnimatedContent(
@@ -952,7 +995,7 @@ fun TeamPanel(
                 Text(
                     text = display,
                     color = TextWhite,
-                    fontSize = 520.sp,
+                    fontSize = scoreFontSize,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.graphicsLayer {
@@ -967,20 +1010,20 @@ fun TeamPanel(
         Row(
             modifier = Modifier
                 .align(if (gamesBoxAtStart) Alignment.TopEnd else Alignment.TopStart)
-                .padding(top = 125.dp, start = 86.dp, end = 86.dp),
+                .padding(top = teamNameTopPad, start = teamNameSidePad, end = teamNameSidePad),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            horizontalArrangement = Arrangement.spacedBy(teamNameSpacing),
         ) {
             if (isServing) {
                 Icon(Icons.Filled.SportsTennis, "Serving",
-                    tint = GoldColor, modifier = Modifier.size(28.dp))
+                    tint = GoldColor, modifier = Modifier.size(servingIconSize))
             }
             Text(
                 text = teamLabel,
                 color = accentColor,
-                fontSize = 56.sp,
+                fontSize = teamNameSize,
                 fontWeight = FontWeight.Bold,
-                letterSpacing = 3.sp,
+                letterSpacing = teamNameLetterSpacing,
             )
         }
 
