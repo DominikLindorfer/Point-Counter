@@ -1,16 +1,20 @@
-# Padel Pulse — iPadOS App
+# Padel Pulse — iOS App
 
 <p align="center">
-  <img src="https://img.shields.io/badge/iPadOS-17.0+-blue.svg" alt="iPadOS 17.0+">
+  <img src="https://img.shields.io/badge/iOS-17.0+-blue.svg" alt="iOS 17.0+">
   <img src="https://img.shields.io/badge/Swift_5.9-SwiftUI-FA7343.svg" alt="Swift 5.9 + SwiftUI">
-  <img src="https://img.shields.io/badge/Status-Beta-orange.svg" alt="Status: Beta">
+  <img src="https://img.shields.io/badge/Universal-iPhone_%26_iPad-green.svg" alt="Universal: iPhone & iPad">
   <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT">
 </p>
 
-Native iPad scoreboard for padel & tennis. Landscape-locked, full-screen, designed for courtside use with touch or Bluetooth remote.
+Native iOS scoreboard for padel & tennis. Universal app for iPhone and iPad, landscape-locked, full-screen, designed for courtside use with touch or Bluetooth remote.
 
 <p align="center">
-  <img src="docs/scoreboard-fresh.png" alt="Padel Pulse iPadOS — main scoreboard" width="720" />
+  <img src="docs/scoreboard-fresh.png" alt="Padel Pulse — main scoreboard" width="720" />
+</p>
+
+<p align="center">
+  <img src="docs/settings-panel.png" alt="Padel Pulse — settings panel" width="720" />
 </p>
 
 ---
@@ -22,7 +26,7 @@ xcodegen generate                    # Generate .xcodeproj from project.yml
 open PadelPulse.xcodeproj            # Build & run in Xcode 16+ for iPad
 ```
 
-Requires iPadOS 17.0+. iPad only (no iPhone). Camera features require a real device.
+Requires iOS 17.0+. Universal app (iPhone + iPad), landscape-only. Camera features require a real device.
 
 ## Features
 
@@ -34,7 +38,7 @@ Requires iPadOS 17.0+. iPad only (no iPhone). Camera features require a real dev
 - Undo with full history stack
 
 ### Display & UX
-- **Adaptive layout** — `LayoutMetrics` scales 50+ dimensions to any iPad screen
+- **Adaptive layout** — `LayoutMetrics` scales 50+ dimensions from iPhone SE to iPad Pro 13"
 - **Giant score display** — readable from across the court
 - **Team customization** — custom names + 8 color presets (Navy, Crimson, Forest, Purple, Teal, Amber, Graphite, Rose)
 - **Fun random team names** — 30 padel-themed names on each new match
@@ -105,18 +109,21 @@ PadelPulse/
 ## UI Layout
 
 ```
-┌─────────────────────────────────────────────────────┐
-│ [↩] [⇄] [🎥] [↻]              [⏱ 1:23] [⚙]       │
-│                                   S1 6:0             │
-│   ┌──────┐                        S2 4:3  ┌──────┐  │
-│   │GAMES │                                │GAMES │  │
-│   │  3   │                                │  2   │  │
-│   └──────┘                                └──────┘  │
-│          30                    15                    │
-│                                                      │
-│      CHIQUITAS          COURT JESTERS                │
-│                 ← 🎾 RIGHT →                         │
-└─────────────────────────────────────────────────────┘
++----------------------------+----------------------------+
+| [<-][<>][cam][new]         |            01:23  [gear]   |
+|                            |             S1 6:0  S2 4:3 |
+|                            |                            |
+|   +-------+                |                +-------+   |
+|   | GAMES |                |                | GAMES |   |
+|   |   3   |                |                |   2   |   |
+|   +-------+                |                +-------+   |
+|                            |                            |
+|            30              |              15            |
+|                            |                            |
+|       CHIQUITAS            |        COURT JESTERS       |
++----------------------------+----------------------------+
+|               <-  RIGHT  ->                             |
++----------------------------+----------------------------+
 ```
 
 - **Top-left:** icon-only toolbar (Undo, Swap, Camera*, New Match) — 44x44pt touch targets
@@ -149,7 +156,9 @@ xcodebuild -project PadelPulse.xcodeproj -scheme PadelPulseTests \
 
 - Volume keys cannot be intercepted on iPadOS (OS restriction). Use Media Next/Prev via Bluetooth remote.
 - Camera requires a real device (not simulator).
-- App is landscape-locked with `UIRequiresFullScreen = YES` (no Split View/Slide Over).
+- Universal app (iPhone + iPad), landscape-locked on both devices.
+- iPad uses `UIRequiresFullScreen = YES` (no Split View/Slide Over).
+- `LayoutMetrics` uses width-only scaling on iPad (preserving original layout) and dual-axis `min(widthScale, heightScale)` on iPhone with per-metric min clamps for readability.
 - Launch screen uses `UILaunchScreen` dict in Info.plist (not a storyboard).
 - `ScoreBoardButtonStyle` uses ZStack with fixed 44x44 frame for uniform touch targets.
 - No network calls, no analytics, no ads, no third-party dependencies.

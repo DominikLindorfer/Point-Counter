@@ -12,7 +12,7 @@
 <p align="center">
   <a href="https://github.com/DominikLindorfer/Padelcounter/blob/main/LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
   <img src="https://img.shields.io/badge/Platform-Android-green.svg" alt="Platform: Android">
-  <img src="https://img.shields.io/badge/Platform-iPadOS_(beta)-orange.svg" alt="Platform: iPadOS (beta)">
+  <img src="https://img.shields.io/badge/Platform-iOS_(iPhone_%26_iPad)-orange.svg" alt="Platform: iOS (iPhone & iPad)">
   <img src="https://img.shields.io/badge/Kotlin-Jetpack%20Compose-7F52FF.svg" alt="Kotlin + Jetpack Compose">
   <img src="https://img.shields.io/badge/Swift-SwiftUI-FA7343.svg" alt="Swift + SwiftUI">
 </p>
@@ -60,9 +60,9 @@ Available on Google Play. Built with Kotlin + Jetpack Compose.
 
 See [`app/`](app/) for the Android source code.
 
-### iPadOS (beta)
+### iOS — iPhone & iPad
 
-Native iPad app built with Swift + SwiftUI. Feature-complete with additional premium features like haptic feedback, sound effects, match state persistence, keyboard shortcuts, confetti animations, and localization (EN/DE/ES).
+Native universal app built with Swift + SwiftUI. Landscape-only on both devices, adaptive layout from iPhone SE to iPad Pro 13". Includes haptic feedback, sound effects, match state persistence, keyboard shortcuts, confetti animations, and localization (EN/DE/ES).
 
 See [`ios/README.md`](ios/README.md) for full documentation.
 
@@ -74,8 +74,8 @@ All you need is a tablet, a stand, and a Bluetooth remote:
 |------|------|
 | **Android Tablet** — Xiaomi Redmi Pad Pro | [Amazon.de](https://www.amazon.de/dp/B0FJ9234ZX) |
 | **iPad** — any iPad running iPadOS 17+ | |
-| **Tablet Stand** | [Amazon.de](https://www.amazon.de/dp/B0DRXP3V6W) |
-| **Bluetooth Remote** | [Amazon.de](https://www.amazon.de/dp/B08MKJX4MH) |
+| **Tablet Stand** | [Amazon.de](https://www.amazon.de/dp/B07B9QC2R3) |
+| **Bluetooth Remote** | [Amazon.de](https://www.amazon.de/dp/B0DRXP3V6W) |
 
 ## Bluetooth Remote
 
@@ -107,20 +107,20 @@ git clone https://github.com/DominikLindorfer/Point-Counter.git
 # Min SDK 26 (Android 8.0) · Target SDK 36 (Android 15)
 ```
 
-### iPadOS
+### iOS (iPhone & iPad)
 
 ```bash
 cd ios
 xcodegen generate        # Generate .xcodeproj from project.yml
 open PadelPulse.xcodeproj
-# Build for iPad in Xcode 16+ (requires iPadOS 17.0+)
+# Build for iPhone or iPad in Xcode 16+ (requires iOS 17.0+)
 ```
 
 ## Project Structure
 
 ```
 ├── app/                    # Android app (Kotlin + Jetpack Compose)
-├── ios/                    # iPadOS app (Swift + SwiftUI) — see ios/README.md
+├── ios/                    # iOS app (Swift + SwiftUI, iPhone + iPad) — see ios/README.md
 ├── CLAUDE.md               # Dev context for AI-assisted development
 └── README.md               # This file
 ```

@@ -4,7 +4,7 @@
 
 Cross-platform padel & tennis courtside scoreboard. Fork of `DominikLindorfer/Point-Counter` (upstream remote already configured).
 
-**Status:** Android app is published on Google Play. iPadOS app is in **beta** (feature-complete, pre-release polish in progress).
+**Status:** Android app is published on Google Play. iOS app (iPhone + iPad) is in **beta** (feature-complete, pre-release polish in progress).
 
 ---
 
@@ -41,13 +41,13 @@ app/src/main/java/io/github/dominiklindorfer/padelcounter/
 
 ---
 
-## iPadOS App (beta)
+## iOS App (beta)
 
 **Bundle ID:** `com.padelpulse.app`
-**Deployment Target:** iPadOS 17.0+ | **Device:** iPad only (landscape-locked)
+**Deployment Target:** iOS 17.0+ | **Device:** Universal (iPhone + iPad, landscape-locked)
 **Version:** 1.0.0-beta
 
-### Tech Stack (iPadOS)
+### Tech Stack (iOS)
 
 - Swift 5.9+ / SwiftUI with `@Observable` macro (iOS 17)
 - AVFoundation for camera preview & video recording
@@ -59,7 +59,7 @@ app/src/main/java/io/github/dominiklindorfer/padelcounter/
 - XcodeGen for project generation (`ios/project.yml`)
 - Localized: English, German, Spanish
 
-### Structure (iPadOS)
+### Structure (iOS)
 
 ```
 ios/PadelPulse/
@@ -101,7 +101,7 @@ ios/PadelPulse/
     └── es.lproj/Localizable.strings      # Spanish
 ```
 
-### Build (iPadOS)
+### Build (iOS)
 
 ```bash
 cd ios
@@ -112,9 +112,9 @@ xcodebuild -project PadelPulse.xcodeproj -scheme PadelPulseTests \
   -destination 'platform=iOS Simulator,name=iPad Pro 11-inch (M5)' test
 ```
 
-### iPadOS Features (beyond Android parity)
+### iOS Features (beyond Android parity)
 
-- **Adaptive layout** — `LayoutMetrics` scales all 50+ dimensions to any iPad screen size
+- **Adaptive layout** — `LayoutMetrics` scales 50+ dimensions from iPhone SE to iPad Pro 13" (dual-axis on iPhone, width-only on iPad)
 - **Haptic feedback** — UIImpactFeedbackGenerator for scoring, settings, game/match events
 - **Match state persistence** — in-progress match survives app kill (UserDefaults + Codable)
 - **iPad keyboard shortcuts** — Cmd+Z (undo), Cmd+N (new match), Cmd+S (swap), Cmd+, (settings)
@@ -127,18 +127,20 @@ xcodebuild -project PadelPulse.xcodeproj -scheme PadelPulseTests \
 - **Compact set scores** — completed sets shown as pills top-right below the timer
 - **Camera as opt-in** — camera overlay toggle in settings, button only visible when enabled
 
-### iPadOS UI Layout
+### iOS UI Layout
 
 - **Top-left toolbar:** icon-only buttons — Undo, Swap, [Camera], New Match (uniform 44x44pt touch targets)
 - **Top-right:** Timer + Settings gear (same row), completed set pills below
 - **Center:** two team panels with giant score, GAMES box in inner corner, team name at bottom
 - **Bottom center:** serve side indicator (L/R) when enabled
 
-### iPadOS-specific notes
+### iOS-specific notes
 
-- Volume keys cannot be intercepted on iPadOS (OS restriction). Bluetooth remotes use Media Next/Prev + Play/Pause via MPRemoteCommandCenter.
+- Universal app (iPhone + iPad), landscape-locked on both devices.
+- `LayoutMetrics` uses width-only scaling on iPad (preserving original layout) and dual-axis `min(widthScale, heightScale)` on iPhone with per-metric min clamps for readability on small screens.
+- Volume keys cannot be intercepted on iOS (OS restriction). Bluetooth remotes use Media Next/Prev + Play/Pause via MPRemoteCommandCenter.
 - Camera requires real device (not simulator).
-- App is landscape-locked with `UIRequiresFullScreen = YES` (no Split View).
+- iPad uses `UIRequiresFullScreen = YES` (no Split View).
 - Launch screen uses `UILaunchScreen` dict in Info.plist (not a storyboard).
 - `ScoreBoardButtonStyle` uses a ZStack with fixed 44x44 frame to guarantee uniform touch targets regardless of SF Symbol dimensions.
 
