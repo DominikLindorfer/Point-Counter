@@ -33,8 +33,8 @@ struct TeamPanelView: View {
             .contentShape(Rectangle())
             .onTapGesture { onClick() }
 
-            // Games box — top corner near center
             VStack(spacing: 0) {
+                // Games box — top corner near center
                 HStack {
                     if gamesBoxAtStart {
                         gamesBox(currentGames: currentGames)
@@ -46,13 +46,13 @@ struct TeamPanelView: View {
                 }
                 .padding(.top, layout.panelPadding)
                 .padding(.horizontal, layout.panelPadding)
-                Spacer()
-            }
 
-            // Score + team name — centered
-            VStack(spacing: 0) {
                 Spacer()
 
+                // Team name above score
+                teamNameRow
+
+                // Giant score
                 Text(pointDisplay)
                     .font(.system(size: layout.scoreFont, weight: .bold))
                     .foregroundColor(.white)
@@ -63,11 +63,8 @@ struct TeamPanelView: View {
                     .animation(.spring(response: 0.4, dampingFraction: 0.55), value: pointDisplay)
                     .padding(.horizontal, 20)
 
-                teamNameRow
-
                 Spacer()
             }
-            .padding(.top, layout.scorePaddingTop)
             .padding(.bottom, layout.serveAreaClearance)
         }
         .onChange(of: pointDisplay) { _, _ in

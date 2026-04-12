@@ -85,6 +85,7 @@ struct ScoreBoardView: View {
                     onClick: { vm.scorePoint(team: rightTeam) }
                 )
             }
+            .ignoresSafeArea()
 
             // Top-left buttons (icon-only)
             VStack {

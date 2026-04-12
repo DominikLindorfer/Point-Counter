@@ -131,7 +131,7 @@ xcodebuild -project PadelPulse.xcodeproj -scheme PadelPulseTests \
 
 - **Top-left toolbar:** icon-only buttons — Undo, Swap, [Camera], New Match (uniform 44x44pt touch targets)
 - **Top-right:** Timer + Settings gear (same row), completed set pills below
-- **Center:** two team panels with giant score, GAMES box in inner corner, team name at bottom
+- **Center:** two team panels with team name above giant score, GAMES box in inner corner
 - **Bottom center:** serve side indicator (L/R) when enabled
 
 ### iOS-specific notes
