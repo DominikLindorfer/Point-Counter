@@ -31,3 +31,6 @@ xcuserdata/
 *.xcuserstate
 *.xcscmblueprint
 *.xccheckout
+
+# Internal docs
+docs/
