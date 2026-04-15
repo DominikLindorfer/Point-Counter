@@ -33,6 +33,7 @@
 		ED93C69ED227208A47CC655A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 32A4B0043AA3E9E60C0B83BE /* Assets.xcassets */; };
 		EED30B72871C427CBDBB5E0D /* MatchHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A74CAEF0D377317B3C5AABE /* MatchHistoryView.swift */; };
 		F1CEDF84DB7ACDE12C5D7184 /* PadelScoringTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D1C1F317A0956102AE2E5C9 /* PadelScoringTests.swift */; };
+		F54487E4A419F8661182D5F0 /* silence.m4a in Resources */ = {isa = PBXBuildFile; fileRef = 9C2E869577A8D71ABD9569C9 /* silence.m4a */; };
 		F866328D678247D29692A765 /* MatchStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = 189735DF9F53B93BCF5BCE54 /* MatchStorage.swift */; };
 		F8D80097BBBC24BD80493EEE /* MatchViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 96833DE1F09E19EE51CBA320 /* MatchViewModel.swift */; };
 		FF277E98C6620DA142C10440 /* Localizable.strings in Resources */ = {isa = PBXBuildFile; fileRef = 0138F6A17D4C85A5D8FFE29E /* Localizable.strings */; };
@@ -70,13 +71,14 @@
 		8CDFE041F96A2073E8A6B21B /* ConfettiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiView.swift; sourceTree = "<group>"; };
 		8FC9F0E31D1AC0C975FA485C /* MatchScoreCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchScoreCardView.swift; sourceTree = "<group>"; };
 		96833DE1F09E19EE51CBA320 /* MatchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchViewModel.swift; sourceTree = "<group>"; };
+		9C2E869577A8D71ABD9569C9 /* silence.m4a */ = {isa = PBXFileReference; path = silence.m4a; sourceTree = "<group>"; };
 		9D1C1F317A0956102AE2E5C9 /* PadelScoringTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PadelScoringTests.swift; sourceTree = "<group>"; };
 		AC67DD955C96863FD4EA0CB5 /* ServeSideIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServeSideIndicatorView.swift; sourceTree = "<group>"; };
 		B6E91D477A63D05344618892 /* SavedMatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedMatch.swift; sourceTree = "<group>"; };
 		C90556AEAF09A74696D62A98 /* ColorSwatchPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSwatchPicker.swift; sourceTree = "<group>"; };
 		CADF9F0DA638E5BC3AA349CD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
 		CBA4C1AB66E242E1B9E9D22A /* PadelPulseTests.xctest */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.cfbundle; path = PadelPulseTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		D20410D3ACC8AF375EFCC69A /* PadelPulse.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = PadelPulse.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		D20410D3ACC8AF375EFCC69A /* PadelPulse.app */ = {isa = PBXFileReference; includeInIndex = 0; lastKnownFileType = wrapper.application; path = PadelPulse.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		DBD566DC6819BD59CBADA8AA /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		DFD00A60147F284247981462 /* PadelPulseApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PadelPulseApp.swift; sourceTree = "<group>"; };
 		E21E0036B11EBF94582A15A9 /* CameraOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CameraOverlayView.swift; sourceTree = "<group>"; };
@@ -163,6 +165,7 @@
 			isa = PBXGroup;
 			children = (
 				32A4B0043AA3E9E60C0B83BE /* Assets.xcassets */,
+				9C2E869577A8D71ABD9569C9 /* silence.m4a */,
 				0138F6A17D4C85A5D8FFE29E /* Localizable.strings */,
 			);
 			path = Resources;
@@ -275,6 +278,8 @@
 			attributes = {
 				BuildIndependentTargetsInParallel = YES;
 				LastUpgradeCheck = 1600;
+				TargetAttributes = {
+				};
 			};
 			buildConfigurationList = 367CEDA9A43E39A688CE498A /* Build configuration list for PBXProject "PadelPulse" */;
 			developmentRegion = en;
@@ -305,6 +310,7 @@
 			files = (
 				ED93C69ED227208A47CC655A /* Assets.xcassets in Resources */,
 				FF277E98C6620DA142C10440 /* Localizable.strings in Resources */,
+				F54487E4A419F8661182D5F0 /* silence.m4a in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -551,7 +557,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = P38L5RD8CU;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PadelPulse/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -571,7 +576,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = P38L5RD8CU;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PadelPulse/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (

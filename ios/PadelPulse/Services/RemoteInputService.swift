@@ -16,6 +16,7 @@ final class RemoteInputService {
     var onUndo: (() -> Void)?
 
     private var audioSession: AVAudioSession?
+    private var silentPlayer: AVAudioPlayer?
 
     func start() {
         setupAudioSession()
@@ -32,7 +33,19 @@ final class RemoteInputService {
         center.previousTrackCommand.isEnabled = false
         center.togglePlayPauseCommand.isEnabled = false
 
+        silentPlayer?.stop()
+        silentPlayer = nil
+
         try? AVAudioSession.sharedInstance().setActive(false)
+    }
+
+    /// Re-activates the audio session and silent loop after interruptions
+    /// (call returns, Siri, foregrounding from background).
+    func resumeSilentLoop() {
+        try? AVAudioSession.sharedInstance().setActive(true)
+        if let player = silentPlayer, !player.isPlaying {
+            player.play()
+        }
     }
 
     // MARK: - Layer 1: MPRemoteCommandCenter (Media Keys)
@@ -40,11 +53,21 @@ final class RemoteInputService {
     private func setupAudioSession() {
         do {
             let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            try session.setCategory(.playback, mode: .default, options: [])
             try session.setActive(true)
             audioSession = session
 
-            // Set "Now Playing" info so iPadOS routes media keys to this app
+            // Silent audio loop is required for iOS to deliver MPRemoteCommand
+            // events — the app must be the active "Now Playing" source.
+            if let url = Bundle.main.url(forResource: "silence", withExtension: "m4a") {
+                let player = try AVAudioPlayer(contentsOf: url)
+                player.numberOfLoops = -1
+                player.volume = 0
+                player.prepareToPlay()
+                player.play()
+                silentPlayer = player
+            }
+
             MPNowPlayingInfoCenter.default().nowPlayingInfo = [
                 MPMediaItemPropertyTitle: "Padel Pulse",
                 MPMediaItemPropertyArtist: "Scoreboard"

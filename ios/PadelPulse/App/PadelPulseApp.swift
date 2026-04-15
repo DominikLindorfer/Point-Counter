@@ -47,6 +47,7 @@ struct PadelPulseApp: App {
                 viewModel.saveInProgressMatch()
             case .active:
                 viewModel.resumeTimer()
+                remoteInput.resumeSilentLoop()
             default:
                 break
             }
