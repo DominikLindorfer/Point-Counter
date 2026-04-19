@@ -7,7 +7,7 @@ import Foundation
 /// Views re-render when the `@AppStorage("selected_language")` value changes via
 /// a `.id(...)` modifier on the root ContentView.
 enum LanguageService {
-    static let storageKey = "selected_language"
+    static let storageKey = DefaultsKey.selectedLanguage
     static let supportedLanguages = ["en", "de", "es"]
 
     /// Apply the stored language choice to `Bundle.main` at app launch.

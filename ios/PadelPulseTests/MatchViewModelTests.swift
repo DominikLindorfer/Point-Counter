@@ -13,12 +13,12 @@ final class MatchViewModelTests: XCTestCase {
     override func setUp() {
         super.setUp()
         // Clear any in-progress match left from prior runs.
-        UserDefaults.standard.removeObject(forKey: "in_progress_match")
+        UserDefaults.standard.removeObject(forKey: DefaultsKey.inProgressMatch)
         vm = MatchViewModel(storage: MatchStorage())
     }
 
     override func tearDown() {
-        UserDefaults.standard.removeObject(forKey: "in_progress_match")
+        UserDefaults.standard.removeObject(forKey: DefaultsKey.inProgressMatch)
         vm = nil
         super.tearDown()
     }

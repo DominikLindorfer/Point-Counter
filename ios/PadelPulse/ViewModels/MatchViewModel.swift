@@ -77,7 +77,7 @@ final class MatchViewModel {
     var team2PointsWon = 0
     var matchHistory: [SavedMatch] = []
     var autoSwapMode: AutoSwapMode {
-        didSet { UserDefaults.standard.set(autoSwapMode.rawValue, forKey: Self.autoSwapModeKey) }
+        didSet { UserDefaults.standard.set(autoSwapMode.rawValue, forKey: DefaultsKey.autoSwapMode) }
     }
 
     // Undo stack — mutations are mirrored into `undoCount` so SwiftUI can observe canUndo.
@@ -88,7 +88,6 @@ final class MatchViewModel {
 
     private(set) var undoCount = 0
     private let storage: MatchStorage
-    private static let autoSwapModeKey = "auto_swap_mode"
 
     var canUndo: Bool { undoCount > 0 }
 
@@ -98,7 +97,7 @@ final class MatchViewModel {
         self.team1Name = names.0
         self.team2Name = names.1
         self.matchHistory = storage.loadAll()
-        let raw = UserDefaults.standard.string(forKey: Self.autoSwapModeKey) ?? AutoSwapMode.afterSet.rawValue
+        let raw = UserDefaults.standard.string(forKey: DefaultsKey.autoSwapMode) ?? AutoSwapMode.afterSet.rawValue
         self.autoSwapMode = AutoSwapMode(rawValue: raw) ?? .afterSet
     }
 
@@ -261,8 +260,6 @@ final class MatchViewModel {
 
     // MARK: - Match State Persistence
 
-    private static let inProgressKey = "in_progress_match"
-
     func saveInProgressMatch() {
         // Only save if there's an active match worth restoring
         guard matchRunning || !undoStack.isEmpty || state.team1Points > 0 || state.team2Points > 0 else {
@@ -292,12 +289,12 @@ final class MatchViewModel {
         )
 
         if let data = try? JSONEncoder().encode(persisted) {
-            UserDefaults.standard.set(data, forKey: Self.inProgressKey)
+            UserDefaults.standard.set(data, forKey: DefaultsKey.inProgressMatch)
         }
     }
 
     func restoreInProgressMatch() {
-        guard let data = UserDefaults.standard.data(forKey: Self.inProgressKey),
+        guard let data = UserDefaults.standard.data(forKey: DefaultsKey.inProgressMatch),
               let persisted = try? JSONDecoder().decode(PersistedMatchState.self, from: data) else {
             return
         }
@@ -334,7 +331,7 @@ final class MatchViewModel {
     }
 
     func clearInProgressMatch() {
-        UserDefaults.standard.removeObject(forKey: Self.inProgressKey)
+        UserDefaults.standard.removeObject(forKey: DefaultsKey.inProgressMatch)
     }
 
     func pauseTimer() {

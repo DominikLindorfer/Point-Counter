@@ -9,8 +9,8 @@ struct ScoreBoardView: View {
     @State private var showSettings = false
     @State private var showCamera = false
     @State private var showNewMatchConfirmation = false
-    @AppStorage("has_seen_onboarding") private var hasSeenOnboarding = false
-    @AppStorage("camera_overlay_enabled") private var cameraEnabled = false
+    @AppStorage(DefaultsKey.hasSeenOnboarding) private var hasSeenOnboarding = false
+    @AppStorage(DefaultsKey.cameraOverlayEnabled) private var cameraEnabled = false
 
     /// Snapshot of one side of the scoreboard (left or right), already resolved
     /// against `sidesSwapped` so the view layer doesn't repeat the ternary dance.

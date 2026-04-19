@@ -8,7 +8,7 @@ struct SettingsSidebarView: View {
     var onShowCredits: () -> Void = {}
 
     @Environment(\.layout) private var layout
-    @AppStorage("camera_overlay_enabled") private var cameraEnabled = false
+    @AppStorage(DefaultsKey.cameraOverlayEnabled) private var cameraEnabled = false
     @AppStorage(LanguageService.storageKey) private var selectedLanguage = "system"
 
     private var languageDisplayName: String {
