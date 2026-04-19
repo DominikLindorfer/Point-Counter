@@ -13,8 +13,11 @@ struct NameFieldView: View {
                     if newValue.count > 16 {
                         text = String(newValue.prefix(16))
                         showLimitReached = true
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                            withAnimation { showLimitReached = false }
+                        Task {
+                            try? await Task.sleep(for: .seconds(2))
+                            await MainActor.run {
+                                withAnimation { showLimitReached = false }
+                            }
                         }
                     }
                 }

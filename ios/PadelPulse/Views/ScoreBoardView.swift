@@ -297,7 +297,6 @@ struct ScoreBoardView: View {
 
 struct ScoreBoardButtonStyle: ButtonStyle {
     var bgColor: Color = ButtonBg
-    var size: CGFloat = 44
 
     func makeBody(configuration: Configuration) -> some View {
         ZStack {
@@ -306,7 +305,7 @@ struct ScoreBoardButtonStyle: ButtonStyle {
             configuration.label
                 .foregroundColor(.white)
         }
-        .frame(width: size, height: size)
+        .frame(width: 44, height: 44)
         .scaleEffect(configuration.isPressed ? 0.95 : 1.0)
         .opacity(configuration.isPressed ? 0.8 : 1.0)
         .animation(.easeInOut(duration: 0.1), value: configuration.isPressed)

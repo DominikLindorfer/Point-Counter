@@ -9,6 +9,7 @@ struct PadelPulseApp: App {
 
     init() {
         LanguageService.applyStoredLanguage()
+        HapticService.prepareAll()
     }
 
     var body: some Scene {

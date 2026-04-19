@@ -102,7 +102,8 @@ final class MatchViewModel {
     }
 
     private static func randomTeamNames() -> (String, String) {
-        var shuffled = funTeamNames.shuffled()
+        guard funTeamNames.count >= 2 else { return ("TEAM 1", "TEAM 2") }
+        let shuffled = funTeamNames.shuffled()
         return (shuffled[0], shuffled[1])
     }
 
