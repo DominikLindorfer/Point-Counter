@@ -46,10 +46,10 @@ struct PadelPulseApp: App {
         }
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
-            case .background:
+            case .background, .inactive:
+                // Pause first so a subsequent kill (OOM, long time in app switcher)
+                // restores with an accurate elapsed time rather than wall-clock delta.
                 viewModel.pauseTimer()
-                viewModel.saveInProgressMatch()
-            case .inactive:
                 viewModel.saveInProgressMatch()
             case .active:
                 viewModel.resumeTimer()
