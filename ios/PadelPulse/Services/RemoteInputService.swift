@@ -82,19 +82,20 @@ final class RemoteInputService {
 
         center.nextTrackCommand.isEnabled = true
         center.nextTrackCommand.addTarget { [weak self] _ in
-            self?.onTeam1Score?()
+            // Handlers can fire on an arbitrary thread — @Observable mutations must be on main.
+            DispatchQueue.main.async { self?.onTeam1Score?() }
             return .success
         }
 
         center.previousTrackCommand.isEnabled = true
         center.previousTrackCommand.addTarget { [weak self] _ in
-            self?.onTeam2Score?()
+            DispatchQueue.main.async { self?.onTeam2Score?() }
             return .success
         }
 
         center.togglePlayPauseCommand.isEnabled = true
         center.togglePlayPauseCommand.addTarget { [weak self] _ in
-            self?.onUndo?()
+            DispatchQueue.main.async { self?.onUndo?() }
             return .success
         }
 
@@ -126,15 +127,17 @@ final class RemoteInputService {
     private func configureKeyboard(_ keyboard: GCKeyboard) {
         keyboard.keyboardInput?.keyChangedHandler = { [weak self] _, _, keyCode, pressed in
             guard pressed else { return }
-            switch keyCode {
-            case .upArrow, .keypadPlus:
-                self?.onTeam1Score?()
-            case .downArrow, .keypadHyphen:
-                self?.onTeam2Score?()
-            case .spacebar:
-                self?.onUndo?()
-            default:
-                break
+            DispatchQueue.main.async {
+                switch keyCode {
+                case .upArrow, .keypadPlus:
+                    self?.onTeam1Score?()
+                case .downArrow, .keypadHyphen:
+                    self?.onTeam2Score?()
+                case .spacebar:
+                    self?.onUndo?()
+                default:
+                    break
+                }
             }
         }
     }
