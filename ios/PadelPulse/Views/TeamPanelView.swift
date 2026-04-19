@@ -18,10 +18,6 @@ struct TeamPanelView: View {
     let onClick: () -> Void
 
     @Environment(\.layout) private var layout
-    @State private var scoreScale: CGFloat = 1.0
-    @State private var scoreVersion = 0
-    @State private var gamesScale: CGFloat = 1.0
-    @State private var gamesVersion = 0
 
     var body: some View {
         let currentGames = currentSet < gamesList.count ? gamesList[currentSet] : 0
@@ -63,7 +59,6 @@ struct TeamPanelView: View {
                     .foregroundColor(.white)
                     .minimumScaleFactor(0.3)
                     .lineLimit(1)
-                    .scaleEffect(scoreScale)
                     .contentTransition(.numericText())
                     .animation(.spring(response: 0.4, dampingFraction: 0.55), value: pointDisplay)
                     .padding(.horizontal, 20)
@@ -74,24 +69,6 @@ struct TeamPanelView: View {
 
             if isServing && showServeSide && !isMatchOver {
                 racketOverlay
-            }
-        }
-        .onChange(of: pointDisplay) { _, _ in
-            scoreVersion += 1
-            if scoreVersion > 1 {
-                scoreScale = 1.08
-                withAnimation(.spring(response: 0.4, dampingFraction: 0.55)) {
-                    scoreScale = 1.0
-                }
-            }
-        }
-        .onChange(of: currentGames) { _, _ in
-            gamesVersion += 1
-            if gamesVersion > 1 {
-                gamesScale = 1.15
-                withAnimation(.spring(response: 0.5, dampingFraction: 0.5)) {
-                    gamesScale = 1.0
-                }
             }
         }
         .accessibilityElement(children: .ignore)
@@ -140,7 +117,6 @@ struct TeamPanelView: View {
                 .font(.system(size: layout.gamesNumberFont, weight: .bold))
                 .foregroundColor(.white)
                 .minimumScaleFactor(0.5)
-                .scaleEffect(gamesScale)
                 .contentTransition(.numericText())
                 .animation(.spring(response: 0.3, dampingFraction: 0.7), value: currentGames)
         }
