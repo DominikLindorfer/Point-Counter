@@ -161,75 +161,38 @@ struct SettingsSidebarView: View {
 
                         Spacer().frame(height: 10)
 
-                        // Serve side indicator toggle
-                        HStack {
-                            HStack(spacing: 12) {
-                                Image(systemName: "arrow.left.arrow.right")
-                                    .font(.system(size: layout.settingsRowIcon))
-                                    .foregroundColor(vm.showServeSide ? GoldColor : DimColor)
-                                Text("Serve Side (L/R)")
-                                    .font(.system(size: layout.settingsRowLabel))
-                                    .foregroundColor(.white)
-                            }
-                            Spacer()
-                            Toggle("", isOn: Binding(
+                        toggleRow(
+                            icon: "arrow.left.arrow.right",
+                            label: "Serve Side (L/R)",
+                            isOn: Binding(
                                 get: { vm.showServeSide },
                                 set: { vm.showServeSide = $0; HapticService.settingChanged() }
-                            ))
-                            .labelsHidden()
-                            .tint(GoldColor)
-                        }
-                        .padding(16)
-                        .background(SettingsSurface)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                            )
+                        )
 
                         Spacer().frame(height: 10)
 
-                        // Sound effects toggle
-                        HStack {
-                            HStack(spacing: 12) {
-                                Image(systemName: SoundService.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
-                                    .font(.system(size: layout.settingsRowIcon))
-                                    .foregroundColor(SoundService.isMuted ? DimColor : GoldColor)
-                                Text("Sound Effects")
-                                    .font(.system(size: layout.settingsRowLabel))
-                                    .foregroundColor(.white)
-                            }
-                            Spacer()
-                            Toggle("", isOn: Binding(
+                        toggleRow(
+                            iconOn: "speaker.wave.2.fill",
+                            iconOff: "speaker.slash.fill",
+                            label: "Sound Effects",
+                            isOn: Binding(
                                 get: { !SoundService.isMuted },
                                 set: { SoundService.isMuted = !$0; HapticService.settingChanged() }
-                            ))
-                            .labelsHidden()
-                            .tint(GoldColor)
-                        }
-                        .padding(16)
-                        .background(SettingsSurface)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                            )
+                        )
 
                         Spacer().frame(height: 10)
 
-                        // Camera overlay toggle
-                        HStack {
-                            HStack(spacing: 12) {
-                                Image(systemName: cameraEnabled ? "video.fill" : "video.slash.fill")
-                                    .font(.system(size: layout.settingsRowIcon))
-                                    .foregroundColor(cameraEnabled ? GoldColor : DimColor)
-                                Text("Camera")
-                                    .font(.system(size: layout.settingsRowLabel))
-                                    .foregroundColor(.white)
-                            }
-                            Spacer()
-                            Toggle("", isOn: Binding(
+                        toggleRow(
+                            iconOn: "video.fill",
+                            iconOff: "video.slash.fill",
+                            label: "Camera",
+                            isOn: Binding(
                                 get: { cameraEnabled },
                                 set: { cameraEnabled = $0; HapticService.settingChanged() }
-                            ))
-                            .labelsHidden()
-                            .tint(GoldColor)
-                        }
-                        .padding(16)
-                        .background(SettingsSurface)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                            )
+                        )
 
                         Spacer().frame(height: 10)
 
@@ -300,6 +263,41 @@ struct SettingsSidebarView: View {
             }
         }
         .animation(.easeInOut(duration: 0.3), value: visible)
+    }
+
+    /// Single-icon toggle row (icon stays the same, color follows state).
+    private func toggleRow(
+        icon: String,
+        label: LocalizedStringKey,
+        isOn: Binding<Bool>
+    ) -> some View {
+        toggleRow(iconOn: icon, iconOff: icon, label: label, isOn: isOn)
+    }
+
+    /// Two-icon toggle row (icon swaps between on/off state).
+    private func toggleRow(
+        iconOn: String,
+        iconOff: String,
+        label: LocalizedStringKey,
+        isOn: Binding<Bool>
+    ) -> some View {
+        HStack {
+            HStack(spacing: 12) {
+                Image(systemName: isOn.wrappedValue ? iconOn : iconOff)
+                    .font(.system(size: layout.settingsRowIcon))
+                    .foregroundColor(isOn.wrappedValue ? GoldColor : DimColor)
+                Text(label)
+                    .font(.system(size: layout.settingsRowLabel))
+                    .foregroundColor(.white)
+            }
+            Spacer()
+            Toggle("", isOn: isOn)
+                .labelsHidden()
+                .tint(GoldColor)
+        }
+        .padding(16)
+        .background(SettingsSurface)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
     private func sectionHeader(_ title: String, color: Color) -> some View {
