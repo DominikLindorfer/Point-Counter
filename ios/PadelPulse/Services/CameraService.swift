@@ -3,12 +3,17 @@ import Photos
 import UIKit
 
 /// Manages AVCaptureSession for camera preview and video recording.
+///
+/// All AVCaptureSession mutation runs on a dedicated serial queue so configuration
+/// and start/stop never block the main thread. `@Published` properties are hopped
+/// back to main for SwiftUI observation.
 final class CameraService: NSObject, ObservableObject {
     let captureSession = AVCaptureSession()
     private var movieOutput = AVCaptureMovieFileOutput()
     private var currentCameraPosition: AVCaptureDevice.Position = .back
     private var audioInput: AVCaptureDeviceInput?
     private var videoInput: AVCaptureDeviceInput?
+    private let sessionQueue = DispatchQueue(label: "com.padelpulse.camera.session")
 
     @Published var isRecording = false
     @Published var recordingStartTime: Date?
@@ -17,14 +22,13 @@ final class CameraService: NSObject, ObservableObject {
 
     override init() {
         super.init()
-        configureSession()
+        sessionQueue.async { [weak self] in self?.configureSession() }
     }
 
     private func configureSession() {
         captureSession.beginConfiguration()
         captureSession.sessionPreset = .hd1280x720
 
-        // Video input
         if let camera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: currentCameraPosition),
            let input = try? AVCaptureDeviceInput(device: camera) {
             if captureSession.canAddInput(input) {
@@ -33,7 +37,6 @@ final class CameraService: NSObject, ObservableObject {
             }
         }
 
-        // Audio input
         if let mic = AVCaptureDevice.default(for: .audio),
            let input = try? AVCaptureDeviceInput(device: mic) {
             if captureSession.canAddInput(input) {
@@ -42,7 +45,6 @@ final class CameraService: NSObject, ObservableObject {
             }
         }
 
-        // Movie output
         if captureSession.canAddOutput(movieOutput) {
             captureSession.addOutput(movieOutput)
         }
@@ -51,58 +53,64 @@ final class CameraService: NSObject, ObservableObject {
     }
 
     func startSession() {
-        guard !captureSession.isRunning else { return }
-        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
-            self?.captureSession.startRunning()
+        sessionQueue.async { [weak self] in
+            guard let self, !self.captureSession.isRunning else { return }
+            self.captureSession.startRunning()
         }
     }
 
     func stopSession() {
-        guard captureSession.isRunning else { return }
-        captureSession.stopRunning()
+        sessionQueue.async { [weak self] in
+            guard let self, self.captureSession.isRunning else { return }
+            self.captureSession.stopRunning()
+        }
     }
 
     func switchCamera() {
-        guard !isRecording else { return }
+        sessionQueue.async { [weak self] in
+            guard let self else { return }
+            if self.movieOutput.isRecording { return }
 
-        currentCameraPosition = currentCameraPosition == .back ? .front : .back
+            self.currentCameraPosition = self.currentCameraPosition == .back ? .front : .back
 
-        captureSession.beginConfiguration()
-
-        // Remove current video input
-        if let videoInput {
-            captureSession.removeInput(videoInput)
-        }
-
-        // Add new camera
-        if let camera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: currentCameraPosition),
-           let input = try? AVCaptureDeviceInput(device: camera) {
-            if captureSession.canAddInput(input) {
-                captureSession.addInput(input)
-                videoInput = input
+            self.captureSession.beginConfiguration()
+            if let videoInput = self.videoInput {
+                self.captureSession.removeInput(videoInput)
             }
+            if let camera = AVCaptureDevice.default(.builtInWideAngleCamera, for: .video, position: self.currentCameraPosition),
+               let input = try? AVCaptureDeviceInput(device: camera) {
+                if self.captureSession.canAddInput(input) {
+                    self.captureSession.addInput(input)
+                    self.videoInput = input
+                }
+            }
+            self.captureSession.commitConfiguration()
         }
-
-        captureSession.commitConfiguration()
     }
 
     func startRecording() {
-        guard !isRecording else { return }
-
-        let tempURL = FileManager.default.temporaryDirectory
-            .appendingPathComponent("Padel_\(Int(Date().timeIntervalSince1970 * 1000))")
-            .appendingPathExtension("mp4")
-
-        movieOutput.startRecording(to: tempURL, recordingDelegate: self)
-        isRecording = true
-        recordingStartTime = Date()
+        sessionQueue.async { [weak self] in
+            guard let self, !self.movieOutput.isRecording else { return }
+            let tempURL = FileManager.default.temporaryDirectory
+                .appendingPathComponent("Padel_\(Int(Date().timeIntervalSince1970 * 1000))")
+                .appendingPathExtension("mp4")
+            self.movieOutput.startRecording(to: tempURL, recordingDelegate: self)
+            DispatchQueue.main.async {
+                self.isRecording = true
+                self.recordingStartTime = Date()
+            }
+        }
     }
 
     func stopRecording() {
-        guard isRecording else { return }
-        movieOutput.stopRecording()
-        isRecording = false
-        recordingStartTime = nil
+        sessionQueue.async { [weak self] in
+            guard let self, self.movieOutput.isRecording else { return }
+            self.movieOutput.stopRecording()
+            DispatchQueue.main.async {
+                self.isRecording = false
+                self.recordingStartTime = nil
+            }
+        }
     }
 }
 
@@ -119,7 +127,6 @@ extension CameraService: AVCaptureFileOutputRecordingDelegate {
             return
         }
 
-        // Save to Photos library
         PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
             guard status == .authorized else {
                 DispatchQueue.main.async { self.onRecordingFinished?(false) }
@@ -128,8 +135,7 @@ extension CameraService: AVCaptureFileOutputRecordingDelegate {
 
             PHPhotoLibrary.shared().performChanges({
                 PHAssetChangeRequest.creationRequestForAssetFromVideo(atFileURL: outputFileURL)
-            }) { success, error in
-                // Clean up temp file
+            }) { success, _ in
                 try? FileManager.default.removeItem(at: outputFileURL)
                 DispatchQueue.main.async { self.onRecordingFinished?(success) }
             }
