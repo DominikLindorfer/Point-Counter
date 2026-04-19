@@ -74,20 +74,24 @@ ios/PadelPulse/
 │   ├── ScoreBoardView.swift              # Root split-screen scoreboard, toolbar, set pills
 │   ├── TeamPanelView.swift               # Team half-panel (giant score, games box, team name)
 │   ├── SettingsSidebarView.swift         # Slide-in settings with pill-badge values, toggles
-│   ├── MatchHistoryView.swift            # Match history cards + share (text & image)
+│   ├── MatchHistoryView.swift            # ATP-style match history cards + share (text & image)
 │   ├── MatchOverOverlayView.swift        # Confetti, staggered entrance, winner glow, share
 │   ├── OnboardingOverlayView.swift       # First-launch hint overlay
 │   ├── CameraOverlayView.swift           # AVFoundation camera + recording
-│   ├── MatchTimerView.swift              # Timer pill
+│   ├── MatchTimerView.swift              # Match timer pill
+│   ├── WallClockView.swift               # Current time-of-day pill (HH:mm, system locale)
 │   ├── ServeSideIndicatorView.swift      # L/R serve indicator with pulse animation
+│   ├── CreditsView.swift                 # Upstream repo + SVG icon attribution (CC BY 3.0)
 │   └── Components/
 │       ├── ColorSwatchPicker.swift       # 8-color inline preset picker
 │       ├── ConfettiView.swift            # Canvas-based particle animation (60 particles)
 │       ├── MatchScoreCardView.swift      # 600x315 share card for image export
 │       ├── NameFieldView.swift           # Team name text field
-│       └── SetScorePill.swift            # Set score display pill
+│       ├── PadelRacketView.swift         # SVG asset, template-tinted to gold
+│       └── SetScorePill.swift            # ATP-style set pill (winner bold, loser dim)
 ├── Services/
 │   ├── CameraService.swift               # AVCaptureSession management
+│   ├── LanguageService.swift             # Runtime app-language switcher (bundle swizzle)
 │   ├── RemoteInputService.swift          # Bluetooth media remote handling
 │   └── SoundService.swift                # System sounds with mute toggle
 ├── Utilities/
@@ -124,15 +128,18 @@ xcodebuild -project PadelPulse.xcodeproj -scheme PadelPulseTests \
 - **Animated match-over** — confetti particles, staggered entrance, winner glow pulse, trophy fly-in
 - **8 team color presets** — inline swatch picker (Navy, Crimson, Forest, Purple, Teal, Amber, Graphite, Rose)
 - **Fun random team names** — 30 padel-themed names assigned randomly on new match
-- **Compact set scores** — completed sets shown as pills top-right below the timer
+- **Compact set scores** — completed sets shown as horizontal pills top-right below the timer
 - **Camera as opt-in** — camera overlay toggle in settings, button only visible when enabled
+- **Runtime language switcher** — Auto / EN / DE / ES togglable in settings, no app restart (bundle swizzle + `.id(...)` re-render)
+- **Wall clock pill** — current time-of-day shown next to the match timer
+- **Credits page** — linked from settings, attributes upstream Point-Counter repo and Noun Project SVG icon
 
 ### iOS UI Layout
 
 - **Top-left toolbar:** icon-only buttons — Undo, Swap, [Camera], New Match (uniform 44x44pt touch targets)
-- **Top-right:** Timer + Settings gear (same row), completed set pills below
-- **Center:** two team panels with team name above giant score, GAMES box in inner corner
-- **Bottom center:** serve side indicator (L/R) when enabled
+- **Top-right:** Clock + Match Timer + Settings gear (same row), completed set pills horizontally below
+- **Center:** two team panels with team name above giant score, compact number-only games box in inner corner
+- **Bottom center:** gold padel-racket icon on the serving side (no L/R text)
 
 ### iOS-specific notes
 

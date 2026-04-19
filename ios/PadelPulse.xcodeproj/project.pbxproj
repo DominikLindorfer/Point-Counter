@@ -11,6 +11,7 @@
 		0C64C90650908C2ACC1639BE /* TeamColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A92EB714C0E8CA7142255E /* TeamColor.swift */; };
 		187293A9D7C30ADB614B8C89 /* ServeSideIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC67DD955C96863FD4EA0CB5 /* ServeSideIndicatorView.swift */; };
 		36668422FD0A550258F51689 /* MatchTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C1FEC15A2F84C0377CBE24 /* MatchTimerView.swift */; };
+		3CFAE344E6327ED9B6D51656 /* LanguageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B01DB3007B7E1A4E775D103 /* LanguageService.swift */; };
 		4D6F492F567AFB7532375DD0 /* SetScorePill.swift in Sources */ = {isa = PBXBuildFile; fileRef = F820833747F8C63CC7848176 /* SetScorePill.swift */; };
 		5209EC0A6B8528F52BD85CC5 /* MatchState.swift in Sources */ = {isa = PBXBuildFile; fileRef = E690611FE7B4E59EA37DF29A /* MatchState.swift */; };
 		53E638F4B1E62BE6A045AC8F /* RemoteInputService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3974BF755D1822E5350F6498 /* RemoteInputService.swift */; };
@@ -27,9 +28,13 @@
 		B88B86F97607266A024B2DD6 /* CameraService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE97BC2451812350965B48 /* CameraService.swift */; };
 		BB1C63F1DDA003A8A6B8CD17 /* MatchOverOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C0CC4300D908F9863D99709 /* MatchOverOverlayView.swift */; };
 		C21EF1D5D185CA5DA2D5969E /* ColorSwatchPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = C90556AEAF09A74696D62A98 /* ColorSwatchPicker.swift */; };
+		C98C94216571738BB77089C0 /* PadelRacketView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AEF92A992C2BD9498307197 /* PadelRacketView.swift */; };
 		C9DBAC4A7E8D971D088EA7FC /* CameraOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E21E0036B11EBF94582A15A9 /* CameraOverlayView.swift */; };
 		D893CB127AFD2BF46CC95F96 /* TeamPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A0095B7F83735DA7FE32E3 /* TeamPanelView.swift */; };
+		DEE037DBCE0175E37557783A /* MatchViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55F8605A1AD01611E0E406B0 /* MatchViewModelTests.swift */; };
 		E7E2D7BA02F81151D58FB0F1 /* ShareImageRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 352AF53470F6924492394933 /* ShareImageRenderer.swift */; };
+		E93F41192E7EFE874B5D7C5E /* WallClockView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5813745251943634C9F2A431 /* WallClockView.swift */; };
+		EA3D14E06D58848AB79DD7D7 /* CreditsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9F57137E83AD0052453E7C5C /* CreditsView.swift */; };
 		ED93C69ED227208A47CC655A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 32A4B0043AA3E9E60C0B83BE /* Assets.xcassets */; };
 		EED30B72871C427CBDBB5E0D /* MatchHistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3A74CAEF0D377317B3C5AABE /* MatchHistoryView.swift */; };
 		F1CEDF84DB7ACDE12C5D7184 /* PadelScoringTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9D1C1F317A0956102AE2E5C9 /* PadelScoringTests.swift */; };
@@ -58,12 +63,16 @@
 		352AF53470F6924492394933 /* ShareImageRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareImageRenderer.swift; sourceTree = "<group>"; };
 		3974BF755D1822E5350F6498 /* RemoteInputService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoteInputService.swift; sourceTree = "<group>"; };
 		3A74CAEF0D377317B3C5AABE /* MatchHistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchHistoryView.swift; sourceTree = "<group>"; };
+		3B01DB3007B7E1A4E775D103 /* LanguageService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LanguageService.swift; sourceTree = "<group>"; };
 		44C1FEC15A2F84C0377CBE24 /* MatchTimerView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchTimerView.swift; sourceTree = "<group>"; };
 		48A92EB714C0E8CA7142255E /* TeamColor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TeamColor.swift; sourceTree = "<group>"; };
 		48E83101E65B7F02A50F10DA /* SoundService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SoundService.swift; sourceTree = "<group>"; };
 		4A4F87D302E6316DD690EAF2 /* NameFieldView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NameFieldView.swift; sourceTree = "<group>"; };
 		4CC8C3B33606B040AED17E38 /* ScoreBoardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScoreBoardView.swift; sourceTree = "<group>"; };
+		55F8605A1AD01611E0E406B0 /* MatchViewModelTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchViewModelTests.swift; sourceTree = "<group>"; };
+		5813745251943634C9F2A431 /* WallClockView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = WallClockView.swift; sourceTree = "<group>"; };
 		68D417882764B704E5707102 /* es */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = es; path = es.lproj/Localizable.strings; sourceTree = "<group>"; };
+		6AEF92A992C2BD9498307197 /* PadelRacketView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PadelRacketView.swift; sourceTree = "<group>"; };
 		6C0CC4300D908F9863D99709 /* MatchOverOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchOverOverlayView.swift; sourceTree = "<group>"; };
 		71775C9741BC25C1B45EB734 /* OnboardingOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingOverlayView.swift; sourceTree = "<group>"; };
 		71A11A65E24C094BF711B626 /* SettingsSidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSidebarView.swift; sourceTree = "<group>"; };
@@ -73,6 +82,7 @@
 		96833DE1F09E19EE51CBA320 /* MatchViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchViewModel.swift; sourceTree = "<group>"; };
 		9C2E869577A8D71ABD9569C9 /* silence.m4a */ = {isa = PBXFileReference; path = silence.m4a; sourceTree = "<group>"; };
 		9D1C1F317A0956102AE2E5C9 /* PadelScoringTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PadelScoringTests.swift; sourceTree = "<group>"; };
+		9F57137E83AD0052453E7C5C /* CreditsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditsView.swift; sourceTree = "<group>"; };
 		AC67DD955C96863FD4EA0CB5 /* ServeSideIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServeSideIndicatorView.swift; sourceTree = "<group>"; };
 		B6E91D477A63D05344618892 /* SavedMatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedMatch.swift; sourceTree = "<group>"; };
 		C90556AEAF09A74696D62A98 /* ColorSwatchPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSwatchPicker.swift; sourceTree = "<group>"; };
@@ -110,6 +120,7 @@
 			isa = PBXGroup;
 			children = (
 				31CE97BC2451812350965B48 /* CameraService.swift */,
+				3B01DB3007B7E1A4E775D103 /* LanguageService.swift */,
 				3974BF755D1822E5350F6498 /* RemoteInputService.swift */,
 				48E83101E65B7F02A50F10DA /* SoundService.swift */,
 			);
@@ -120,6 +131,7 @@
 			isa = PBXGroup;
 			children = (
 				E21E0036B11EBF94582A15A9 /* CameraOverlayView.swift */,
+				9F57137E83AD0052453E7C5C /* CreditsView.swift */,
 				3A74CAEF0D377317B3C5AABE /* MatchHistoryView.swift */,
 				6C0CC4300D908F9863D99709 /* MatchOverOverlayView.swift */,
 				44C1FEC15A2F84C0377CBE24 /* MatchTimerView.swift */,
@@ -128,6 +140,7 @@
 				AC67DD955C96863FD4EA0CB5 /* ServeSideIndicatorView.swift */,
 				71A11A65E24C094BF711B626 /* SettingsSidebarView.swift */,
 				F1A0095B7F83735DA7FE32E3 /* TeamPanelView.swift */,
+				5813745251943634C9F2A431 /* WallClockView.swift */,
 				7A0C972425FEFD4EB54A68B6 /* {Components} */,
 				99BE0B2969F21A27AA6E0ED6 /* Components */,
 			);
@@ -144,6 +157,7 @@
 		89939CD65AC7B057FFDE5E04 /* PadelPulseTests */ = {
 			isa = PBXGroup;
 			children = (
+				55F8605A1AD01611E0E406B0 /* MatchViewModelTests.swift */,
 				9D1C1F317A0956102AE2E5C9 /* PadelScoringTests.swift */,
 			);
 			path = PadelPulseTests;
@@ -156,6 +170,7 @@
 				8CDFE041F96A2073E8A6B21B /* ConfettiView.swift */,
 				8FC9F0E31D1AC0C975FA485C /* MatchScoreCardView.swift */,
 				4A4F87D302E6316DD690EAF2 /* NameFieldView.swift */,
+				6AEF92A992C2BD9498307197 /* PadelRacketView.swift */,
 				F820833747F8C63CC7848176 /* SetScorePill.swift */,
 			);
 			path = Components;
@@ -326,7 +341,9 @@
 				C21EF1D5D185CA5DA2D5969E /* ColorSwatchPicker.swift in Sources */,
 				AB30D0E803AEABDE4284CF30 /* ConfettiView.swift in Sources */,
 				9022512B8C26B510587CFE2C /* Constants.swift in Sources */,
+				EA3D14E06D58848AB79DD7D7 /* CreditsView.swift in Sources */,
 				01C6F336E3FC5F3308D20B5F /* HapticService.swift in Sources */,
+				3CFAE344E6327ED9B6D51656 /* LanguageService.swift in Sources */,
 				EED30B72871C427CBDBB5E0D /* MatchHistoryView.swift in Sources */,
 				BB1C63F1DDA003A8A6B8CD17 /* MatchOverOverlayView.swift in Sources */,
 				56827FB51743069038152122 /* MatchScoreCardView.swift in Sources */,
@@ -337,6 +354,7 @@
 				8FB7141E9D605B646F5C8995 /* NameFieldView.swift in Sources */,
 				7D79A4FF012B8FE7A0A6014C /* OnboardingOverlayView.swift in Sources */,
 				76B5633E59AF2CAAD1E04E72 /* PadelPulseApp.swift in Sources */,
+				C98C94216571738BB77089C0 /* PadelRacketView.swift in Sources */,
 				53E638F4B1E62BE6A045AC8F /* RemoteInputService.swift in Sources */,
 				7C77880DC846C5056431DD52 /* SavedMatch.swift in Sources */,
 				9CFF6EB687AD992748F57FB5 /* ScoreBoardView.swift in Sources */,
@@ -347,6 +365,7 @@
 				8F5543C8AD96F06E4F69315B /* SoundService.swift in Sources */,
 				0C64C90650908C2ACC1639BE /* TeamColor.swift in Sources */,
 				D893CB127AFD2BF46CC95F96 /* TeamPanelView.swift in Sources */,
+				E93F41192E7EFE874B5D7C5E /* WallClockView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -354,6 +373,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DEE037DBCE0175E37557783A /* MatchViewModelTests.swift in Sources */,
 				F1CEDF84DB7ACDE12C5D7184 /* PadelScoringTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -444,13 +464,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is needed to record your padel matches from courtside.";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access is needed to record audio with your match videos.";
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Photo library access is needed to save your recorded match videos.";
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UIRequiresFullScreen = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				GENERATE_INFOPLIST_FILE = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
@@ -531,13 +545,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
-				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access is needed to record your padel matches from courtside.";
-				INFOPLIST_KEY_NSMicrophoneUsageDescription = "Microphone access is needed to record audio with your match videos.";
-				INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription = "Photo library access is needed to save your recorded match videos.";
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UIRequiresFullScreen = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				GENERATE_INFOPLIST_FILE = NO;
 				IPHONEOS_DEPLOYMENT_TARGET = 17.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
@@ -557,7 +565,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PadelPulse/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -576,7 +583,6 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_IDENTITY = "iPhone Developer";
 				CURRENT_PROJECT_VERSION = 1;
-				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = PadelPulse/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",

@@ -23,12 +23,27 @@
 "ADVANTAGE" = "VORTEIL";
 "Sets to Win" = "Sätze zum Sieg";
 "NO LIMIT" = "ENDLOS";
+"Auto Side Swap" = "Autom. Seitenwechsel";
+"OFF" = "AUS";
+"AFTER SET" = "NACH SATZ";
 "Serving" = "Aufschlag";
+"SERVING" = "AUFSCHLAG";
 "Serve Side (L/R)" = "Aufschlagseite (L/R)";
 "Sound Effects" = "Soundeffekte";
 "Camera" = "Kamera";
+"Language" = "Sprache";
+"Auto" = "Auto";
 "Match History" = "Spielverlauf";
+"Credits" = "Credits";
 "Double tap to change" = "Doppeltippen zum Ändern";
+
+/* CreditsView */
+"CREDITS" = "CREDITS";
+"Based on" = "Basiert auf";
+"Point-Counter by Dominik Lindorfer" = "Point-Counter von Dominik Lindorfer";
+"Padel racket icon" = "Padelschläger-Icon";
+"\"padel\" by Rusma Ratri Handini from Noun Project (CC BY 3.0)" = "„padel“ von Rusma Ratri Handini aus Noun Project (CC BY 3.0)";
+"Made with love for padel." = "Mit Liebe zum Padel gemacht.";
 
 /* TeamPanelView */
 "GAMES" = "GAMES";

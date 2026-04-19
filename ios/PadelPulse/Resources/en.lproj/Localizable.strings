@@ -23,12 +23,27 @@
 "ADVANTAGE" = "ADVANTAGE";
 "Sets to Win" = "Sets to Win";
 "NO LIMIT" = "NO LIMIT";
+"Auto Side Swap" = "Auto Side Swap";
+"OFF" = "OFF";
+"AFTER SET" = "AFTER SET";
 "Serving" = "Serving";
+"SERVING" = "SERVING";
 "Serve Side (L/R)" = "Serve Side (L/R)";
 "Sound Effects" = "Sound Effects";
 "Camera" = "Camera";
+"Language" = "Language";
+"Auto" = "Auto";
 "Match History" = "Match History";
+"Credits" = "Credits";
 "Double tap to change" = "Double tap to change";
+
+/* CreditsView */
+"CREDITS" = "CREDITS";
+"Based on" = "Based on";
+"Point-Counter by Dominik Lindorfer" = "Point-Counter by Dominik Lindorfer";
+"Padel racket icon" = "Padel racket icon";
+"\"padel\" by Rusma Ratri Handini from Noun Project (CC BY 3.0)" = "\"padel\" by Rusma Ratri Handini from Noun Project (CC BY 3.0)";
+"Made with love for padel." = "Made with love for padel.";
 
 /* TeamPanelView */
 "GAMES" = "GAMES";

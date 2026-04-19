@@ -39,16 +39,18 @@ struct LayoutMetrics {
     }
 
     // Score display — unclamped, dominates the screen
-    var scoreFont: CGFloat { 400 * scale }
-    var teamNameFont: CGFloat { max(18, 56 * scale) }
-    var servingBallSize: CGFloat { 28 * scale }
+    var scoreFont: CGFloat { 520 * scale }
+    var teamNameFont: CGFloat { max(16, 44 * scale) }
+    var servingBadgeFont: CGFloat { max(14, 32 * scale) }
+    var servingRacketSize: CGFloat { max(56, 104 * scale) }
 
     // Games box — unclamped, dominates the screen
-    var gamesBoxWidth: CGFloat { 140 * scale }
+    var gamesBoxWidth: CGFloat { 180 * scale }
     var gamesBoxHeight: CGFloat { 170 * scale }
-    var gamesBoxCorner: CGFloat { 18 * scale }
+    var gamesBoxCorner: CGFloat { 22 * scale }
     var gamesLabelFont: CGFloat { 18 * scale }
-    var gamesNumberFont: CGFloat { 110 * scale }
+    var gamesNumberFont: CGFloat { 156 * scale }
+    var gamesBoxTopPadding: CGFloat { 32 * scale }
 
     // Toolbar
     var toolbarIconSize: CGFloat { max(16, 20 * scale) }

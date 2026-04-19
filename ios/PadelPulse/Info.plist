@@ -15,9 +15,15 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>NSCameraUsageDescription</key>
+	<string>Camera access is needed to record your padel matches from courtside.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Microphone access is needed to record audio with your match videos.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Photo library access is needed to save your recorded match videos.</string>
 	<key>UILaunchScreen</key>
 	<dict>
 		<key>UIColorName</key>

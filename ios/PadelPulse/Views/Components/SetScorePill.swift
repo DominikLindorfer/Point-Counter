@@ -10,7 +10,10 @@ struct SetScorePill: View {
     var labelFontSize: CGFloat = 16
 
     var body: some View {
-        VStack(spacing: 0) {
+        let leftWins = leftGames > rightGames
+        let rightWins = rightGames > leftGames
+
+        VStack(spacing: 2) {
             Text("SET \(setIndex + 1)")
                 .font(.system(size: labelFontSize, weight: .medium))
                 .foregroundColor(DimColor)
@@ -18,19 +21,21 @@ struct SetScorePill: View {
 
             HStack(spacing: 4) {
                 Text("\(leftGames)")
-                    .font(.system(size: fontSize, weight: .bold))
-                    .foregroundColor(leftColor)
+                    .font(.system(size: fontSize, weight: leftWins ? .bold : .medium))
+                    .foregroundColor(leftWins ? .white : .white.opacity(0.45))
+                    .monospacedDigit()
                 Text(":")
                     .font(.system(size: fontSize, weight: .bold))
-                    .foregroundColor(DimColor)
+                    .foregroundColor(DimColor.opacity(0.6))
                 Text("\(rightGames)")
-                    .font(.system(size: fontSize, weight: .bold))
-                    .foregroundColor(rightColor)
+                    .font(.system(size: fontSize, weight: rightWins ? .bold : .medium))
+                    .foregroundColor(rightWins ? .white : .white.opacity(0.45))
+                    .monospacedDigit()
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 6)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 10)
         .background(ButtonBg)
-        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 }

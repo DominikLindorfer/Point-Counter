@@ -12,6 +12,8 @@ struct TeamPanelView: View {
     let currentSet: Int
     let isMatchOver: Bool
     let isTiebreak: Bool
+    let showServeSide: Bool
+    let serveOnLeft: Bool
     var gamesBoxAtStart: Bool = false
     let onClick: () -> Void
 
@@ -38,13 +40,16 @@ struct TeamPanelView: View {
                 HStack {
                     if gamesBoxAtStart {
                         gamesBox(currentGames: currentGames)
+                            .padding(.leading, layout.panelPadding)
                         Spacer()
                     } else {
                         Spacer()
                         gamesBox(currentGames: currentGames)
+                            .padding(.trailing, layout.panelPadding)
                     }
                 }
-                .padding(.top, layout.panelPadding)
+                .padding(.top, layout.gamesBoxTopPadding)
+                .padding(.bottom, layout.gamesBoxTopPadding)
                 .padding(.horizontal, layout.panelPadding)
 
                 Spacer()
@@ -66,6 +71,10 @@ struct TeamPanelView: View {
                 Spacer()
             }
             .padding(.bottom, layout.serveAreaClearance)
+
+            if isServing && showServeSide && !isMatchOver {
+                racketOverlay
+            }
         }
         .onChange(of: pointDisplay) { _, _ in
             scoreVersion += 1
@@ -92,21 +101,33 @@ struct TeamPanelView: View {
         .accessibilityAddTraits(.isButton)
     }
 
-    private var teamNameRow: some View {
-        HStack(spacing: 8) {
-            if isServing {
-                Image(systemName: "tennisball.fill")
-                    .foregroundColor(GoldColor)
-                    .font(.system(size: layout.servingBallSize))
+    private var racketOverlay: some View {
+        VStack {
+            Spacer()
+            HStack {
+                if serveOnLeft {
+                    PadelRacketView(color: GoldColor, size: layout.servingRacketSize)
+                    Spacer()
+                } else {
+                    Spacer()
+                    PadelRacketView(color: GoldColor, size: layout.servingRacketSize)
+                }
             }
-            Text(teamLabel)
-                .font(.system(size: layout.teamNameFont, weight: .bold))
-                .foregroundColor(accentColor)
-                .lineLimit(1)
-                .minimumScaleFactor(0.5)
-                .tracking(3)
+            .padding(.horizontal, layout.panelPadding * 1.5)
+            .padding(.bottom, layout.panelPadding * 1.5)
+            .animation(.easeInOut(duration: 0.25), value: serveOnLeft)
         }
-        .padding(.horizontal, layout.panelPadding)
+        .accessibilityHidden(true)
+    }
+
+    private var teamNameRow: some View {
+        Text(teamLabel)
+            .font(.system(size: layout.teamNameFont, weight: .bold))
+            .foregroundColor(accentColor)
+            .lineLimit(1)
+            .minimumScaleFactor(0.5)
+            .tracking(3)
+            .padding(.horizontal, layout.panelPadding)
     }
 
     private func gamesBox(currentGames: Int) -> some View {
@@ -115,26 +136,13 @@ struct TeamPanelView: View {
                 .fill(Color.black.opacity(0.3))
                 .frame(width: layout.gamesBoxWidth, height: layout.gamesBoxHeight)
 
-            VStack(spacing: 0) {
-                Text("GAMES")
-                    .font(.system(size: layout.gamesLabelFont, weight: .bold))
-                    .foregroundColor(.white.opacity(0.6))
-                    .tracking(3)
-                    .padding(.top, 10)
-
-                Spacer()
-
-                Text("\(currentGames)")
-                    .font(.system(size: layout.gamesNumberFont, weight: .bold))
-                    .foregroundColor(.white)
-                    .minimumScaleFactor(0.5)
-                    .scaleEffect(gamesScale)
-                    .contentTransition(.numericText())
-                    .animation(.spring(response: 0.3, dampingFraction: 0.7), value: currentGames)
-
-                Spacer()
-            }
-            .frame(width: layout.gamesBoxWidth, height: layout.gamesBoxHeight)
+            Text("\(currentGames)")
+                .font(.system(size: layout.gamesNumberFont, weight: .bold))
+                .foregroundColor(.white)
+                .minimumScaleFactor(0.5)
+                .scaleEffect(gamesScale)
+                .contentTransition(.numericText())
+                .animation(.spring(response: 0.3, dampingFraction: 0.7), value: currentGames)
         }
     }
 }

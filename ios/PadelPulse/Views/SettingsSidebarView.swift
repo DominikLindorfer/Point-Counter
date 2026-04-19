@@ -5,9 +5,28 @@ struct SettingsSidebarView: View {
     let vm: MatchViewModel
     let onClose: () -> Void
     var onShowHistory: () -> Void = {}
+    var onShowCredits: () -> Void = {}
 
     @Environment(\.layout) private var layout
     @AppStorage("camera_overlay_enabled") private var cameraEnabled = false
+    @AppStorage(LanguageService.storageKey) private var selectedLanguage = "system"
+
+    private var languageDisplayName: String {
+        switch selectedLanguage {
+        case "en": return "English"
+        case "de": return "Deutsch"
+        case "es": return "Español"
+        default: return "Auto"
+        }
+    }
+
+    private func cycleLanguage() {
+        let order = ["system"] + LanguageService.supportedLanguages
+        let idx = order.firstIndex(of: selectedLanguage) ?? 0
+        let next = order[(idx + 1) % order.count]
+        selectedLanguage = next
+        LanguageService.apply(languageCode: next)
+    }
 
     var body: some View {
         let team1Accent = vm.team1Color.contrastingTextColor
@@ -116,6 +135,17 @@ struct SettingsSidebarView: View {
 
                         Spacer().frame(height: 10)
 
+                        // Auto side-swap
+                        settingsRow(
+                            icon: "arrow.left.arrow.right.square",
+                            iconColor: vm.autoSwapMode == .off ? DimColor : GoldColor,
+                            label: "Auto Side Swap",
+                            value: vm.autoSwapMode == .off ? "OFF" : "AFTER SET",
+                            valueColor: vm.autoSwapMode == .off ? DimColor : GoldColor
+                        ) { vm.cycleAutoSwapMode() }
+
+                        Spacer().frame(height: 10)
+
                         // First serve
                         let serveName = vm.servingTeam == 1 ? vm.team1Name : vm.team2Name
                         let serveColor = vm.servingTeam == 1 ? team1Accent : team2Accent
@@ -201,6 +231,17 @@ struct SettingsSidebarView: View {
                         .background(SettingsSurface)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
 
+                        Spacer().frame(height: 10)
+
+                        // Language switcher
+                        settingsRow(
+                            icon: "globe",
+                            iconColor: selectedLanguage == "system" ? DimColor : GoldColor,
+                            label: "Language",
+                            value: LocalizedStringKey(languageDisplayName),
+                            valueColor: selectedLanguage == "system" ? DimColor : GoldColor
+                        ) { cycleLanguage() }
+
                         Spacer().frame(height: 28)
                         Divider().background(Color(white: 0.2))
                         Spacer().frame(height: 20)
@@ -221,6 +262,26 @@ struct SettingsSidebarView: View {
                         .onTapGesture {
                             onClose()
                             onShowHistory()
+                        }
+
+                        Spacer().frame(height: 10)
+
+                        // Credits
+                        HStack(spacing: 12) {
+                            Image(systemName: "heart.fill")
+                                .font(.system(size: layout.settingsRowIcon))
+                                .foregroundColor(GoldColor)
+                            Text("Credits")
+                                .font(.system(size: layout.settingsRowLabel))
+                                .foregroundColor(.white)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(16)
+                        .background(SettingsSurface)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .onTapGesture {
+                            onClose()
+                            onShowCredits()
                         }
                     }
                     .padding(28)

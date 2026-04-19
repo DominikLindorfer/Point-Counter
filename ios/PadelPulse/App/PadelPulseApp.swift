@@ -4,7 +4,12 @@ import SwiftUI
 struct PadelPulseApp: App {
     @State private var viewModel = MatchViewModel(storage: MatchStorage())
     @Environment(\.scenePhase) private var scenePhase
+    @AppStorage(LanguageService.storageKey) private var selectedLanguage = "system"
     private let remoteInput = RemoteInputService()
+
+    init() {
+        LanguageService.applyStoredLanguage()
+    }
 
     var body: some Scene {
         WindowGroup {
@@ -14,6 +19,7 @@ struct PadelPulseApp: App {
                         screenWidth: geo.size.width,
                         screenHeight: geo.size.height
                     ))
+                    .id(selectedLanguage)
             }
             .statusBarHidden()
             .persistentSystemOverlays(.hidden)
@@ -65,6 +71,7 @@ struct PadelPulseApp: App {
 struct ContentView: View {
     let vm: MatchViewModel
     @State private var showHistory = false
+    @State private var showCredits = false
 
     var body: some View {
         ZStack {
@@ -74,14 +81,25 @@ struct ContentView: View {
                         insertion: .move(edge: .trailing).combined(with: .opacity),
                         removal: .move(edge: .trailing).combined(with: .opacity)
                     ))
-            } else {
-                ScoreBoardView(vm: vm, onShowHistory: { showHistory = true })
+            } else if showCredits {
+                CreditsView(onClose: { showCredits = false })
                     .transition(.asymmetric(
-                        insertion: .move(edge: .leading).combined(with: .opacity),
-                        removal: .move(edge: .leading).combined(with: .opacity)
+                        insertion: .move(edge: .trailing).combined(with: .opacity),
+                        removal: .move(edge: .trailing).combined(with: .opacity)
                     ))
+            } else {
+                ScoreBoardView(
+                    vm: vm,
+                    onShowHistory: { showHistory = true },
+                    onShowCredits: { showCredits = true }
+                )
+                .transition(.asymmetric(
+                    insertion: .move(edge: .leading).combined(with: .opacity),
+                    removal: .move(edge: .leading).combined(with: .opacity)
+                ))
             }
         }
         .animation(.easeInOut(duration: 0.35), value: showHistory)
+        .animation(.easeInOut(duration: 0.35), value: showCredits)
     }
 }

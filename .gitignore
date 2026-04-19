@@ -27,6 +27,7 @@ playstorekey
 ios/PadelPulse.xcodeproj/xcuserdata/
 ios/PadelPulse.xcodeproj/project.xcworkspace/xcuserdata/
 ios/DerivedData/
+ios/build/
 xcuserdata/
 *.xcuserstate
 *.xcscmblueprint

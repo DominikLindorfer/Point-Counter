@@ -3,6 +3,7 @@ import SwiftUI
 struct ScoreBoardView: View {
     let vm: MatchViewModel
     var onShowHistory: () -> Void = {}
+    var onShowCredits: () -> Void = {}
 
     @Environment(\.layout) private var layout
     @State private var showSettings = false
@@ -44,6 +45,8 @@ struct ScoreBoardView: View {
 
             // Main content: two halves
             HStack(spacing: 0) {
+                let serveOnLeft = (state.team1Points + state.team2Points) % 2 != 0
+
                 TeamPanelView(
                     teamLabel: leftName,
                     pointDisplay: leftDisplay,
@@ -56,6 +59,8 @@ struct ScoreBoardView: View {
                     currentSet: state.currentSet,
                     isMatchOver: state.isMatchOver,
                     isTiebreak: state.isTiebreak,
+                    showServeSide: vm.showServeSide,
+                    serveOnLeft: serveOnLeft,
                     onClick: { vm.scorePoint(team: leftTeam) }
                 )
 
@@ -81,6 +86,8 @@ struct ScoreBoardView: View {
                     currentSet: state.currentSet,
                     isMatchOver: state.isMatchOver,
                     isTiebreak: state.isTiebreak,
+                    showServeSide: vm.showServeSide,
+                    serveOnLeft: serveOnLeft,
                     gamesBoxAtStart: true,
                     onClick: { vm.scorePoint(team: rightTeam) }
                 )
@@ -136,6 +143,8 @@ struct ScoreBoardView: View {
                     Spacer()
                     VStack(alignment: .trailing, spacing: 8) {
                         HStack(spacing: layout.toolbarSpacing) {
+                            WallClockView()
+
                             MatchTimerView(vm: vm)
 
                             Button(action: { showSettings = true }) {
@@ -146,26 +155,28 @@ struct ScoreBoardView: View {
                             .accessibilityLabel("Settings")
                         }
 
-                        ForEach(0..<leftGamesList.count, id: \.self) { index in
-                            if index < state.currentSet || (state.isMatchOver && index <= state.currentSet) {
-                                compactSetPill(
-                                    setIndex: index,
-                                    leftGames: leftGamesList[index],
-                                    rightGames: rightGamesList[index]
-                                )
-                                .transition(.scale.combined(with: .opacity))
+                        HStack(spacing: 6) {
+                            ForEach(0..<leftGamesList.count, id: \.self) { index in
+                                if index < state.currentSet || (state.isMatchOver && index <= state.currentSet) {
+                                    compactSetPill(
+                                        setIndex: index,
+                                        leftGames: leftGamesList[index],
+                                        rightGames: rightGamesList[index]
+                                    )
+                                    .transition(.scale.combined(with: .opacity))
+                                }
                             }
-                        }
 
-                        if state.isTiebreak {
-                            Text("TB")
-                                .font(.system(size: layout.compactTiebreakFont, weight: .bold))
-                                .foregroundColor(GoldColor)
-                                .padding(.horizontal, 10)
-                                .padding(.vertical, 6)
-                                .background(GoldColor.opacity(0.15))
-                                .clipShape(RoundedRectangle(cornerRadius: 8))
-                                .transition(.scale.combined(with: .opacity))
+                            if state.isTiebreak {
+                                Text("TB")
+                                    .font(.system(size: layout.compactTiebreakFont, weight: .bold))
+                                    .foregroundColor(GoldColor)
+                                    .padding(.horizontal, 10)
+                                    .padding(.vertical, 6)
+                                    .background(GoldColor.opacity(0.15))
+                                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                                    .transition(.scale.combined(with: .opacity))
+                            }
                         }
                     }
                     .animation(.easeInOut(duration: 0.3), value: state.currentSet)
@@ -173,18 +184,6 @@ struct ScoreBoardView: View {
                 }
                 .padding(layout.panelPadding)
                 Spacer()
-            }
-
-            // Serve side indicator — bottom center
-            if vm.showServeSide {
-                VStack {
-                    Spacer()
-                    ServeSideIndicatorView(
-                        totalPoints: state.team1Points + state.team2Points,
-                        isMatchOver: state.isMatchOver
-                    )
-                    .padding(.bottom, layout.panelPadding)
-                }
             }
 
             // Camera overlay — bottom left
@@ -222,7 +221,8 @@ struct ScoreBoardView: View {
                 visible: showSettings,
                 vm: vm,
                 onClose: { showSettings = false },
-                onShowHistory: onShowHistory
+                onShowHistory: onShowHistory,
+                onShowCredits: onShowCredits
             )
 
             // Onboarding overlay (first launch only)
