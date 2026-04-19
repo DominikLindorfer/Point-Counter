@@ -17,6 +17,7 @@ final class RemoteInputService {
 
     private var audioSession: AVAudioSession?
     private var silentPlayer: AVAudioPlayer?
+    private var keyboardConnectObserver: NSObjectProtocol?
 
     func start() {
         setupAudioSession()
@@ -35,6 +36,11 @@ final class RemoteInputService {
 
         silentPlayer?.stop()
         silentPlayer = nil
+
+        if let token = keyboardConnectObserver {
+            NotificationCenter.default.removeObserver(token)
+            keyboardConnectObserver = nil
+        }
 
         try? AVAudioSession.sharedInstance().setActive(false)
     }
@@ -108,8 +114,8 @@ final class RemoteInputService {
     // MARK: - Layer 2: GCKeyboard (Hardware keyboard fallback)
 
     private func setupGameController() {
-        // Listen for keyboard connections
-        NotificationCenter.default.addObserver(
+        // Listen for keyboard connections. Store the token so stop() can unregister.
+        keyboardConnectObserver = NotificationCenter.default.addObserver(
             forName: .GCKeyboardDidConnect,
             object: nil,
             queue: .main
