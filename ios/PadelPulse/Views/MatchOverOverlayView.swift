@@ -85,14 +85,7 @@ struct MatchOverOverlayView: View {
 
                 HStack(spacing: 16) {
                     Button {
-                        let match = SavedMatch(
-                            id: 0, timestamp: Int64(Date().timeIntervalSince1970 * 1000),
-                            team1Name: vm.team1Name, team2Name: vm.team2Name,
-                            team1Sets: state.team1Sets, team2Sets: state.team2Sets,
-                            team1Games: state.team1Games, team2Games: state.team2Games,
-                            winner: state.winner, durationMs: 0, goldenPoint: vm.goldenPoint,
-                            team1PointsWon: vm.team1PointsWon, team2PointsWon: vm.team2PointsWon
-                        )
+                        let match = vm.currentMatchSnapshot()
                         if let image = ShareImageRenderer.render(match: match) {
                             shareImage = image
                             showShareSheet = true

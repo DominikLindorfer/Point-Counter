@@ -220,14 +220,15 @@ final class MatchViewModel {
         clearInProgressMatch()
     }
 
-    private func saveMatch() {
-        let duration = matchStartTimeMs > 0
-            ? Int64(Date().timeIntervalSince1970 * 1000) - matchStartTimeMs
-            : 0
-
-        let match = SavedMatch(
+    /// Build a SavedMatch from the current view-model state. Shared between
+    /// `saveMatch()` (auto-persist on match over) and the overlay's share action.
+    /// If `durationMs` is nil, derives it from `matchStartTimeMs`.
+    func currentMatchSnapshot(durationMs: Int64? = nil) -> SavedMatch {
+        let now = Int64(Date().timeIntervalSince1970 * 1000)
+        let derivedDuration = matchStartTimeMs > 0 ? now - matchStartTimeMs : 0
+        return SavedMatch(
             id: 0,
-            timestamp: Int64(Date().timeIntervalSince1970 * 1000),
+            timestamp: now,
             team1Name: team1Name,
             team2Name: team2Name,
             team1Sets: state.team1Sets,
@@ -235,12 +236,15 @@ final class MatchViewModel {
             team1Games: state.team1Games,
             team2Games: state.team2Games,
             winner: state.winner,
-            durationMs: duration,
+            durationMs: durationMs ?? derivedDuration,
             goldenPoint: goldenPoint,
             team1PointsWon: team1PointsWon,
             team2PointsWon: team2PointsWon
         )
-        _ = storage.save(match)
+    }
+
+    private func saveMatch() {
+        _ = storage.save(currentMatchSnapshot())
         matchHistory = storage.loadAll()
         clearInProgressMatch()
     }
