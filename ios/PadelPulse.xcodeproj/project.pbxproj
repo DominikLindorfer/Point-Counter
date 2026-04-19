@@ -10,6 +10,7 @@
 		01C6F336E3FC5F3308D20B5F /* HapticService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29BD615A3E1E70913C4534CC /* HapticService.swift */; };
 		0C64C90650908C2ACC1639BE /* TeamColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A92EB714C0E8CA7142255E /* TeamColor.swift */; };
 		187293A9D7C30ADB614B8C89 /* ServeSideIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC67DD955C96863FD4EA0CB5 /* ServeSideIndicatorView.swift */; };
+		22654429666E0A69EAF835E6 /* DefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A89C6B5700B7CDDAF63A66A /* DefaultsKeys.swift */; };
 		36668422FD0A550258F51689 /* MatchTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C1FEC15A2F84C0377CBE24 /* MatchTimerView.swift */; };
 		3CFAE344E6327ED9B6D51656 /* LanguageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B01DB3007B7E1A4E775D103 /* LanguageService.swift */; };
 		4D6F492F567AFB7532375DD0 /* SetScorePill.swift in Sources */ = {isa = PBXBuildFile; fileRef = F820833747F8C63CC7848176 /* SetScorePill.swift */; };
@@ -24,6 +25,7 @@
 		8FB7141E9D605B646F5C8995 /* NameFieldView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4A4F87D302E6316DD690EAF2 /* NameFieldView.swift */; };
 		9022512B8C26B510587CFE2C /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = DBD566DC6819BD59CBADA8AA /* Constants.swift */; };
 		9CFF6EB687AD992748F57FB5 /* ScoreBoardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 4CC8C3B33606B040AED17E38 /* ScoreBoardView.swift */; };
+		9D05EC8EDD1CB081C0FBAF92 /* PersistenceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 806A3856D49C936FAFDA3D30 /* PersistenceTests.swift */; };
 		AB30D0E803AEABDE4284CF30 /* ConfettiView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8CDFE041F96A2073E8A6B21B /* ConfettiView.swift */; };
 		B88B86F97607266A024B2DD6 /* CameraService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE97BC2451812350965B48 /* CameraService.swift */; };
 		BB1C63F1DDA003A8A6B8CD17 /* MatchOverOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C0CC4300D908F9863D99709 /* MatchOverOverlayView.swift */; };
@@ -76,6 +78,8 @@
 		6C0CC4300D908F9863D99709 /* MatchOverOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchOverOverlayView.swift; sourceTree = "<group>"; };
 		71775C9741BC25C1B45EB734 /* OnboardingOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingOverlayView.swift; sourceTree = "<group>"; };
 		71A11A65E24C094BF711B626 /* SettingsSidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSidebarView.swift; sourceTree = "<group>"; };
+		7A89C6B5700B7CDDAF63A66A /* DefaultsKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultsKeys.swift; sourceTree = "<group>"; };
+		806A3856D49C936FAFDA3D30 /* PersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceTests.swift; sourceTree = "<group>"; };
 		8CC95C775A15DECC011C3C4D /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		8CDFE041F96A2073E8A6B21B /* ConfettiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiView.swift; sourceTree = "<group>"; };
 		8FC9F0E31D1AC0C975FA485C /* MatchScoreCardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MatchScoreCardView.swift; sourceTree = "<group>"; };
@@ -110,6 +114,7 @@
 			isa = PBXGroup;
 			children = (
 				DBD566DC6819BD59CBADA8AA /* Constants.swift */,
+				7A89C6B5700B7CDDAF63A66A /* DefaultsKeys.swift */,
 				29BD615A3E1E70913C4534CC /* HapticService.swift */,
 				352AF53470F6924492394933 /* ShareImageRenderer.swift */,
 			);
@@ -159,6 +164,7 @@
 			children = (
 				55F8605A1AD01611E0E406B0 /* MatchViewModelTests.swift */,
 				9D1C1F317A0956102AE2E5C9 /* PadelScoringTests.swift */,
+				806A3856D49C936FAFDA3D30 /* PersistenceTests.swift */,
 			);
 			path = PadelPulseTests;
 			sourceTree = "<group>";
@@ -342,6 +348,7 @@
 				AB30D0E803AEABDE4284CF30 /* ConfettiView.swift in Sources */,
 				9022512B8C26B510587CFE2C /* Constants.swift in Sources */,
 				EA3D14E06D58848AB79DD7D7 /* CreditsView.swift in Sources */,
+				22654429666E0A69EAF835E6 /* DefaultsKeys.swift in Sources */,
 				01C6F336E3FC5F3308D20B5F /* HapticService.swift in Sources */,
 				3CFAE344E6327ED9B6D51656 /* LanguageService.swift in Sources */,
 				EED30B72871C427CBDBB5E0D /* MatchHistoryView.swift in Sources */,
@@ -375,6 +382,7 @@
 			files = (
 				DEE037DBCE0175E37557783A /* MatchViewModelTests.swift in Sources */,
 				F1CEDF84DB7ACDE12C5D7184 /* PadelScoringTests.swift in Sources */,
+				9D05EC8EDD1CB081C0FBAF92 /* PersistenceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

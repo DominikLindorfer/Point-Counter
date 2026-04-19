@@ -90,13 +90,14 @@ ios/PadelPulse/
 │       ├── PadelRacketView.swift         # SVG asset, template-tinted to gold
 │       └── SetScorePill.swift            # ATP-style set pill (winner bold, loser dim)
 ├── Services/
-│   ├── CameraService.swift               # AVCaptureSession management
-│   ├── LanguageService.swift             # Runtime app-language switcher (bundle swizzle)
+│   ├── CameraService.swift               # AVCaptureSession management (serial session queue)
+│   ├── LanguageService.swift             # Runtime app-language switcher (bundle swizzle + Environment locale)
 │   ├── RemoteInputService.swift          # Bluetooth media remote handling
 │   └── SoundService.swift                # System sounds with mute toggle
 ├── Utilities/
 │   ├── Constants.swift                   # Colors, LayoutMetrics (50+ scaled properties)
-│   ├── HapticService.swift               # UIImpactFeedbackGenerator wrappers
+│   ├── DefaultsKeys.swift                # Central registry of every UserDefaults key
+│   ├── HapticService.swift               # UIImpactFeedbackGenerator wrappers (+ prepareAll)
 │   └── ShareImageRenderer.swift          # ImageRenderer wrapper for share cards
 └── Resources/
     ├── Assets.xcassets/                  # AppIcon, LaunchLogo, DarkBg, GoldColor
