@@ -12,30 +12,49 @@ struct ScoreBoardView: View {
     @AppStorage("has_seen_onboarding") private var hasSeenOnboarding = false
     @AppStorage("camera_overlay_enabled") private var cameraEnabled = false
 
+    /// Snapshot of one side of the scoreboard (left or right), already resolved
+    /// against `sidesSwapped` so the view layer doesn't repeat the ternary dance.
+    private struct SideSnapshot {
+        let name: String
+        let display: String
+        let bg: Color
+        let accent: Color
+        let sets: Int
+        let gamesList: [Int]
+        let team: Int
+    }
+
+    private func snapshot(
+        isLeft: Bool,
+        display1: String,
+        display2: String,
+        team1Accent: Color,
+        team2Accent: Color
+    ) -> SideSnapshot {
+        let state = vm.state
+        let team1OnThisSide = isLeft != vm.sidesSwapped
+        return SideSnapshot(
+            name: team1OnThisSide ? vm.team1Name : vm.team2Name,
+            display: team1OnThisSide ? display1 : display2,
+            bg: team1OnThisSide ? vm.team1Color : vm.team2Color,
+            accent: team1OnThisSide ? team1Accent : team2Accent,
+            sets: team1OnThisSide ? state.team1Sets : state.team2Sets,
+            gamesList: team1OnThisSide ? state.team1Games : state.team2Games,
+            team: team1OnThisSide ? 1 : 2
+        )
+    }
+
     var body: some View {
         let state = vm.state
         let (display1, display2) = PadelScoring.displayPoints(state: state, goldenPoint: vm.goldenPoint)
 
-        let team1Bg = vm.team1Color
         let team1Accent = vm.team1Color.contrastingTextColor
-        let team2Bg = vm.team2Color
         let team2Accent = vm.team2Color.contrastingTextColor
 
-        // Determine which team shows on which side
-        let leftName = vm.sidesSwapped ? vm.team2Name : vm.team1Name
-        let rightName = vm.sidesSwapped ? vm.team1Name : vm.team2Name
-        let leftDisplay = vm.sidesSwapped ? display2 : display1
-        let rightDisplay = vm.sidesSwapped ? display1 : display2
-        let leftBg = vm.sidesSwapped ? team2Bg : team1Bg
-        let rightBg = vm.sidesSwapped ? team1Bg : team2Bg
-        let leftAccent = vm.sidesSwapped ? team2Accent : team1Accent
-        let rightAccent = vm.sidesSwapped ? team1Accent : team2Accent
-        let leftTeam = vm.sidesSwapped ? 2 : 1
-        let rightTeam = vm.sidesSwapped ? 1 : 2
-        let leftSets = vm.sidesSwapped ? state.team2Sets : state.team1Sets
-        let rightSets = vm.sidesSwapped ? state.team1Sets : state.team2Sets
-        let leftGamesList = vm.sidesSwapped ? state.team2Games : state.team1Games
-        let rightGamesList = vm.sidesSwapped ? state.team1Games : state.team2Games
+        let left = snapshot(isLeft: true, display1: display1, display2: display2,
+                            team1Accent: team1Accent, team2Accent: team2Accent)
+        let right = snapshot(isLeft: false, display1: display1, display2: display2,
+                             team1Accent: team1Accent, team2Accent: team2Accent)
 
         let servingOnLeft = (vm.servingTeam == 1 && !vm.sidesSwapped) ||
             (vm.servingTeam == 2 && vm.sidesSwapped)
@@ -48,20 +67,20 @@ struct ScoreBoardView: View {
                 let serveOnLeft = (state.team1Points + state.team2Points) % 2 != 0
 
                 TeamPanelView(
-                    teamLabel: leftName,
-                    pointDisplay: leftDisplay,
-                    backgroundColor: leftBg,
-                    accentColor: leftAccent,
+                    teamLabel: left.name,
+                    pointDisplay: left.display,
+                    backgroundColor: left.bg,
+                    accentColor: left.accent,
                     isServing: servingOnLeft,
-                    setsWon: leftSets,
-                    gamesList: leftGamesList,
-                    opponentGamesList: rightGamesList,
+                    setsWon: left.sets,
+                    gamesList: left.gamesList,
+                    opponentGamesList: right.gamesList,
                     currentSet: state.currentSet,
                     isMatchOver: state.isMatchOver,
                     isTiebreak: state.isTiebreak,
                     showServeSide: vm.showServeSide,
                     serveOnLeft: serveOnLeft,
-                    onClick: { vm.scorePoint(team: leftTeam) }
+                    onClick: { vm.scorePoint(team: left.team) }
                 )
 
                 Rectangle()
@@ -75,21 +94,21 @@ struct ScoreBoardView: View {
                     .frame(width: 2)
 
                 TeamPanelView(
-                    teamLabel: rightName,
-                    pointDisplay: rightDisplay,
-                    backgroundColor: rightBg,
-                    accentColor: rightAccent,
+                    teamLabel: right.name,
+                    pointDisplay: right.display,
+                    backgroundColor: right.bg,
+                    accentColor: right.accent,
                     isServing: !servingOnLeft,
-                    setsWon: rightSets,
-                    gamesList: rightGamesList,
-                    opponentGamesList: leftGamesList,
+                    setsWon: right.sets,
+                    gamesList: right.gamesList,
+                    opponentGamesList: left.gamesList,
                     currentSet: state.currentSet,
                     isMatchOver: state.isMatchOver,
                     isTiebreak: state.isTiebreak,
                     showServeSide: vm.showServeSide,
                     serveOnLeft: serveOnLeft,
                     gamesBoxAtStart: true,
-                    onClick: { vm.scorePoint(team: rightTeam) }
+                    onClick: { vm.scorePoint(team: right.team) }
                 )
             }
             .ignoresSafeArea()
@@ -156,12 +175,12 @@ struct ScoreBoardView: View {
                         }
 
                         HStack(spacing: 6) {
-                            ForEach(0..<leftGamesList.count, id: \.self) { index in
+                            ForEach(0..<left.gamesList.count, id: \.self) { index in
                                 if index < state.currentSet || (state.isMatchOver && index <= state.currentSet) {
                                     compactSetPill(
                                         setIndex: index,
-                                        leftGames: leftGamesList[index],
-                                        rightGames: rightGamesList[index]
+                                        leftGames: left.gamesList[index],
+                                        rightGames: right.gamesList[index]
                                     )
                                     .transition(.scale.combined(with: .opacity))
                                 }
@@ -205,10 +224,10 @@ struct ScoreBoardView: View {
             if state.isMatchOver {
                 MatchOverOverlayView(
                     vm: vm,
-                    leftGamesList: leftGamesList,
-                    rightGamesList: rightGamesList,
-                    leftBg: leftBg,
-                    rightBg: rightBg,
+                    leftGamesList: left.gamesList,
+                    rightGamesList: right.gamesList,
+                    leftBg: left.bg,
+                    rightBg: right.bg,
                     team1Accent: team1Accent,
                     team2Accent: team2Accent
                 )
