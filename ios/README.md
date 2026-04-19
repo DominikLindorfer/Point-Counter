@@ -63,6 +63,7 @@ Requires iOS 17.0+. Universal app (iPhone + iPad), landscape-only. Camera featur
 
 ### Localization
 - English, German, Spanish (~95 strings each)
+- Runtime language switcher — Auto / EN / DE / ES via Menu in settings, no app restart
 
 ## Architecture
 
@@ -78,26 +79,31 @@ PadelPulse/
 ├── Views/
 │   ├── ScoreBoardView.swift              # Root view — panels, toolbar, set pills, overlays
 │   ├── TeamPanelView.swift               # Team half — giant score, GAMES box, team name
-│   ├── SettingsSidebarView.swift         # Slide-in settings — pill badges, chevrons, toggles
+│   ├── SettingsSidebarView.swift         # Slide-in settings — pill badges, toggles, language Menu
 │   ├── MatchHistoryView.swift            # History cards + share (text & image)
 │   ├── MatchOverOverlayView.swift        # Confetti, staggered entrance, winner glow, share
 │   ├── OnboardingOverlayView.swift       # First-launch hints
 │   ├── CameraOverlayView.swift           # AVFoundation camera + recording
-│   ├── MatchTimerView.swift              # Timer pill
+│   ├── MatchTimerView.swift              # Match timer pill
+│   ├── WallClockView.swift               # Current time-of-day pill (HH:mm)
+│   ├── CreditsView.swift                 # Upstream repo + icon attribution
 │   ├── ServeSideIndicatorView.swift      # L/R serve indicator with pulse
 │   └── Components/
-│       ├── ColorSwatchPicker.swift       # 8-color inline preset picker
+│       ├── ColorSwatchPicker.swift       # 8-color inline preset picker (cached RGB)
 │       ├── ConfettiView.swift            # Canvas + TimelineView particle animation
 │       ├── MatchScoreCardView.swift      # 600x315 share card
 │       ├── NameFieldView.swift           # Team name text field
+│       ├── PadelRacketView.swift         # SVG asset, template-tinted to gold (serve indicator)
 │       └── SetScorePill.swift            # Set score display pill
 ├── Services/
-│   ├── CameraService.swift               # AVCaptureSession management
-│   ├── RemoteInputService.swift          # MPRemoteCommandCenter + GCKeyboard
+│   ├── CameraService.swift               # AVCaptureSession management (serial session queue)
+│   ├── LanguageService.swift             # Runtime locale override (bundle swizzle + Environment locale)
+│   ├── RemoteInputService.swift          # MPRemoteCommandCenter + GCKeyboard (main-thread hops)
 │   └── SoundService.swift                # AudioServicesPlaySystemSound + mute toggle
 ├── Utilities/
 │   ├── Constants.swift                   # Colors + LayoutMetrics (50+ scaled properties)
-│   ├── HapticService.swift               # UIImpactFeedbackGenerator wrappers
+│   ├── DefaultsKeys.swift                # Central registry of every UserDefaults key
+│   ├── HapticService.swift               # UIImpactFeedbackGenerator wrappers (+ prepareAll)
 │   └── ShareImageRenderer.swift          # ImageRenderer → UIImage
 └── Resources/
     ├── Assets.xcassets/                  # AppIcon, LaunchLogo, DarkBg, GoldColor
@@ -110,26 +116,24 @@ PadelPulse/
 
 ```
 +----------------------------+----------------------------+
-| [<-][<>][cam][new]         |            01:23  [gear]   |
+| [<-][<>][cam][new]         |     14:32  01:23  [gear]   |
 |                            |             S1 6:0  S2 4:3 |
 |                            |                            |
 |   +-------+                |                +-------+   |
 |   | GAMES |                |                | GAMES |   |
 |   |   3   |                |                |   2   |   |
 |   +-------+                |                +-------+   |
-|                            |                            |
+|        CHIQUITAS           |       COURT JESTERS        |
 |            30              |              15            |
 |                            |                            |
-|       CHIQUITAS            |        COURT JESTERS       |
-+----------------------------+----------------------------+
-|               <-  RIGHT  ->                             |
+|   🏸 (serve on left)       |                            |
 +----------------------------+----------------------------+
 ```
 
 - **Top-left:** icon-only toolbar (Undo, Swap, Camera*, New Match) — 44x44pt touch targets
-- **Top-right:** Timer + Settings (same row), completed set pills below
-- **Center:** two team panels with giant score, GAMES box at inner corner
-- **Bottom:** team names, serve side indicator
+- **Top-right:** Wall clock + Match timer + Settings (same row), completed set pills below
+- **Center:** two team panels — team name above giant score, GAMES box at inner corner
+- **Serve side:** gold padel-racket icon in the bottom corner of the serving team's panel
 
 *Camera button only visible when enabled in settings.
 
