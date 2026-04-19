@@ -128,13 +128,10 @@ struct ScoreBoardView: View {
                     .accessibilityLabel("Swap sides")
 
                     if cameraEnabled {
-                        Button(action: { showCamera.toggle() }) {
-                            Image(systemName: "video.fill")
-                                .font(.system(size: layout.toolbarIconSize))
-                        }
-                        .buttonStyle(ScoreBoardButtonStyle(
+                        scoreBoardButton(
+                            icon: "video.fill",
                             bgColor: showCamera ? Color(red: 0x8B / 255.0, green: 0, blue: 0) : ButtonBg
-                        ))
+                        ) { showCamera.toggle() }
                         .accessibilityLabel(showCamera ? "Hide camera" : "Show camera")
                     }
 
@@ -265,13 +262,14 @@ struct ScoreBoardView: View {
     private func scoreBoardButton(
         icon: String,
         disabled: Bool = false,
+        bgColor: Color = ButtonBg,
         action: @escaping () -> Void
     ) -> some View {
         Button(action: action) {
             Image(systemName: icon)
                 .font(.system(size: layout.toolbarIconSize))
         }
-        .buttonStyle(ScoreBoardButtonStyle())
+        .buttonStyle(ScoreBoardButtonStyle(bgColor: bgColor))
         .disabled(disabled)
         .opacity(disabled ? 0.3 : 1.0)
     }
