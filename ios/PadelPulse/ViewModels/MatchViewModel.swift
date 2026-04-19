@@ -80,14 +80,17 @@ final class MatchViewModel {
         didSet { UserDefaults.standard.set(autoSwapMode.rawValue, forKey: Self.autoSwapModeKey) }
     }
 
-    // Undo stack — not observed by views
-    @ObservationIgnored private var undoStack: [UndoSnapshot] = []
+    // Undo stack — mutations are mirrored into `undoCount` so SwiftUI can observe canUndo.
+    @ObservationIgnored private var undoStack: [UndoSnapshot] = [] {
+        didSet { undoCount = undoStack.count }
+    }
     @ObservationIgnored private var pausedElapsedMs: Int64 = 0
 
+    private(set) var undoCount = 0
     private let storage: MatchStorage
     private static let autoSwapModeKey = "auto_swap_mode"
 
-    var canUndo: Bool { !undoStack.isEmpty }
+    var canUndo: Bool { undoCount > 0 }
 
     init(storage: MatchStorage) {
         self.storage = storage
