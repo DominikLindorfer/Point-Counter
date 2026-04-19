@@ -126,6 +126,34 @@ final class MatchViewModelTests: XCTestCase {
         XCTAssertEqual(vm.servingTeam, 1)
     }
 
+    // MARK: - Auto side swap + undo
+
+    /// When a set ends and `autoSwapMode == .afterSet` toggles `sidesSwapped`,
+    /// an undo of that set-winning point must restore the previous swap state.
+    func testUndoRestoresSidesSwappedAfterAutoSwap() {
+        vm.autoSwapMode = .afterSet
+        vm.goldenPoint = true
+        vm.setsToWin = 2
+        vm.updateServingTeam(1)
+
+        // Position team 1 to win the set on the next point:
+        // 5 games already, 40 in the current game, golden-point → next point wins game, game wins set.
+        vm.state.team1Games = [5]
+        vm.state.team2Games = [0]
+        vm.state.team1Points = 3
+
+        let swappedBefore = vm.sidesSwapped
+        vm.scorePoint(team: 1)
+        XCTAssertEqual(vm.state.team1Sets, 1, "set should be won")
+        XCTAssertEqual(vm.state.currentSet, 1, "a new set should be started")
+        XCTAssertNotEqual(vm.sidesSwapped, swappedBefore,
+                          "auto-swap should toggle sidesSwapped at set end")
+
+        vm.undo()
+        XCTAssertEqual(vm.sidesSwapped, swappedBefore,
+                       "undo must restore sidesSwapped that was toggled by auto-swap")
+    }
+
     func testUndoAcrossGameBoundaryGoldenPoint() {
         vm.goldenPoint = true
         vm.updateServingTeam(1)

@@ -13,6 +13,8 @@ struct UndoSnapshot: Codable, Equatable {
     let matchStartTimeMs: Int64
     let matchRunning: Bool
     let pausedElapsedMs: Int64
+    // Optional for backwards-compat with snapshots persisted before sidesSwapped was tracked.
+    let sidesSwapped: Bool?
 }
 
 /// Auto side-swap behaviour. Remote buttons stay team-fixed; only the display rotates.
@@ -114,7 +116,8 @@ final class MatchViewModel {
             team2PointsWon: team2PointsWon,
             matchStartTimeMs: matchStartTimeMs,
             matchRunning: matchRunning,
-            pausedElapsedMs: pausedElapsedMs
+            pausedElapsedMs: pausedElapsedMs,
+            sidesSwapped: sidesSwapped
         ))
 
         if !matchRunning {
@@ -199,6 +202,7 @@ final class MatchViewModel {
         matchStartTimeMs = snap.matchStartTimeMs
         matchRunning = snap.matchRunning
         pausedElapsedMs = snap.pausedElapsedMs
+        if let swapped = snap.sidesSwapped { sidesSwapped = swapped }
     }
 
     func resetMatch() {
