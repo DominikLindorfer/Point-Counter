@@ -2,6 +2,9 @@
 "UNDO" = "DESHACER";
 "SWAP" = "CAMBIAR";
 "NEW MATCH" = "NUEVO PARTIDO";
+"Undo" = "Deshacer";
+"Swap sides" = "Cambiar lados";
+"New match" = "Nuevo partido";
 "TIEBREAK" = "TIEBREAK";
 "TB" = "TB";
 "Start New Match?" = "¿Nuevo partido?";

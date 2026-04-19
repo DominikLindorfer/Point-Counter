@@ -2,6 +2,9 @@
 "UNDO" = "UNDO";
 "SWAP" = "SWAP";
 "NEW MATCH" = "NEW MATCH";
+"Undo" = "Undo";
+"Swap sides" = "Swap sides";
+"New match" = "New match";
 "TIEBREAK" = "TIEBREAK";
 "TB" = "TB";
 "Start New Match?" = "Start New Match?";

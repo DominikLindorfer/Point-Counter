@@ -2,6 +2,9 @@
 "UNDO" = "ZURÜCK";
 "SWAP" = "TAUSCH";
 "NEW MATCH" = "NEUES MATCH";
+"Undo" = "Zurück";
+"Swap sides" = "Seiten tauschen";
+"New match" = "Neues Match";
 "TIEBREAK" = "TIEBREAK";
 "TB" = "TB";
 "Start New Match?" = "Neues Match starten?";

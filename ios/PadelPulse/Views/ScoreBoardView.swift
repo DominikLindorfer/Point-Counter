@@ -120,12 +120,12 @@ struct ScoreBoardView: View {
                         icon: "arrow.uturn.backward",
                         disabled: !vm.canUndo
                     ) { vm.undo() }
-                    .accessibilityLabel("UNDO")
+                    .accessibilityLabel("Undo")
 
                     scoreBoardButton(
                         icon: "arrow.left.arrow.right"
                     ) { HapticService.settingChanged(); vm.swapSides() }
-                    .accessibilityLabel("SWAP")
+                    .accessibilityLabel("Swap sides")
 
                     if cameraEnabled {
                         Button(action: { showCamera.toggle() }) {
@@ -148,7 +148,7 @@ struct ScoreBoardView: View {
                             vm.resetMatch()
                         }
                     }
-                    .accessibilityLabel("NEW MATCH")
+                    .accessibilityLabel("New match")
 
                     Spacer()
                 }
