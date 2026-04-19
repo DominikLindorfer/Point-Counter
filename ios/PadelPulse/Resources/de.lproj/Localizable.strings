@@ -3,6 +3,7 @@
 "SWAP" = "TAUSCH";
 "NEW MATCH" = "NEUES MATCH";
 "TIEBREAK" = "TIEBREAK";
+"TB" = "TB";
 "Start New Match?" = "Neues Match starten?";
 "New Match" = "Neues Match";
 "Cancel" = "Abbrechen";

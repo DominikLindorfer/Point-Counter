@@ -187,7 +187,7 @@ struct ScoreBoardView: View {
                             }
 
                             if state.isTiebreak {
-                                Text("TB")
+                                Text(LocalizedStringKey("TB"))
                                     .font(.system(size: layout.compactTiebreakFont, weight: .bold))
                                     .foregroundColor(GoldColor)
                                     .padding(.horizontal, 10)
