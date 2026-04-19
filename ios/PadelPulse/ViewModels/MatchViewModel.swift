@@ -310,18 +310,17 @@ final class MatchViewModel {
         undoStack = persisted.undoStack
         if let restored = persisted.autoSwapMode { autoSwapMode = restored }
 
-        // Restore timer state
+        // Restore timer state. Always land in "paused" — PadelPulseApp's scenePhase .active
+        // handler calls resumeTimer(), which recomputes matchStartTimeMs from now - pausedElapsedMs.
+        matchStartTimeMs = persisted.matchStartTimeMs
+        matchRunning = false
         if persisted.matchRunning {
-            // Recalculate start time from elapsed
+            // Legacy saves (before .inactive pauseTimer) may have recorded a live startTime.
+            // Treat wall-clock delta as elapsed — fresh installs with the pause-first fix won't hit this.
             let elapsed = Int64(Date().timeIntervalSince1970 * 1000) - persisted.matchStartTimeMs
-            let wasElapsed = persisted.pausedElapsedMs > 0 ? persisted.pausedElapsedMs : elapsed
-            pausedElapsedMs = wasElapsed
-            // Resume as paused — PadelPulseApp's scenePhase .active will call resumeTimer()
-            matchRunning = false
+            pausedElapsedMs = persisted.pausedElapsedMs > 0 ? persisted.pausedElapsedMs : elapsed
         } else {
             pausedElapsedMs = persisted.pausedElapsedMs
-            matchStartTimeMs = persisted.matchStartTimeMs
-            matchRunning = false
         }
 
         clearInProgressMatch()
@@ -338,7 +337,10 @@ final class MatchViewModel {
     }
 
     func resumeTimer() {
-        guard pausedElapsedMs > 0 else { return }
+        // Resume only if there's a paused match to resume. Previously this gated on
+        // pausedElapsedMs > 0, which missed sub-millisecond pauses and restored
+        // sessions where the elapsed value happened to round to 0.
+        guard !matchRunning, matchStartTimeMs > 0 else { return }
         matchStartTimeMs = Int64(Date().timeIntervalSince1970 * 1000) - pausedElapsedMs
         matchRunning = true
         pausedElapsedMs = 0

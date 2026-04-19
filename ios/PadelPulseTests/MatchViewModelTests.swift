@@ -154,6 +154,35 @@ final class MatchViewModelTests: XCTestCase {
                        "undo must restore sidesSwapped that was toggled by auto-swap")
     }
 
+    // MARK: - Pause/Resume timer
+
+    /// resumeTimer used to guard on `pausedElapsedMs > 0`, which broke for
+    /// sub-millisecond pauses and for restored sessions where the stored
+    /// elapsed happened to round to 0.
+    func testResumeAfterImmediatePauseStillRunsTimer() {
+        vm.scorePoint(team: 1)
+        XCTAssertTrue(vm.matchRunning)
+        let startedAt = vm.matchStartTimeMs
+
+        vm.pauseTimer()
+        XCTAssertFalse(vm.matchRunning)
+
+        vm.resumeTimer()
+        XCTAssertTrue(vm.matchRunning, "resumeTimer must resume regardless of paused duration")
+        XCTAssertGreaterThanOrEqual(vm.matchStartTimeMs, startedAt,
+                                    "startTime recomputed against current wall clock")
+    }
+
+    /// resumeTimer must be a no-op when no match has started yet.
+    func testResumeBeforeAnyPointIsNoOp() {
+        XCTAssertFalse(vm.matchRunning)
+        XCTAssertEqual(vm.matchStartTimeMs, 0)
+
+        vm.resumeTimer()
+        XCTAssertFalse(vm.matchRunning, "resumeTimer must not start a timer without a match")
+        XCTAssertEqual(vm.matchStartTimeMs, 0)
+    }
+
     func testUndoAcrossGameBoundaryGoldenPoint() {
         vm.goldenPoint = true
         vm.updateServingTeam(1)
