@@ -20,6 +20,10 @@ struct PadelPulseApp: App {
                         screenWidth: geo.size.width,
                         screenHeight: geo.size.height
                     ))
+                    // Environment.locale is what SwiftUI's Text(LocalizedStringKey)
+                    // actually consults for .lproj selection. The Bundle swizzle alone
+                    // didn't propagate into the rendered view tree.
+                    .environment(\.locale, locale(for: selectedLanguage))
                     .id(selectedLanguage)
             }
             .statusBarHidden()
@@ -45,6 +49,11 @@ struct PadelPulseApp: App {
                     .keyboardShortcut("s", modifiers: .command)
             }
         }
+        .onChange(of: selectedLanguage) { _, newValue in
+            // Safety net: any other caller that updates @AppStorage directly
+            // still gets the bundle swapped before the .id-driven re-render.
+            LanguageService.apply(languageCode: newValue)
+        }
         .onChange(of: scenePhase) { _, newPhase in
             switch newPhase {
             case .background, .inactive:
@@ -59,6 +68,10 @@ struct PadelPulseApp: App {
                 break
             }
         }
+    }
+
+    private func locale(for code: String) -> Locale {
+        code == "system" ? .autoupdatingCurrent : Locale(identifier: code)
     }
 
     private func setupRemoteInput() {

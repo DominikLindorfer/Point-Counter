@@ -20,12 +20,17 @@ struct SettingsSidebarView: View {
         }
     }
 
-    private func cycleLanguage() {
-        let order = ["system"] + LanguageService.supportedLanguages
-        let idx = order.firstIndex(of: selectedLanguage) ?? 0
-        let next = order[(idx + 1) % order.count]
-        selectedLanguage = next
-        LanguageService.apply(languageCode: next)
+    private var languageBinding: Binding<String> {
+        Binding(
+            get: { selectedLanguage },
+            set: { new in
+                // Swizzle the bundle before updating @AppStorage so the .id-driven
+                // refresh on ContentView sees the new bundle on first render.
+                LanguageService.apply(languageCode: new)
+                selectedLanguage = new
+                HapticService.settingChanged()
+            }
+        )
     }
 
     var body: some View {
@@ -196,14 +201,20 @@ struct SettingsSidebarView: View {
 
                         Spacer().frame(height: 10)
 
-                        // Language switcher
-                        settingsRow(
-                            icon: "globe",
-                            iconColor: selectedLanguage == "system" ? DimColor : GoldColor,
-                            label: "Language",
-                            value: LocalizedStringKey(languageDisplayName),
-                            valueColor: selectedLanguage == "system" ? DimColor : GoldColor
-                        ) { cycleLanguage() }
+                        // Language switcher — Menu with Picker so users pick directly
+                        // instead of cycling through states blind.
+                        Menu {
+                            Picker(selection: languageBinding) {
+                                Text(verbatim: "Auto").tag("system")
+                                Text(verbatim: "English").tag("en")
+                                Text(verbatim: "Deutsch").tag("de")
+                                Text(verbatim: "Español").tag("es")
+                            } label: {
+                                Text("Language")
+                            }
+                        } label: {
+                            languageRowLabel
+                        }
 
                         Spacer().frame(height: 28)
                         Divider().background(Color(white: 0.2))
@@ -263,6 +274,37 @@ struct SettingsSidebarView: View {
             }
         }
         .animation(.easeInOut(duration: 0.3), value: visible)
+    }
+
+    /// Settings-row styled label for the language Menu (mirrors settingsRow visually).
+    private var languageRowLabel: some View {
+        let active = selectedLanguage != "system"
+        return HStack {
+            HStack(spacing: 12) {
+                Image(systemName: "globe")
+                    .font(.system(size: layout.settingsRowIcon))
+                    .foregroundColor(active ? GoldColor : DimColor)
+                Text("Language")
+                    .font(.system(size: layout.settingsRowLabel))
+                    .foregroundColor(.white)
+            }
+            Spacer()
+            HStack(spacing: 8) {
+                Text(verbatim: languageDisplayName)
+                    .font(.system(size: layout.settingsRowValue, weight: .bold))
+                    .foregroundColor(active ? GoldColor : DimColor)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(Color.white.opacity(0.08))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(DimColor.opacity(0.5))
+            }
+        }
+        .padding(16)
+        .background(SettingsSurface)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
     /// Single-icon toggle row (icon stays the same, color follows state).
