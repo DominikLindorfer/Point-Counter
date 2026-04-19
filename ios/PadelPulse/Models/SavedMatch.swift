@@ -16,12 +16,19 @@ struct SavedMatch: Codable, Identifiable {
     let team1PointsWon: Int
     let team2PointsWon: Int
 
+    /// Shared DateFormatter — DateFormatter is thread-safe for read access on iOS 7+,
+    /// and rebuilding one per `formattedDate` access was measurable while scrolling
+    /// the match history.
+    private static let displayFormatter: DateFormatter = {
+        let df = DateFormatter()
+        df.dateFormat = "MMM dd, yyyy  HH:mm"
+        return df
+    }()
+
     /// Formatted date string for display.
     var formattedDate: String {
         let date = Date(timeIntervalSince1970: Double(timestamp) / 1000.0)
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM dd, yyyy  HH:mm"
-        return formatter.string(from: date)
+        return Self.displayFormatter.string(from: date)
     }
 
     /// Duration as formatted string (M:SS).
