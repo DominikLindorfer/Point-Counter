@@ -30,6 +30,7 @@
 		B88B86F97607266A024B2DD6 /* CameraService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 31CE97BC2451812350965B48 /* CameraService.swift */; };
 		BB1C63F1DDA003A8A6B8CD17 /* MatchOverOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6C0CC4300D908F9863D99709 /* MatchOverOverlayView.swift */; };
 		C21EF1D5D185CA5DA2D5969E /* ColorSwatchPicker.swift in Sources */ = {isa = PBXBuildFile; fileRef = C90556AEAF09A74696D62A98 /* ColorSwatchPicker.swift */; };
+		C37E8266E2E914CAE7F464DB /* LocalizationParityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7CE9723F30897FE8DAB7EF7F /* LocalizationParityTests.swift */; };
 		C98C94216571738BB77089C0 /* PadelRacketView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6AEF92A992C2BD9498307197 /* PadelRacketView.swift */; };
 		C9DBAC4A7E8D971D088EA7FC /* CameraOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E21E0036B11EBF94582A15A9 /* CameraOverlayView.swift */; };
 		D893CB127AFD2BF46CC95F96 /* TeamPanelView.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A0095B7F83735DA7FE32E3 /* TeamPanelView.swift */; };
@@ -79,6 +80,7 @@
 		71775C9741BC25C1B45EB734 /* OnboardingOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OnboardingOverlayView.swift; sourceTree = "<group>"; };
 		71A11A65E24C094BF711B626 /* SettingsSidebarView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsSidebarView.swift; sourceTree = "<group>"; };
 		7A89C6B5700B7CDDAF63A66A /* DefaultsKeys.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DefaultsKeys.swift; sourceTree = "<group>"; };
+		7CE9723F30897FE8DAB7EF7F /* LocalizationParityTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LocalizationParityTests.swift; sourceTree = "<group>"; };
 		806A3856D49C936FAFDA3D30 /* PersistenceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PersistenceTests.swift; sourceTree = "<group>"; };
 		8CC95C775A15DECC011C3C4D /* de */ = {isa = PBXFileReference; lastKnownFileType = text.plist.strings; name = de; path = de.lproj/Localizable.strings; sourceTree = "<group>"; };
 		8CDFE041F96A2073E8A6B21B /* ConfettiView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfettiView.swift; sourceTree = "<group>"; };
@@ -162,6 +164,7 @@
 		89939CD65AC7B057FFDE5E04 /* PadelPulseTests */ = {
 			isa = PBXGroup;
 			children = (
+				7CE9723F30897FE8DAB7EF7F /* LocalizationParityTests.swift */,
 				55F8605A1AD01611E0E406B0 /* MatchViewModelTests.swift */,
 				9D1C1F317A0956102AE2E5C9 /* PadelScoringTests.swift */,
 				806A3856D49C936FAFDA3D30 /* PersistenceTests.swift */,
@@ -380,6 +383,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C37E8266E2E914CAE7F464DB /* LocalizationParityTests.swift in Sources */,
 				DEE037DBCE0175E37557783A /* MatchViewModelTests.swift in Sources */,
 				F1CEDF84DB7ACDE12C5D7184 /* PadelScoringTests.swift in Sources */,
 				9D05EC8EDD1CB081C0FBAF92 /* PersistenceTests.swift in Sources */,
