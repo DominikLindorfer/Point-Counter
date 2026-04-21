@@ -2,6 +2,10 @@ import Foundation
 
 /// A saved match record.
 struct SavedMatch: Codable, Identifiable {
+    /// Schema version for this record. Optional so legacy saves written before
+    /// this field existed decode as v1. Bump + add a migration in MatchStorage
+    /// when changing the shape of persisted fields.
+    var schemaVersion: Int? = 1
     var id: Int64
     let timestamp: Int64          // milliseconds since epoch
     let team1Name: String

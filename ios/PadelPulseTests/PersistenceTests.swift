@@ -143,6 +143,59 @@ final class PersistenceTests: XCTestCase {
         XCTAssertEqual(vm.sidesSwapped, afterSet1, "no toggle mid-set")
     }
 
+    // MARK: - Schema version
+
+    /// New saves must tag schemaVersion = 1 so future migrations can detect them.
+    func testNewSavesAreTaggedAsSchemaV1() throws {
+        let state = MatchState()
+        let persisted = PersistedMatchState(
+            state: state, goldenPoint: true, sidesSwapped: false, setsToWin: 2,
+            team1Name: "A", team2Name: "B",
+            team1ColorRGB: [0, 0, 0], team2ColorRGB: [1, 1, 1],
+            servingTeam: 1, showServeSide: true,
+            matchStartTimeMs: 0, matchRunning: false,
+            team1PointsWon: 0, team2PointsWon: 0, pausedElapsedMs: 0,
+            undoStack: [], autoSwapMode: .afterSet
+        )
+        XCTAssertEqual(persisted.schemaVersion, 1, "new persisted match snapshot defaults to v1")
+
+        let match = SavedMatch(
+            id: 1, timestamp: 0, team1Name: "A", team2Name: "B",
+            team1Sets: 0, team2Sets: 0, team1Games: [0], team2Games: [0],
+            winner: 0, durationMs: 0, goldenPoint: true,
+            team1PointsWon: 0, team2PointsWon: 0
+        )
+        XCTAssertEqual(match.schemaVersion, 1, "new SavedMatch defaults to v1")
+    }
+
+    /// Legacy records written before schemaVersion existed must still decode cleanly —
+    /// their schemaVersion surfaces as nil (treated as v1 by any future migrator).
+    func testLegacySavesDecodeWithNilSchemaVersion() throws {
+        let legacyJSON = """
+        [{
+          "id": 42,
+          "timestamp": 1700000000000,
+          "team1Name": "Legacy A",
+          "team2Name": "Legacy B",
+          "team1Sets": 2,
+          "team2Sets": 1,
+          "team1Games": [6, 4, 7],
+          "team2Games": [4, 6, 5],
+          "winner": 1,
+          "durationMs": 3600000,
+          "goldenPoint": true,
+          "team1PointsWon": 50,
+          "team2PointsWon": 42
+        }]
+        """.data(using: .utf8)!
+
+        let decoded = try JSONDecoder().decode([SavedMatch].self, from: legacyJSON)
+        XCTAssertEqual(decoded.count, 1)
+        XCTAssertNil(decoded[0].schemaVersion, "missing field must decode to nil (legacy marker)")
+        XCTAssertEqual(decoded[0].team1Name, "Legacy A")
+        XCTAssertEqual(decoded[0].winner, 1)
+    }
+
     // MARK: - Corrupt storage quarantine
 
     /// Corrupt JSON in UserDefaults must not wipe silently: loadAll() quarantines

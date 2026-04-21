@@ -25,6 +25,10 @@ enum AutoSwapMode: String, Codable {
 
 /// All state needed to restore an in-progress match.
 struct PersistedMatchState: Codable {
+    /// Schema version for this snapshot. Optional so legacy saves written before
+    /// this field existed decode as v1. Bump + add a migration when changing
+    /// the shape of persisted fields.
+    var schemaVersion: Int? = 1
     let state: MatchState
     let goldenPoint: Bool
     let sidesSwapped: Bool
