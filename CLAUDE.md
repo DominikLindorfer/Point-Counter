@@ -122,7 +122,7 @@ xcodebuild -project PadelPulse.xcodeproj -scheme PadelPulseTests \
 - **Adaptive layout** — `LayoutMetrics` scales 50+ dimensions from iPhone SE to iPad Pro 13" (dual-axis on iPhone, width-only on iPad)
 - **Haptic feedback** — UIImpactFeedbackGenerator for scoring, settings, game/match events
 - **Match state persistence** — in-progress match survives app kill (UserDefaults + Codable)
-- **iPad keyboard shortcuts** — Cmd+Z (undo), Cmd+N (new match), Cmd+S (swap), Cmd+, (settings)
+- **iPad keyboard shortcuts** — Cmd+Z (undo), Cmd+N (new match), Cmd+Shift+S (swap), Cmd+, (settings)
 - **Onboarding overlay** — first-launch hints, dismissed permanently via `@AppStorage`
 - **Sound effects** — system sounds for points, games, match over (toggleable in settings)
 - **Share as image** — `ImageRenderer` renders a 600x315 score card to `UIImage`

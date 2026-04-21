@@ -45,8 +45,10 @@ struct PadelPulseApp: App {
                     .keyboardShortcut("n", modifiers: .command)
             }
             CommandMenu("Match") {
+                // Cmd+Shift+S: plain Cmd+S collides with the system-wide Save shortcut;
+                // users hitting it expect to save, not flip the court.
                 Button("Swap Sides") { HapticService.settingChanged(); viewModel.swapSides() }
-                    .keyboardShortcut("s", modifiers: .command)
+                    .keyboardShortcut("s", modifiers: [.command, .shift])
             }
         }
         .onChange(of: selectedLanguage) { _, newValue in

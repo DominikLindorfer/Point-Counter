@@ -59,7 +59,7 @@ Requires iOS 17.0+. Universal app (iPhone + iPad), landscape-only. Camera featur
 ### Input
 - **Touch** — tap left/right panel to score
 - **Bluetooth remote** — Next/Prev Track for scoring, Play/Pause for undo
-- **iPad keyboard** — Cmd+Z (undo), Cmd+N (new match), Cmd+S (swap), Cmd+, (settings), Arrow keys + Space via GCKeyboard
+- **iPad keyboard** — Cmd+Z (undo), Cmd+N (new match), Cmd+Shift+S (swap), Cmd+, (settings), Arrow keys + Space via GCKeyboard
 
 ### Localization
 - English, German, Spanish (~95 strings each)
