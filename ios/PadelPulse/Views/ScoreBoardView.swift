@@ -257,6 +257,9 @@ struct ScoreBoardView: View {
         .onChange(of: cameraEnabled) { _, newValue in
             if !newValue { showCamera = false }
         }
+        .onReceive(NotificationCenter.default.publisher(for: .toggleSettings)) { _ in
+            showSettings.toggle()
+        }
     }
 
     private func scoreBoardButton(

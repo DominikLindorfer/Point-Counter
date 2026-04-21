@@ -1,5 +1,11 @@
 import SwiftUI
 
+extension Notification.Name {
+    /// Fired from keyboard commands that can't reach view-local @State directly.
+    /// ScoreBoardView listens for this to toggle the settings sidebar on Cmd+,.
+    static let toggleSettings = Notification.Name("padelpulse.toggleSettings")
+}
+
 @main
 struct PadelPulseApp: App {
     @State private var viewModel = MatchViewModel(storage: MatchStorage())
@@ -49,6 +55,9 @@ struct PadelPulseApp: App {
                 // users hitting it expect to save, not flip the court.
                 Button("Swap Sides") { HapticService.settingChanged(); viewModel.swapSides() }
                     .keyboardShortcut("s", modifiers: [.command, .shift])
+
+                Button("Settings") { NotificationCenter.default.post(name: .toggleSettings, object: nil) }
+                    .keyboardShortcut(",", modifiers: .command)
             }
         }
         .onChange(of: selectedLanguage) { _, newValue in
