@@ -9,10 +9,12 @@ final class PersistenceTests: XCTestCase {
     override func setUp() {
         super.setUp()
         UserDefaults.standard.removeObject(forKey: DefaultsKey.inProgressMatch)
+        UserDefaults.standard.removeObject(forKey: DefaultsKey.matchHistory)
     }
 
     override func tearDown() {
         UserDefaults.standard.removeObject(forKey: DefaultsKey.inProgressMatch)
+        UserDefaults.standard.removeObject(forKey: DefaultsKey.matchHistory)
         super.tearDown()
     }
 
@@ -139,6 +141,34 @@ final class PersistenceTests: XCTestCase {
         vm.scorePoint(team: 1)
         vm.scorePoint(team: 2)
         XCTAssertEqual(vm.sidesSwapped, afterSet1, "no toggle mid-set")
+    }
+
+    // MARK: - Corrupt storage quarantine
+
+    /// Corrupt JSON in UserDefaults must not wipe silently: loadAll() quarantines
+    /// the bytes to Documents/ and clears the key so the app stays usable.
+    func testLoadAllQuarantinesCorruptData() throws {
+        let corrupt = Data("{this is not valid json".utf8)
+        UserDefaults.standard.set(corrupt, forKey: DefaultsKey.matchHistory)
+
+        let docs = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first!
+        let priorQuarantine = (try? FileManager.default.contentsOfDirectory(atPath: docs.path)) ?? []
+        let priorCount = priorQuarantine.filter { $0.hasPrefix("matches_corrupt_") }.count
+
+        let matches = MatchStorage().loadAll()
+
+        XCTAssertTrue(matches.isEmpty, "corrupt JSON should decode to an empty history, not crash")
+        XCTAssertNil(UserDefaults.standard.data(forKey: DefaultsKey.matchHistory),
+                     "corrupt key should be cleared so next launch starts clean")
+
+        let afterQuarantine = (try? FileManager.default.contentsOfDirectory(atPath: docs.path)) ?? []
+        let afterCount = afterQuarantine.filter { $0.hasPrefix("matches_corrupt_") }.count
+        XCTAssertGreaterThan(afterCount, priorCount, "quarantine file should be written to Documents/")
+
+        // Cleanup: remove the quarantine file we just created so tests stay idempotent.
+        for name in afterQuarantine where name.hasPrefix("matches_corrupt_") && !priorQuarantine.contains(name) {
+            try? FileManager.default.removeItem(at: docs.appendingPathComponent(name))
+        }
     }
 
     /// autoSwapMode = .off must never toggle sidesSwapped, even across set boundaries.

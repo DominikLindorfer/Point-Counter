@@ -295,8 +295,17 @@ final class MatchViewModel {
     }
 
     func restoreInProgressMatch() {
-        guard let data = UserDefaults.standard.data(forKey: DefaultsKey.inProgressMatch),
-              let persisted = try? JSONDecoder().decode(PersistedMatchState.self, from: data) else {
+        guard let data = UserDefaults.standard.data(forKey: DefaultsKey.inProgressMatch) else {
+            return
+        }
+        let persisted: PersistedMatchState
+        do {
+            persisted = try JSONDecoder().decode(PersistedMatchState.self, from: data)
+        } catch {
+            // Quarantine so the corrupt snapshot isn't lost silently, then clear
+            // the key so the next launch starts clean instead of re-trying forever.
+            MatchStorage.quarantine(data: data, label: "in_progress_match", error: error)
+            UserDefaults.standard.removeObject(forKey: DefaultsKey.inProgressMatch)
             return
         }
 
