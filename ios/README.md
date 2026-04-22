@@ -14,6 +14,10 @@ Native iOS scoreboard for padel & tennis. Universal app for iPhone and iPad, lan
 </p>
 
 <p align="center">
+  <img src="docs/serve-pick-overlay.png" alt="Padel Pulse — pre-match serve pick + side swap" width="720" />
+</p>
+
+<p align="center">
   <img src="docs/settings-panel.png" alt="Padel Pulse — settings panel" width="720" />
 </p>
 
