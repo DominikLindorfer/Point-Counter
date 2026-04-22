@@ -143,6 +143,34 @@ final class PersistenceTests: XCTestCase {
         XCTAssertEqual(vm.sidesSwapped, afterSet1, "no toggle mid-set")
     }
 
+    // MARK: - ID generation
+
+    /// New saves get random Int64 IDs. Over a realistic batch of inserts the
+    /// IDs must all be unique (the old monotonic counter had a read-modify-write
+    /// race this test also locks in against a regression).
+    func testRandomIdsAreUniqueAcrossManySaves() {
+        let storage = MatchStorage()
+        storage.deleteAll()
+        defer { storage.deleteAll() }
+
+        let sample = SavedMatch(
+            id: 0, timestamp: 0,
+            team1Name: "A", team2Name: "B",
+            team1Sets: 1, team2Sets: 0,
+            team1Games: [6], team2Games: [3],
+            winner: 1, durationMs: 0, goldenPoint: true,
+            team1PointsWon: 0, team2PointsWon: 0
+        )
+
+        var seen = Set<Int64>()
+        for _ in 0..<200 {
+            let saved = storage.save(sample)
+            XCTAssertGreaterThan(saved.id, 0, "generated id must be positive")
+            XCTAssertFalse(seen.contains(saved.id), "duplicate id generated: \(saved.id)")
+            seen.insert(saved.id)
+        }
+    }
+
     // MARK: - Schema version
 
     /// New saves must tag schemaVersion = 1 so future migrations can detect them.

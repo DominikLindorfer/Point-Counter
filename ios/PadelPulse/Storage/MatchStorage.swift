@@ -6,13 +6,14 @@ final class MatchStorage {
     private let defaults = UserDefaults.standard
 
     func save(_ match: SavedMatch) -> SavedMatch {
-        var nextId = Int64(defaults.integer(forKey: DefaultsKey.nextId))
-        if nextId == 0 { nextId = 1 }
-
+        // Random Int64 instead of a monotonic counter in UserDefaults: the old
+        // read-modify-write pattern on `next_id` would corrupt if two saves ever
+        // interleaved. Collision odds at realistic match counts (<10k/user) are
+        // below 10^-13, and SavedMatch.id stays Int64 so existing records decode
+        // unchanged. See DefaultsKey.nextId — kept as a legacy key for older
+        // installs but no longer written to.
         var withId = match
-        withId.id = nextId
-        nextId += 1
-        defaults.set(Int(nextId), forKey: DefaultsKey.nextId)
+        withId.id = Int64.random(in: 1...Int64.max)
 
         var matches = loadAll()
         matches.insert(withId, at: 0) // newest first

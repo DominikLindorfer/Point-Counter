@@ -9,6 +9,9 @@ import Foundation
 /// - accidental key drift (typos, renames) is impossible without touching here.
 enum DefaultsKey {
     static let matchHistory = "match_history"
+    /// Legacy: monotonic counter for match IDs. No longer written (random Int64
+    /// IDs in MatchStorage.save replaced it). Kept for documentation so nothing
+    /// reuses the key by accident; safe to delete after a few release cycles.
     static let nextId = "next_id"
     static let inProgressMatch = "in_progress_match"
     static let autoSwapMode = "auto_swap_mode"
