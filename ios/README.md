@@ -34,7 +34,19 @@ Requires iOS 17.0+. Universal app (iPhone + iPad), landscape-only. Camera featur
 
 ### On-device install (USB)
 
-Signing is pinned in `project.yml` (`DEVELOPMENT_TEAM` + `CODE_SIGN_STYLE: Automatic`), so xcodegen regenerations don't wipe it:
+Signing is pinned in `project.yml` (`DEVELOPMENT_TEAM` + `CODE_SIGN_STYLE: Automatic`), so xcodegen regenerations don't wipe it.
+
+**One-command redeploy** (auto-detects the paired iPad, regenerates, builds, installs, launches):
+
+```bash
+./ios/scripts/deploy.sh
+# or, once symlinked to ~/bin/padelpulse-deploy:
+padelpulse-deploy
+```
+
+Needed on a free-tier developer account because app signatures expire every 7 days — just plug the iPad in, unlock it, run the script. `~2 min` end-to-end.
+
+Manual equivalent (if the script breaks or for a different device):
 
 ```bash
 # With iPad connected via USB and unlocked, find its ID:
