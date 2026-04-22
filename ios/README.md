@@ -28,6 +28,22 @@ open PadelPulse.xcodeproj            # Build & run in Xcode 16+ for iPad
 
 Requires iOS 17.0+. Universal app (iPhone + iPad), landscape-only. Camera features require a real device.
 
+### On-device install (USB)
+
+Signing is pinned in `project.yml` (`DEVELOPMENT_TEAM` + `CODE_SIGN_STYLE: Automatic`), so xcodegen regenerations don't wipe it:
+
+```bash
+# With iPad connected via USB and unlocked, find its ID:
+xcrun devicectl list devices
+
+# Build + install + launch (replace <DEVICE_ID>):
+xcodebuild -project PadelPulse.xcodeproj -scheme PadelPulse \
+  -destination 'id=<DEVICE_ID>' -configuration Debug -allowProvisioningUpdates build
+xcrun devicectl device install app --device <DEVICE_ID> \
+  ~/Library/Developer/Xcode/DerivedData/PadelPulse-*/Build/Products/Debug-iphoneos/PadelPulse.app
+xcrun devicectl device process launch --device <DEVICE_ID> com.padelpulse.app
+```
+
 ## Features
 
 ### Core Scoring
@@ -42,7 +58,7 @@ Requires iOS 17.0+. Universal app (iPhone + iPad), landscape-only. Camera featur
 - **Giant score display** — readable from across the court
 - **Team customization** — custom names + 8 color presets (Navy, Crimson, Forest, Purple, Teal, Amber, Graphite, Rose)
 - **Fun random team names** — 30 padel-themed names on each new match
-- **Serve indicator** — L/R side with pulse animation, auto-rotates each game
+- **Serve indicator** — big gold **L/R letter + racket icon** paired in the court-side corner of the serving panel, plus a pulsing gold border around the whole panel (readable from across the court)
 - **Compact set scores** — completed sets as pills in the top-right corner
 - **Match timer** — elapsed time from first point
 - **Swap sides** — mirror teams when switching court ends
@@ -87,13 +103,12 @@ PadelPulse/
 │   ├── MatchTimerView.swift              # Match timer pill
 │   ├── WallClockView.swift               # Current time-of-day pill (HH:mm)
 │   ├── CreditsView.swift                 # Upstream repo + icon attribution
-│   ├── ServeSideIndicatorView.swift      # L/R serve indicator with pulse
 │   └── Components/
 │       ├── ColorSwatchPicker.swift       # 8-color inline preset picker (cached RGB)
 │       ├── ConfettiView.swift            # Canvas + TimelineView particle animation
 │       ├── MatchScoreCardView.swift      # 600x315 share card
 │       ├── NameFieldView.swift           # Team name text field
-│       ├── PadelRacketView.swift         # SVG asset, template-tinted to gold (serve indicator)
+│       ├── PadelRacketView.swift         # SVG asset, template-tinted to gold (paired with L/R glyph)
 │       └── SetScorePill.swift            # Set score display pill
 ├── Services/
 │   ├── CameraService.swift               # AVCaptureSession management (serial session queue)
@@ -126,14 +141,15 @@ PadelPulse/
 |        CHIQUITAS           |       COURT JESTERS        |
 |            30              |              15            |
 |                            |                            |
-|   🏸 (serve on left)       |                            |
+|  L🏸                       |                            |
 +----------------------------+----------------------------+
+     ↑ gold pulsing border around the serving panel
 ```
 
 - **Top-left:** icon-only toolbar (Undo, Swap, Camera*, New Match) — 44x44pt touch targets
 - **Top-right:** Wall clock + Match timer + Settings (same row), completed set pills below
 - **Center:** two team panels — team name above giant score, GAMES box at inner corner
-- **Serve side:** gold padel-racket icon in the bottom corner of the serving team's panel
+- **Serve side:** big gold **L/R letter + racket icon** paired in the court-side corner of the serving panel (L = deuce-side / left, R = ad-side / right), plus a pulsing gold border with rounded outer corners around the whole serving panel. Reduce Motion mutes the pulse.
 
 *Camera button only visible when enabled in settings.
 

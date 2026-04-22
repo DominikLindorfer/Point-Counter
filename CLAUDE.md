@@ -80,14 +80,13 @@ ios/PadelPulse/
 │   ├── CameraOverlayView.swift           # AVFoundation camera + recording
 │   ├── MatchTimerView.swift              # Match timer pill
 │   ├── WallClockView.swift               # Current time-of-day pill (HH:mm, system locale)
-│   ├── ServeSideIndicatorView.swift      # L/R serve indicator with pulse animation
 │   ├── CreditsView.swift                 # Upstream repo + SVG icon attribution (CC BY 3.0)
 │   └── Components/
 │       ├── ColorSwatchPicker.swift       # 8-color inline preset picker
 │       ├── ConfettiView.swift            # Canvas-based particle animation (60 particles)
 │       ├── MatchScoreCardView.swift      # 600x315 share card for image export
 │       ├── NameFieldView.swift           # Team name text field
-│       ├── PadelRacketView.swift         # SVG asset, template-tinted to gold
+│       ├── PadelRacketView.swift         # SVG asset, template-tinted to gold (paired with L/R glyph in TeamPanelView)
 │       └── SetScorePill.swift            # ATP-style set pill (winner bold, loser dim)
 ├── Services/
 │   ├── CameraService.swift               # AVCaptureSession management (serial session queue)
@@ -140,7 +139,7 @@ xcodebuild -project PadelPulse.xcodeproj -scheme PadelPulseTests \
 - **Top-left toolbar:** icon-only buttons — Undo, Swap, [Camera], New Match (uniform 44x44pt touch targets)
 - **Top-right:** Clock + Match Timer + Settings gear (same row), completed set pills horizontally below
 - **Center:** two team panels with team name above giant score, compact number-only games box in inner corner
-- **Bottom center:** gold padel-racket icon on the serving side (no L/R text)
+- **Serve indicator:** big gold L/R letter + padel-racket icon paired in the court-side corner of the serving panel (L = deuce / left, R = ad / right), plus a pulsing gold border with rounded outer corners around the whole serving panel (static at 0.85 opacity under Reduce Motion)
 
 ### iOS-specific notes
 
@@ -151,6 +150,7 @@ xcodebuild -project PadelPulse.xcodeproj -scheme PadelPulseTests \
 - iPad uses `UIRequiresFullScreen = YES` (no Split View).
 - Launch screen uses `UILaunchScreen` dict in Info.plist (not a storyboard).
 - `ScoreBoardButtonStyle` uses a ZStack with fixed 44x44 frame to guarantee uniform touch targets regardless of SF Symbol dimensions.
+- `project.yml` pins `DEVELOPMENT_TEAM` (`P38L5RD8CU`, personal) + `CODE_SIGN_STYLE: Automatic` so xcodegen regenerations don't wipe the Signing team. Required for on-device installs; simulator builds don't care.
 
 ---
 
@@ -167,5 +167,5 @@ xcodebuild -project PadelPulse.xcodeproj -scheme PadelPulseTests \
 - Score transitions with bounce/slide animations
 - Match auto-saves on completion, shareable via platform share sheet
 - Sides can be swapped (mirrors left/right panels)
-- Serve indicator auto-rotates each game, shows L/R side
+- Serve indicator rotates each point (court-side L/R) and each game (server flip); iOS panel additionally glows gold when its team serves
 - No network calls, no analytics, no ads

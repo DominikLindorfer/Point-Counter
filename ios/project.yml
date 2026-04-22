@@ -16,6 +16,11 @@ settings:
     SWIFT_VERSION: "5.9"
     TARGETED_DEVICE_FAMILY: "1,2"  # iPhone + iPad (Universal)
     GENERATE_INFOPLIST_FILE: "NO"
+    # Personal development team — pinned here so xcodegen regenerations
+    # don't wipe it out of the .xcodeproj every time. Required for
+    # on-device installs (simulator builds don't care).
+    DEVELOPMENT_TEAM: P38L5RD8CU
+    CODE_SIGN_STYLE: Automatic
 
 targets:
   PadelPulse:
