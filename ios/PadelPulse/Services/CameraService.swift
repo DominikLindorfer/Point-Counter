@@ -121,14 +121,21 @@ extension CameraService: AVCaptureFileOutputRecordingDelegate {
         from connections: [AVCaptureConnection],
         error: Error?
     ) {
+        // Every branch below must decide what to do with the temp .mp4: either
+        // hand it off to Photos (which copies it, so we delete after) or drop
+        // it ourselves. Previously the auth-denied branch leaked the file.
         if let error {
             print("Recording error: \(error.localizedDescription)")
+            try? FileManager.default.removeItem(at: outputFileURL)
             DispatchQueue.main.async { self.onRecordingFinished?(false) }
             return
         }
 
         PHPhotoLibrary.requestAuthorization(for: .addOnly) { status in
             guard status == .authorized else {
+                // User denied photo-library access — nothing will save the clip,
+                // so remove the temp file ourselves instead of letting it pile up.
+                try? FileManager.default.removeItem(at: outputFileURL)
                 DispatchQueue.main.async { self.onRecordingFinished?(false) }
                 return
             }
