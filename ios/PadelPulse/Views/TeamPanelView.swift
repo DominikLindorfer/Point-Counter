@@ -144,7 +144,10 @@ struct TeamPanelView: View {
                 }
             }
             .padding(.horizontal, layout.panelPadding * 1.5)
-            .padding(.bottom, layout.panelPadding * 1.5)
+            .padding(.bottom, layout.panelPadding * 0.5)
+            // Nudge the whole L/R + racket pair 30pt further down so the
+            // visual distance to the screen edge matches the top toolbar.
+            .offset(y: 30)
             .animation(.easeInOut(duration: 0.25), value: serveOnLeft)
         }
         .accessibilityHidden(true)
