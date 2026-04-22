@@ -1,0 +1,117 @@
+/* ScoreBoardView */
+"UNDO" = "ZURÜCK";
+"SWAP" = "TAUSCH";
+"NEW MATCH" = "NEUES MATCH";
+"Undo" = "Zurück";
+"Swap sides" = "Seiten tauschen";
+"New match" = "Neues Match";
+"TIEBREAK" = "TIEBREAK";
+"TB" = "TB";
+"Start New Match?" = "Neues Match starten?";
+"New Match" = "Neues Match";
+"Cancel" = "Abbrechen";
+"Current match progress will be lost." = "Der aktuelle Spielstand geht verloren.";
+"Hide camera" = "Kamera ausblenden";
+"Show camera" = "Kamera einblenden";
+"Settings" = "Einstellungen";
+
+/* SettingsSidebarView */
+"SETTINGS" = "EINSTELLUNGEN";
+"Team 1" = "Team 1";
+"Team 2" = "Team 2";
+"Name" = "Name";
+"Color" = "Farbe";
+"Match Rules" = "Spielregeln";
+"Scoring Mode" = "Zählweise";
+"GOLDEN PT" = "GOLDEN PT";
+"ADVANTAGE" = "VORTEIL";
+"Sets to Win" = "Sätze zum Sieg";
+"NO LIMIT" = "ENDLOS";
+"Auto Side Swap" = "Autom. Seitenwechsel";
+"OFF" = "AUS";
+"AFTER SET" = "NACH SATZ";
+"Serving" = "Aufschlag";
+"SERVING" = "AUFSCHLAG";
+"Serve Side (L/R)" = "Aufschlagseite (L/R)";
+"Sound Effects" = "Soundeffekte";
+"Camera" = "Kamera";
+"Language" = "Sprache";
+"Auto" = "Auto";
+"Match History" = "Spielverlauf";
+"Credits" = "Credits";
+"Double tap to change" = "Doppeltippen zum Ändern";
+
+/* CreditsView */
+"CREDITS" = "CREDITS";
+"Based on" = "Basiert auf";
+"Point-Counter by Dominik Lindorfer" = "Point-Counter von Dominik Lindorfer";
+"Padel racket icon" = "Padelschläger-Icon";
+"\"padel\" by Rusma Ratri Handini from Noun Project (CC BY 3.0)" = "„padel“ von Rusma Ratri Handini aus Noun Project (CC BY 3.0)";
+"Made with love for padel." = "Mit Liebe zum Padel gemacht.";
+
+/* TeamPanelView */
+"GAMES" = "GAMES";
+"%@, score %@, %lld games" = "%@, Punktestand %@, %lld Spiele";
+"Currently serving" = "Hat Aufschlag";
+"Double tap to score a point for %@" = "Doppeltippen für einen Punkt für %@";
+
+/* MatchOverOverlayView */
+"MATCH OVER" = "MATCH BEENDET";
+"%@ wins!" = "%@ gewinnt!";
+"SHARE" = "TEILEN";
+"Share match result" = "Ergebnis teilen";
+"Start new match" = "Neues Match starten";
+"Match over. %@ wins" = "Match beendet. %@ gewinnt";
+
+/* MatchHistoryView */
+"MATCH HISTORY" = "SPIELVERLAUF";
+"No matches yet" = "Noch keine Matches";
+"Completed matches will appear here" = "Abgeschlossene Matches erscheinen hier";
+"Delete All History?" = "Gesamten Verlauf löschen?";
+"Delete All" = "Alle löschen";
+"This cannot be undone." = "Dies kann nicht rückgängig gemacht werden.";
+"Share as Text" = "Als Text teilen";
+"Share as Image" = "Als Bild teilen";
+"Winner" = "Gewinner";
+"Duration" = "Dauer";
+"Points Won" = "Punkte gewonnen";
+"Back to scoreboard" = "Zurück zur Anzeige";
+"Delete all match history" = "Gesamten Spielverlauf löschen";
+"Delete this match" = "Dieses Match löschen";
+
+/* ServeSideIndicatorView */
+"RIGHT" = "RECHTS";
+"LEFT" = "LINKS";
+"Serve from the right side" = "Aufschlag von rechts";
+"Serve from the left side" = "Aufschlag von links";
+
+/* MatchTimerView */
+"Match timer, %lld minutes %lld seconds" = "Spielzeit, %lld Minuten %lld Sekunden";
+
+/* OnboardingOverlayView */
+"PADEL PULSE" = "PADEL PULSE";
+"Tap left or right side to score a point" = "Tippe links oder rechts um einen Punkt zu vergeben";
+"Tap UNDO or press Spacebar to undo" = "Tippe ZURÜCK oder drücke die Leertaste zum Rückgängigmachen";
+"Tap the gear icon for settings" = "Tippe das Zahnrad-Symbol für Einstellungen";
+"Tap SWAP to switch court sides" = "Tippe TAUSCH um die Seiten zu wechseln";
+"GOT IT" = "VERSTANDEN";
+
+/* NameFieldView */
+"Max 16 characters" = "Max. 16 Zeichen";
+"Team name" = "Teamname";
+
+/* SetScorePill / MatchScoreCardView */
+"SET %lld" = "SATZ %lld";
+"DURATION" = "DAUER";
+"POINTS" = "PUNKTE";
+"MODE" = "MODUS";
+
+/* PadelPulseApp Commands */
+"Undo" = "Rückgängig";
+"Swap Sides" = "Seiten tauschen";
+"Match" = "Match";
+
+/* ShareText */
+"Padel Match Result" = "Padel-Ergebnis";
+"Game scores:" = "Spielstände:";
+"Scoring: Golden Point" = "Zählweise: Golden Point";

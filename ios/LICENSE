@@ -1,0 +1,43 @@
+Padel Pulse iOS — Source Available License
+
+Copyright (c) 2026 Padel Pulse Contributors
+
+Based on Point-Counter by Dominik Lindorfer (MIT License).
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to use
+the Software solely for private, non-commercial, personal purposes, subject
+to the following conditions:
+
+1. PERMITTED USE
+   You may view, download, compile, and run the Software for private,
+   personal, non-commercial use only.
+
+2. PROHIBITED USE
+   Without prior written permission from the copyright holder, you may NOT:
+   (a) use the Software or any derivative work for commercial purposes,
+       including but not limited to selling, licensing, sublicensing, or
+       offering the Software (or any derivative) as part of a paid product
+       or service;
+   (b) distribute, publish, or otherwise make the Software or any derivative
+       work available to third parties, whether for free or for a fee;
+   (c) use the Software in any revenue-generating context, including
+       advertising-supported applications or in-app purchases.
+
+3. ATTRIBUTION
+   This license notice and the above copyright notice shall be included in
+   all copies or substantial portions of the Software.
+
+4. UPSTREAM CODE
+   Portions of the scoring logic are derived from Point-Counter by
+   Dominik Lindorfer, which is licensed under the MIT License. Those
+   portions remain subject to the MIT License. This license applies to all
+   iOS-specific code, assets, and configurations in this directory.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
