@@ -159,6 +159,42 @@ final class PadelScoringTests: XCTestCase {
         XCTAssertFalse(state.isTiebreak)
     }
 
+    /// A dogged tiebreak that runs past 12-10. The 2-point-lead rule applies
+    /// the whole way: at 11-11 the set is still live; 13-11 is the first valid
+    /// set-winning score.
+    func testTiebreakBeyond12_10() {
+        var state = MatchState()
+        state.isTiebreak = true
+        state.team1Games = [6]
+        state.team2Games = [6]
+
+        // Alternate to 10-10.
+        for _ in 0..<10 {
+            state = PadelScoring.scorePoint(state: state, team: 1, goldenPoint: false, setsToWin: 2)
+            state = PadelScoring.scorePoint(state: state, team: 2, goldenPoint: false, setsToWin: 2)
+        }
+        XCTAssertEqual(state.team1Points, 10)
+        XCTAssertEqual(state.team2Points, 10)
+        XCTAssertTrue(state.isTiebreak)
+
+        // 11-10: 1-point lead, not a win.
+        state = PadelScoring.scorePoint(state: state, team: 1, goldenPoint: false, setsToWin: 2)
+        XCTAssertTrue(state.isTiebreak)
+
+        // 11-11.
+        state = PadelScoring.scorePoint(state: state, team: 2, goldenPoint: false, setsToWin: 2)
+        XCTAssertTrue(state.isTiebreak)
+
+        // 12-11: still not a win.
+        state = PadelScoring.scorePoint(state: state, team: 1, goldenPoint: false, setsToWin: 2)
+        XCTAssertTrue(state.isTiebreak)
+
+        // 13-11: 2-point lead, set won.
+        state = PadelScoring.scorePoint(state: state, team: 1, goldenPoint: false, setsToWin: 2)
+        XCTAssertEqual(state.team1Sets, 1, "13-11 wins the tiebreak")
+        XCTAssertFalse(state.isTiebreak)
+    }
+
     func testTiebreakNeedsTwoPointLead() {
         var state = MatchState()
         state.isTiebreak = true
@@ -184,6 +220,60 @@ final class PadelScoringTests: XCTestCase {
         state = PadelScoring.scorePoint(state: state, team: 1, goldenPoint: false, setsToWin: 2)
         XCTAssertEqual(state.team1Sets, 1)
         XCTAssertFalse(state.isTiebreak)
+    }
+
+    // MARK: - Set Edge Cases
+
+    /// 5-5 does not trigger the tiebreak; a set can end 7-5 when the leading
+    /// team wins the next two games. Guards against a buggy set-checker that
+    /// might wrongly force tiebreak at 6-5 or short-circuit at 6-5.
+    func test7_5SetWin() {
+        var state = MatchState()
+        // Team 1 wins 5 games (5-0).
+        for _ in 0..<5 {
+            for _ in 0..<4 {
+                state = PadelScoring.scorePoint(state: state, team: 1, goldenPoint: false, setsToWin: 2)
+            }
+        }
+        // Team 2 equalizes (5-5).
+        for _ in 0..<5 {
+            for _ in 0..<4 {
+                state = PadelScoring.scorePoint(state: state, team: 2, goldenPoint: false, setsToWin: 2)
+            }
+        }
+        XCTAssertEqual(state.team1Games[0], 5)
+        XCTAssertEqual(state.team2Games[0], 5)
+        XCTAssertFalse(state.isTiebreak, "5-5 must not enter tiebreak")
+
+        // 6-5: only a 1-game lead, set continues.
+        for _ in 0..<4 {
+            state = PadelScoring.scorePoint(state: state, team: 1, goldenPoint: false, setsToWin: 2)
+        }
+        XCTAssertEqual(state.team1Games[0], 6)
+        XCTAssertEqual(state.team2Games[0], 5)
+        XCTAssertEqual(state.team1Sets, 0, "6-5 must not win the set")
+
+        // 7-5: 2-game lead, set is won.
+        for _ in 0..<4 {
+            state = PadelScoring.scorePoint(state: state, team: 1, goldenPoint: false, setsToWin: 2)
+        }
+        XCTAssertEqual(state.team1Sets, 1, "7-5 wins the set")
+    }
+
+    /// A clean 6-0 bagel: the winning side wins every game without the loser
+    /// getting on the scoreboard at all. Also checks that a new (empty) set
+    /// is appended to the game arrays.
+    func test6_0Bagel() {
+        var state = MatchState()
+        for _ in 0..<6 {
+            for _ in 0..<4 {
+                state = PadelScoring.scorePoint(state: state, team: 1, goldenPoint: false, setsToWin: 2)
+            }
+        }
+        XCTAssertEqual(state.team1Sets, 1, "6-0 wins the set")
+        XCTAssertEqual(state.team1Games, [6, 0], "set 0 closed at 6, new set appended at 0")
+        XCTAssertEqual(state.team2Games, [0, 0])
+        XCTAssertEqual(state.currentSet, 1, "new set started")
     }
 
     // MARK: - Match Winning

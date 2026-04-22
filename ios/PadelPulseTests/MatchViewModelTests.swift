@@ -183,6 +183,82 @@ final class MatchViewModelTests: XCTestCase {
         XCTAssertEqual(vm.matchStartTimeMs, 0)
     }
 
+    /// Undoing the set-winning point must roll back both the set count AND the
+    /// game list — the new empty set slot appended by scoreSet should vanish.
+    func testUndoAcrossSetBoundary() {
+        vm.goldenPoint = true
+        vm.setsToWin = 2
+        vm.updateServingTeam(1)
+
+        // Score one point to start the timer, then fast-forward state to
+        // "one point from winning set 0".
+        vm.scorePoint(team: 1)
+        vm.state.team1Games = [5]
+        vm.state.team2Games = [2]
+        vm.state.team1Points = 3
+
+        vm.scorePoint(team: 1)
+        XCTAssertEqual(vm.state.team1Sets, 1, "set won")
+        XCTAssertEqual(vm.state.currentSet, 1, "new set started")
+        XCTAssertEqual(vm.state.team1Games, [6, 0])
+
+        vm.undo()
+        XCTAssertEqual(vm.state.team1Sets, 0, "set count reverts")
+        XCTAssertEqual(vm.state.currentSet, 0, "back to set 0")
+        XCTAssertEqual(vm.state.team1Games, [5], "set-0 game count restored, phantom set slot gone")
+        XCTAssertEqual(vm.state.team2Games, [2])
+        XCTAssertEqual(vm.state.team1Points, 3, "40-0 restored")
+    }
+
+    /// scorePoint after match-over is a no-op; no undo snapshot should be
+    /// pushed. Otherwise the undo stack grows while the match stays frozen,
+    /// which would confuse canUndo/undo afterwards.
+    func testScorePointAfterMatchOverIsNoOp() {
+        vm.goldenPoint = true
+        vm.setsToWin = 1
+        vm.updateServingTeam(1)
+
+        for _ in 0..<6 {
+            for _ in 0..<4 { vm.scorePoint(team: 1) }
+        }
+        XCTAssertTrue(vm.state.isMatchOver)
+        XCTAssertEqual(vm.state.winner, 1)
+        let undoCountBefore = vm.undoCount
+
+        vm.scorePoint(team: 1)
+        vm.scorePoint(team: 2)
+        XCTAssertTrue(vm.state.isMatchOver)
+        XCTAssertEqual(vm.state.winner, 1)
+        XCTAssertEqual(vm.undoCount, undoCountBefore,
+                       "no-op scorePoint must not push undo snapshots")
+    }
+
+    /// Undoing the match-winning point must clear isMatchOver/winner and
+    /// restore the pre-point timer state.
+    func testUndoOfMatchWinningPointRevertsMatchOver() {
+        vm.goldenPoint = true
+        vm.setsToWin = 1
+        vm.updateServingTeam(1)
+
+        // Start the match, then fast-forward to one point from winning.
+        vm.scorePoint(team: 1)
+        XCTAssertTrue(vm.matchRunning)
+        vm.state.team1Games = [5]
+        vm.state.team1Points = 3
+
+        vm.scorePoint(team: 1)
+        XCTAssertTrue(vm.state.isMatchOver)
+        XCTAssertEqual(vm.state.winner, 1)
+        XCTAssertFalse(vm.matchRunning, "timer stops on match over")
+
+        vm.undo()
+        XCTAssertFalse(vm.state.isMatchOver, "match-over flag must clear")
+        XCTAssertEqual(vm.state.winner, 0, "winner must clear")
+        XCTAssertTrue(vm.matchRunning, "timer resumes (was running pre-point)")
+        XCTAssertEqual(vm.state.team1Games, [5])
+        XCTAssertEqual(vm.state.team1Points, 3)
+    }
+
     func testUndoAcrossGameBoundaryGoldenPoint() {
         vm.goldenPoint = true
         vm.updateServingTeam(1)
