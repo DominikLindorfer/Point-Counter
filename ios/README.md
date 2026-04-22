@@ -167,7 +167,7 @@ PadelPulse/
 - **Top-left:** icon-only toolbar (Undo, Swap, Camera*, New Match) — 44x44pt touch targets
 - **Top-right:** Wall clock + Match timer + Settings (same row), completed set pills below
 - **Center:** two team panels — team name above giant score, GAMES box at inner corner
-- **Serve side:** big gold **L/R letter + racket icon** paired in the court-side corner of the serving panel (L = deuce-side / left, R = ad-side / right), plus a pulsing gold border with rounded outer corners around the whole serving panel. Reduce Motion mutes the pulse.
+- **Serve side:** big gold **L/R letter + racket icon** paired in the court-side corner of the serving panel (L = deuce-side / left, R = ad-side / right; Spanish renders as **I/D** — Izquierda/Derecha), plus a pulsing gold border with rounded outer corners around the whole serving panel. Reduce Motion mutes the pulse.
 
 *Camera button only visible when enabled in settings.
 

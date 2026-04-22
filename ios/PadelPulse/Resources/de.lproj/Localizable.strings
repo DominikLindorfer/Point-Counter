@@ -85,6 +85,10 @@
 "Serve from the right side" = "Aufschlag von rechts";
 "Serve from the left side" = "Aufschlag von links";
 
+/* TeamPanelView serve glyph (court-side L/R letter next to the racket). Same as English in DE. */
+"L" = "L";
+"R" = "R";
+
 /* MatchTimerView */
 "Match timer, %lld minutes %lld seconds" = "Spielzeit, %lld Minuten %lld Sekunden";
 

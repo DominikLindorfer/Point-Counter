@@ -85,6 +85,10 @@
 "Serve from the right side" = "Serve from the right side";
 "Serve from the left side" = "Serve from the left side";
 
+/* TeamPanelView serve glyph (court-side L/R letter next to the racket). Localized so Spanish reads as I/D (Izquierda/Derecha). */
+"L" = "L";
+"R" = "R";
+
 /* MatchTimerView */
 "Match timer, %lld minutes %lld seconds" = "Match timer, %lld minutes %lld seconds";
 

@@ -141,7 +141,7 @@ xcodebuild -project PadelPulse.xcodeproj -scheme PadelPulseTests \
 - **Top-left toolbar:** icon-only buttons — Undo, Swap, [Camera], New Match (uniform 44x44pt touch targets)
 - **Top-right:** Clock + Match Timer + Settings gear (same row), completed set pills horizontally below
 - **Center:** two team panels with team name above giant score, compact number-only games box in inner corner
-- **Serve indicator:** big gold L/R letter + padel-racket icon paired in the court-side corner of the serving panel (L = deuce / left, R = ad / right), plus a pulsing gold border with rounded outer corners around the whole serving panel (static at 0.85 opacity under Reduce Motion)
+- **Serve indicator:** big gold L/R letter + padel-racket icon paired in the court-side corner of the serving panel (L = deuce / left, R = ad / right; Spanish localization renders as I/D — Izquierda/Derecha), plus a pulsing gold border with rounded outer corners around the whole serving panel (static at 0.85 opacity under Reduce Motion)
 
 ### iOS-specific notes
 

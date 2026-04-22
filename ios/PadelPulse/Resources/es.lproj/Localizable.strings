@@ -85,6 +85,10 @@
 "Serve from the right side" = "Saque desde la derecha";
 "Serve from the left side" = "Saque desde la izquierda";
 
+/* TeamPanelView serve glyph: I = Izquierda (left), D = Derecha (right). */
+"L" = "I";
+"R" = "D";
+
 /* MatchTimerView */
 "Match timer, %lld minutes %lld seconds" = "Tiempo de partido, %lld minutos %lld segundos";
 
