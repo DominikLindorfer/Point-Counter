@@ -248,9 +248,12 @@ struct ScoreBoardView: View {
                 })
             }
         }
-        .confirmationDialog("Start New Match?", isPresented: $showNewMatchConfirmation) {
-            Button("New Match", role: .destructive) { vm.resetMatch() }
+        // .alert instead of .confirmationDialog: on iPad the confirmation
+        // dialog renders as a popover that hides the Cancel role behind
+        // "tap outside to dismiss" — users couldn't see an explicit abort.
+        .alert("Start New Match?", isPresented: $showNewMatchConfirmation) {
             Button("Cancel", role: .cancel) {}
+            Button("New Match", role: .destructive) { vm.resetMatch() }
         } message: {
             Text("Current match progress will be lost.")
         }

@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		01C6F336E3FC5F3308D20B5F /* HapticService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 29BD615A3E1E70913C4534CC /* HapticService.swift */; };
 		0C64C90650908C2ACC1639BE /* TeamColor.swift in Sources */ = {isa = PBXBuildFile; fileRef = 48A92EB714C0E8CA7142255E /* TeamColor.swift */; };
-		187293A9D7C30ADB614B8C89 /* ServeSideIndicatorView.swift in Sources */ = {isa = PBXBuildFile; fileRef = AC67DD955C96863FD4EA0CB5 /* ServeSideIndicatorView.swift */; };
 		22654429666E0A69EAF835E6 /* DefaultsKeys.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7A89C6B5700B7CDDAF63A66A /* DefaultsKeys.swift */; };
 		36668422FD0A550258F51689 /* MatchTimerView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 44C1FEC15A2F84C0377CBE24 /* MatchTimerView.swift */; };
 		3CFAE344E6327ED9B6D51656 /* LanguageService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3B01DB3007B7E1A4E775D103 /* LanguageService.swift */; };
@@ -89,7 +88,6 @@
 		9C2E869577A8D71ABD9569C9 /* silence.m4a */ = {isa = PBXFileReference; path = silence.m4a; sourceTree = "<group>"; };
 		9D1C1F317A0956102AE2E5C9 /* PadelScoringTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PadelScoringTests.swift; sourceTree = "<group>"; };
 		9F57137E83AD0052453E7C5C /* CreditsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CreditsView.swift; sourceTree = "<group>"; };
-		AC67DD955C96863FD4EA0CB5 /* ServeSideIndicatorView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ServeSideIndicatorView.swift; sourceTree = "<group>"; };
 		B6E91D477A63D05344618892 /* SavedMatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SavedMatch.swift; sourceTree = "<group>"; };
 		C90556AEAF09A74696D62A98 /* ColorSwatchPicker.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorSwatchPicker.swift; sourceTree = "<group>"; };
 		CADF9F0DA638E5BC3AA349CD /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = "<group>"; };
@@ -144,7 +142,6 @@
 				44C1FEC15A2F84C0377CBE24 /* MatchTimerView.swift */,
 				71775C9741BC25C1B45EB734 /* OnboardingOverlayView.swift */,
 				4CC8C3B33606B040AED17E38 /* ScoreBoardView.swift */,
-				AC67DD955C96863FD4EA0CB5 /* ServeSideIndicatorView.swift */,
 				71A11A65E24C094BF711B626 /* SettingsSidebarView.swift */,
 				F1A0095B7F83735DA7FE32E3 /* TeamPanelView.swift */,
 				5813745251943634C9F2A431 /* WallClockView.swift */,
@@ -368,7 +365,6 @@
 				53E638F4B1E62BE6A045AC8F /* RemoteInputService.swift in Sources */,
 				7C77880DC846C5056431DD52 /* SavedMatch.swift in Sources */,
 				9CFF6EB687AD992748F57FB5 /* ScoreBoardView.swift in Sources */,
-				187293A9D7C30ADB614B8C89 /* ServeSideIndicatorView.swift in Sources */,
 				4D6F492F567AFB7532375DD0 /* SetScorePill.swift in Sources */,
 				801DB9A809D65BC91858F066 /* SettingsSidebarView.swift in Sources */,
 				E7E2D7BA02F81151D58FB0F1 /* ShareImageRenderer.swift in Sources */,

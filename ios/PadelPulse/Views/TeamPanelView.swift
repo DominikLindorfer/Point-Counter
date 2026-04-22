@@ -18,6 +18,12 @@ struct TeamPanelView: View {
     let onClick: () -> Void
 
     @Environment(\.layout) private var layout
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var glowPulse: CGFloat = 0.4
+
+    private var serveIndicatorVisible: Bool {
+        isServing && showServeSide && !isMatchOver
+    }
 
     var body: some View {
         let currentGames = currentSet < gamesList.count ? gamesList[currentSet] : 0
@@ -67,8 +73,34 @@ struct TeamPanelView: View {
             }
             .padding(.bottom, layout.serveAreaClearance)
 
-            if isServing && showServeSide && !isMatchOver {
-                racketOverlay
+            if serveIndicatorVisible {
+                serveOverlay
+            }
+        }
+        .overlay(
+            // Pulsing gold border on the serving panel — second redundant cue
+            // so which side is serving is obvious without squinting at the
+            // racket icon. Only the outer corners (away from the center
+            // divider) are rounded so the border stays visually anchored to
+            // the panel structure instead of floating over it.
+            UnevenRoundedRectangle(
+                topLeadingRadius: gamesBoxAtStart ? 0 : 20,
+                bottomLeadingRadius: gamesBoxAtStart ? 0 : 20,
+                bottomTrailingRadius: gamesBoxAtStart ? 20 : 0,
+                topTrailingRadius: gamesBoxAtStart ? 20 : 0
+            )
+            .strokeBorder(GoldColor, lineWidth: layout.servePanelGlowWidth)
+            .opacity(serveIndicatorVisible ? glowPulse : 0)
+            .animation(.easeInOut(duration: 0.25), value: serveIndicatorVisible)
+            .allowsHitTesting(false)
+        )
+        .onAppear {
+            if reduceMotion {
+                glowPulse = 0.85
+            } else {
+                withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
+                    glowPulse = 0.95
+                }
             }
         }
         .accessibilityElement(children: .ignore)
@@ -78,16 +110,34 @@ struct TeamPanelView: View {
         .accessibilityAddTraits(.isButton)
     }
 
-    private var racketOverlay: some View {
+    /// Bottom-of-panel indicator: L or R letter paired with the racket icon
+    /// in the corner corresponding to the deuce/ad side the server stands on.
+    /// - serveOnLeft=true  → `[L][🏸]` flushed to the left corner
+    /// - serveOnLeft=false → `[🏸][R]` flushed to the right corner
+    /// The big letter is readable from across the court; the racket stays as
+    /// a visual anchor for players who already recognized it.
+    private var serveOverlay: some View {
         VStack {
             Spacer()
             HStack {
                 if serveOnLeft {
-                    PadelRacketView(color: GoldColor, size: layout.servingRacketSize)
+                    HStack(spacing: 12) {
+                        Text("L")
+                            .font(.system(size: layout.serveLetterFont, weight: .black))
+                            .foregroundColor(GoldColor)
+                            .shadow(color: .black.opacity(0.4), radius: 4, y: 2)
+                        PadelRacketView(color: GoldColor, size: layout.servingRacketSize)
+                    }
                     Spacer()
                 } else {
                     Spacer()
-                    PadelRacketView(color: GoldColor, size: layout.servingRacketSize)
+                    HStack(spacing: 12) {
+                        PadelRacketView(color: GoldColor, size: layout.servingRacketSize)
+                        Text("R")
+                            .font(.system(size: layout.serveLetterFont, weight: .black))
+                            .foregroundColor(GoldColor)
+                            .shadow(color: .black.opacity(0.4), radius: 4, y: 2)
+                    }
                 }
             }
             .padding(.horizontal, layout.panelPadding * 1.5)

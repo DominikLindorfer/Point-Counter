@@ -42,7 +42,11 @@ struct LayoutMetrics {
     var scoreFont: CGFloat { 520 * scale }
     var teamNameFont: CGFloat { max(16, 44 * scale) }
     var servingBadgeFont: CGFloat { max(14, 32 * scale) }
-    var servingRacketSize: CGFloat { max(56, 104 * scale) }
+    var servingRacketSize: CGFloat { max(40, 72 * scale) }
+    // L/R glyph paired with the racket in the court-side corner. Readable
+    // from ~15m while staying proportionate to the racket it sits next to.
+    var serveLetterFont: CGFloat { max(64, 130 * scale) }
+    var servePanelGlowWidth: CGFloat { max(4, 6 * scale) }
 
     // Games box — unclamped, dominates the screen
     var gamesBoxWidth: CGFloat { 180 * scale }
