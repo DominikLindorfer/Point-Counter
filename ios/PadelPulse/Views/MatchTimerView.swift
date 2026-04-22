@@ -6,6 +6,11 @@ struct MatchTimerView: View {
     @Environment(\.layout) private var layout
 
     var body: some View {
+        // Show the timer while the match is active OR paused-with-start-seeded.
+        // The second clause keeps the pill visible during the brief window
+        // between restoreInProgressMatch() (matchRunning=false, startTime>0)
+        // and resumeTimer() firing on scenePhase=.active — otherwise the pill
+        // would flicker in/out across a cold launch.
         if vm.matchRunning || vm.matchStartTimeMs > 0 {
             TimelineView(.periodic(from: .now, by: 1.0)) { context in
                 let elapsed = vm.matchRunning
