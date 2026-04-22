@@ -19,7 +19,7 @@ struct TeamPanelView: View {
 
     @Environment(\.layout) private var layout
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
-    @State private var glowPulse: CGFloat = 0.4
+    @State private var glowPulse: CGFloat = 0.35
 
     private var serveIndicatorVisible: Bool {
         isServing && showServeSide && !isMatchOver
@@ -91,15 +91,18 @@ struct TeamPanelView: View {
             )
             .strokeBorder(GoldColor, lineWidth: layout.servePanelGlowWidth)
             .opacity(serveIndicatorVisible ? glowPulse : 0)
-            .animation(.easeInOut(duration: 0.25), value: serveIndicatorVisible)
             .allowsHitTesting(false)
         )
         .onAppear {
             if reduceMotion {
                 glowPulse = 0.85
             } else {
-                withAnimation(.easeInOut(duration: 1.2).repeatForever(autoreverses: true)) {
-                    glowPulse = 0.95
+                // Wider range (0.35 → 1.0) so the pulse actually reads on a
+                // bright iPad screen in daylight. No scoped .animation modifier
+                // on the overlay — it was competing with the repeatForever
+                // animation and suppressing the pulse.
+                withAnimation(.easeInOut(duration: 1.1).repeatForever(autoreverses: true)) {
+                    glowPulse = 1.0
                 }
             }
         }
