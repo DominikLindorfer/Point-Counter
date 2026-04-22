@@ -96,6 +96,14 @@
 "Tap SWAP to switch court sides" = "Tap SWAP to switch court sides";
 "GOT IT" = "GOT IT";
 
+/* ServePickOverlayView (SWAP + Swap sides reused from ScoreBoardView section above) */
+"WHO SERVES FIRST?" = "WHO SERVES FIRST?";
+"Tap a team or press a remote button · Play/Pause flips sides" = "Tap a team or press a remote button · Play/Pause flips sides";
+"SKIP" = "SKIP";
+"Skip serve pick" = "Skip serve pick";
+"%@, serve first" = "%@, serve first";
+"Ask Who Serves" = "Ask Who Serves";
+
 /* NameFieldView */
 "Max 16 characters" = "Max 16 characters";
 "Team name" = "Team name";

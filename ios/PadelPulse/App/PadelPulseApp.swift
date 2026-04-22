@@ -86,9 +86,36 @@ struct PadelPulseApp: App {
     }
 
     private func setupRemoteInput() {
-        remoteInput.onTeam1Score = { [viewModel] in viewModel.scorePoint(team: 1) }
-        remoteInput.onTeam2Score = { [viewModel] in viewModel.scorePoint(team: 2) }
-        remoteInput.onUndo = { [viewModel] in viewModel.undo() }
+        // While the serve-pick overlay is up, remote team buttons select the
+        // first server instead of scoring — lets players decide who serves
+        // from the court without walking back to the iPad.
+        remoteInput.onTeam1Score = { [viewModel] in
+            if viewModel.needsServePick {
+                viewModel.pickServingTeam(1)
+            } else {
+                viewModel.scorePoint(team: 1)
+            }
+        }
+        remoteInput.onTeam2Score = { [viewModel] in
+            if viewModel.needsServePick {
+                viewModel.pickServingTeam(2)
+            } else {
+                viewModel.scorePoint(team: 2)
+            }
+        }
+        remoteInput.onUndo = { [viewModel] in
+            // Undo is meaningless while no point has been scored. During the
+            // serve-pick overlay we repurpose Play/Pause to flip sides — lets
+            // the user correct the iPad's left/right panel assignment from
+            // the court without walking back. Dismiss falls back to the
+            // SKIP button and tap-outside on the overlay.
+            if viewModel.needsServePick {
+                HapticService.settingChanged()
+                viewModel.swapSides()
+            } else {
+                viewModel.undo()
+            }
+        }
         remoteInput.start()
     }
 }

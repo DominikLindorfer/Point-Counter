@@ -9,6 +9,7 @@ struct SettingsSidebarView: View {
 
     @Environment(\.layout) private var layout
     @AppStorage(DefaultsKey.cameraOverlayEnabled) private var cameraEnabled = false
+    @AppStorage(DefaultsKey.askForServerBeforeMatch) private var askForServer = true
     @AppStorage(LanguageService.storageKey) private var selectedLanguage = "system"
 
     private var languageDisplayName: String {
@@ -163,6 +164,17 @@ struct SettingsSidebarView: View {
                             valueColor: serveColor,
                             teamColorDot: serveBgColor
                         ) { vm.updateServingTeam(vm.servingTeam == 1 ? 2 : 1) }
+
+                        Spacer().frame(height: 10)
+
+                        toggleRow(
+                            icon: "hand.raised.fill",
+                            label: "Ask Who Serves",
+                            isOn: Binding(
+                                get: { askForServer },
+                                set: { askForServer = $0; HapticService.settingChanged() }
+                            )
+                        )
 
                         Spacer().frame(height: 10)
 

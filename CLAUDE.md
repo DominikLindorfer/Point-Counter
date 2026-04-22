@@ -77,6 +77,7 @@ ios/PadelPulse/
 │   ├── MatchHistoryView.swift            # ATP-style match history cards + share (text & image)
 │   ├── MatchOverOverlayView.swift        # Confetti, staggered entrance, winner glow, share
 │   ├── OnboardingOverlayView.swift       # First-launch hint overlay
+│   ├── ServePickOverlayView.swift        # Pre-match "who serves first?" picker (remote-aware)
 │   ├── CameraOverlayView.swift           # AVFoundation camera + recording
 │   ├── MatchTimerView.swift              # Match timer pill
 │   ├── WallClockView.swift               # Current time-of-day pill (HH:mm, system locale)
@@ -131,6 +132,7 @@ xcodebuild -project PadelPulse.xcodeproj -scheme PadelPulseTests \
 - **Compact set scores** — completed sets shown as horizontal pills top-right below the timer
 - **Camera as opt-in** — camera overlay toggle in settings, button only visible when enabled
 - **Runtime language switcher** — Auto / EN / DE / ES togglable in settings, no app restart (bundle swizzle + `.id(...)` re-render)
+- **Serve-pick overlay** — before every fresh match, tap a team tile or press its Bluetooth-remote button to set the first server. Play/Pause (or the inline gold swap button) flips the iPad's left/right panel assignment so it matches the court — fully operable from the remote. SKIP button or tap outside the tiles to dismiss. Toggle in Settings → "Ask Who Serves".
 - **Wall clock pill** — current time-of-day shown next to the match timer
 - **Credits page** — linked from settings, attributes upstream Point-Counter repo and Noun Project SVG icon
 

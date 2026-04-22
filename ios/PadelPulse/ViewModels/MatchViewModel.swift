@@ -74,6 +74,10 @@ final class MatchViewModel {
     var team1Color: Color = defaultTeam1Color
     var team2Color: Color = defaultTeam2Color
     var servingTeam = 1
+    /// True when a fresh match is waiting for the user to pick who serves first.
+    /// While true, the ServePickOverlay is visible and the remote/tap handlers
+    /// route team presses into `pickServingTeam` instead of scoring a point.
+    var needsServePick = false
     var showServeSide = true
     var matchStartTimeMs: Int64 = 0
     var matchRunning = false
@@ -103,6 +107,16 @@ final class MatchViewModel {
         self.matchHistory = storage.loadAll()
         let raw = UserDefaults.standard.string(forKey: DefaultsKey.autoSwapMode) ?? AutoSwapMode.afterSet.rawValue
         self.autoSwapMode = AutoSwapMode(rawValue: raw) ?? .afterSet
+        self.needsServePick = Self.shouldAskForServer()
+    }
+
+    /// Default `askForServerBeforeMatch` to true when the key has never been written.
+    /// `UserDefaults.bool(forKey:)` alone returns false for missing keys, which would
+    /// silently disable the overlay for every existing install on first launch after upgrade.
+    private static func shouldAskForServer() -> Bool {
+        let defaults = UserDefaults.standard
+        if defaults.object(forKey: DefaultsKey.askForServerBeforeMatch) == nil { return true }
+        return defaults.bool(forKey: DefaultsKey.askForServerBeforeMatch)
     }
 
     private static func randomTeamNames() -> (String, String) {
@@ -197,7 +211,26 @@ final class MatchViewModel {
     func updateTeam2Name(_ name: String) { team2Name = name }
     func updateTeam1Color(_ color: Color) { team1Color = color }
     func updateTeam2Color(_ color: Color) { team2Color = color }
-    func updateServingTeam(_ team: Int) { servingTeam = team }
+    func updateServingTeam(_ team: Int) {
+        servingTeam = team
+        // An explicit pick from settings also resolves the pre-match prompt.
+        needsServePick = false
+    }
+
+    /// Pre-match server pick — sets the serving team without scoring a point
+    /// and dismisses the serve-pick overlay. Used by the overlay's tap and by
+    /// the remote/keyboard handlers while `needsServePick` is true.
+    func pickServingTeam(_ team: Int) {
+        servingTeam = team
+        needsServePick = false
+        HapticService.settingChanged()
+    }
+
+    /// Dismiss the pre-match serve-pick overlay without changing `servingTeam`
+    /// (keeps whatever default/last-set value was there).
+    func dismissServePick() {
+        needsServePick = false
+    }
 
     func undo() {
         guard let snap = undoStack.popLast() else { return }
@@ -221,6 +254,7 @@ final class MatchViewModel {
         team1PointsWon = 0
         team2PointsWon = 0
         pausedElapsedMs = 0
+        needsServePick = Self.shouldAskForServer()
         clearInProgressMatch()
     }
 
@@ -322,6 +356,9 @@ final class MatchViewModel {
         team1Color = Color(rgb: persisted.team1ColorRGB)
         team2Color = Color(rgb: persisted.team2ColorRGB)
         servingTeam = persisted.servingTeam
+        // A restored match has at least one scored point (per the save-guard in
+        // saveInProgressMatch), so the server is already decided — skip the overlay.
+        needsServePick = false
         showServeSide = persisted.showServeSide
         team1PointsWon = persisted.team1PointsWon
         team2PointsWon = persisted.team2PointsWon

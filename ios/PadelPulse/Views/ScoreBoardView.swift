@@ -241,6 +241,15 @@ struct ScoreBoardView: View {
                 onShowCredits: onShowCredits
             )
 
+            // Serve-pick overlay — shown before every fresh match while
+            // `askForServerBeforeMatch` is on. Sits below the onboarding
+            // overlay so first-launch users see the hints first, then land
+            // on the serve picker for their first real match.
+            if vm.needsServePick && !state.isMatchOver {
+                ServePickOverlayView(vm: vm)
+                    .animation(.easeInOut(duration: 0.25), value: vm.needsServePick)
+            }
+
             // Onboarding overlay (first launch only)
             if !hasSeenOnboarding {
                 OnboardingOverlayView(onDismiss: {

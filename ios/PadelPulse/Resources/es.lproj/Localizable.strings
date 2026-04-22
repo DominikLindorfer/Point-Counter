@@ -96,6 +96,14 @@
 "Tap SWAP to switch court sides" = "Toca CAMBIAR para intercambiar los lados de la pista";
 "GOT IT" = "ENTENDIDO";
 
+/* ServePickOverlayView (SWAP + Swap sides reused from ScoreBoardView section above) */
+"WHO SERVES FIRST?" = "¿QUIÉN SACA PRIMERO?";
+"Tap a team or press a remote button · Play/Pause flips sides" = "Toca un equipo o pulsa el mando · Play/Pause cambia los lados";
+"SKIP" = "OMITIR";
+"Skip serve pick" = "Omitir elección de saque";
+"%@, serve first" = "%@, saca primero";
+"Ask Who Serves" = "Preguntar quién saca";
+
 /* NameFieldView */
 "Max 16 characters" = "Máx. 16 caracteres";
 "Team name" = "Nombre del equipo";

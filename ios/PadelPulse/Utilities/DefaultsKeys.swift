@@ -19,4 +19,5 @@ enum DefaultsKey {
     static let selectedLanguage = "selected_language"
     static let cameraOverlayEnabled = "camera_overlay_enabled"
     static let hasSeenOnboarding = "has_seen_onboarding"
+    static let askForServerBeforeMatch = "ask_for_server_before_match"
 }

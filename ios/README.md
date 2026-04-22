@@ -70,11 +70,12 @@ xcrun devicectl device process launch --device <DEVICE_ID> com.padelpulse.app
 - **Animated match-over** — confetti particles, staggered entrance, winner glow, trophy fly-in
 - **Share as image** — rendered 600x315 score card via `ImageRenderer`
 - **Onboarding overlay** — first-launch hints, dismissed permanently
+- **Serve-pick overlay** — before every fresh match, tap a team tile or press its Bluetooth-remote button to set the first server from the court (toggleable in settings)
 - **Camera overlay** — optional PiP camera (opt-in via settings)
 
 ### Input
 - **Touch** — tap left/right panel to score
-- **Bluetooth remote** — Next/Prev Track for scoring, Play/Pause for undo
+- **Bluetooth remote** — Next/Prev Track for scoring, Play/Pause for undo. While the serve-pick overlay is up, the team buttons pick the first server and Play/Pause flips sides (match the iPad's left/right to reality) — full pre-match setup without walking back to the iPad.
 - **iPad keyboard** — Cmd+Z (undo), Cmd+N (new match), Cmd+Shift+S (swap), Cmd+, (settings), Arrow keys + Space via GCKeyboard
 
 ### Localization
@@ -99,6 +100,7 @@ PadelPulse/
 │   ├── MatchHistoryView.swift            # History cards + share (text & image)
 │   ├── MatchOverOverlayView.swift        # Confetti, staggered entrance, winner glow, share
 │   ├── OnboardingOverlayView.swift       # First-launch hints
+│   ├── ServePickOverlayView.swift        # Pre-match "who serves first?" picker (remote-aware)
 │   ├── CameraOverlayView.swift           # AVFoundation camera + recording
 │   ├── MatchTimerView.swift              # Match timer pill
 │   ├── WallClockView.swift               # Current time-of-day pill (HH:mm)
