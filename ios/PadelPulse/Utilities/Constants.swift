@@ -143,6 +143,13 @@ extension LayoutMetrics {
 }
 
 private struct LayoutMetricsKey: EnvironmentKey {
+    /// Fallback only — the real value is injected by `PadelPulseApp`'s
+    /// `GeometryReader` at runtime. This default fires in Xcode Previews and
+    /// any edge case where a view is rendered outside the geometry-aware root.
+    /// The reference size (iPad Pro 11" landscape, 1194×834) keeps
+    /// `scale ≈ 1.0` so preview layouts mirror the hand-tuned baseline.
+    /// Picking something device-adaptive here (e.g. UIScreen.main.bounds) is
+    /// tempting but backfires in previews, which don't run on a real screen.
     static let defaultValue = LayoutMetrics(screenWidth: 1194, screenHeight: 834)
 }
 
