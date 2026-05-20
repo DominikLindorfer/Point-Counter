@@ -31,9 +31,17 @@ struct MatchHistoryView: View {
                     Spacer()
                     if !matches.isEmpty {
                         Button(action: { showDeleteAllConfirmation = true }) {
-                            Image(systemName: "trash.slash.fill")
-                                .font(.system(size: layout.historyHeaderIcon))
-                                .foregroundColor(Color(red: 1, green: 0.33, blue: 0.33))
+                            HStack(spacing: 6) {
+                                Image(systemName: "trash.fill")
+                                    .font(.system(size: layout.historyStatIcon))
+                                Text("Delete All")
+                                    .font(.system(size: layout.historyStatValue, weight: .semibold))
+                            }
+                            .foregroundColor(Color(red: 1, green: 0.45, blue: 0.45))
+                            .padding(.horizontal, 14)
+                            .padding(.vertical, 8)
+                            .background(Color(red: 1, green: 0.33, blue: 0.33).opacity(0.12))
+                            .clipShape(Capsule())
                         }
                         .accessibilityLabel("Delete all match history")
                     }
@@ -89,37 +97,21 @@ struct MatchCardView: View {
     let onDelete: () -> Void
 
     @Environment(\.layout) private var layout
-    @State private var shareImage: UIImage?
-    @State private var showShareSheet = false
 
     var body: some View {
+        let totalPoints = match.team1PointsWon + match.team2PointsWon
+        let t1Pct = totalPoints > 0 ? (match.team1PointsWon * 100) / totalPoints : 50
+        let numSets = max(match.team1Games.count, match.team2Games.count)
+        let setColWidth = layout.historyCardGameScore * 1.6
+        let setsColWidth = layout.historyCardScore * 1.1
+
         VStack(alignment: .leading, spacing: 0) {
-            // Date and actions
-            HStack {
+            // Header: date + delete
+            HStack(spacing: 12) {
                 Text(match.formattedDate)
                     .font(.system(size: layout.historyCardDate))
                     .foregroundColor(DimColor)
                 Spacer()
-
-                Menu {
-                    ShareLink(item: match.shareText()) {
-                        Label("Share as Text", systemImage: "text.alignleft")
-                    }
-                    Button {
-                        if let image = ShareImageRenderer.render(match: match) {
-                            shareImage = image
-                            showShareSheet = true
-                        }
-                    } label: {
-                        Label("Share as Image", systemImage: "photo")
-                    }
-                } label: {
-                    Image(systemName: "square.and.arrow.up")
-                        .font(.system(size: layout.historyCardAction))
-                        .foregroundColor(.white)
-                }
-                .accessibilityLabel("Share match result")
-
                 Button(action: onDelete) {
                     Image(systemName: "trash.fill")
                         .font(.system(size: layout.historyCardAction))
@@ -128,96 +120,109 @@ struct MatchCardView: View {
                 .accessibilityLabel("Delete this match")
             }
 
-            Spacer().frame(height: 8)
+            Spacer().frame(height: 18)
 
-            // Team names and set score
-            HStack {
-                Text(match.team1Name)
-                    .font(.system(size: layout.historyCardTeamName, weight: .bold))
-                    .foregroundColor(Team1Blue)
-                Spacer()
-                Text("\(match.team1Sets) - \(match.team2Sets)")
-                    .font(.system(size: layout.historyCardScore, weight: .bold))
-                    .foregroundColor(.white)
-                Spacer()
-                Text(match.team2Name)
-                    .font(.system(size: layout.historyCardTeamName, weight: .bold))
-                    .foregroundColor(Team2Red)
-            }
-
-            Spacer().frame(height: 8)
-
-            // Game scores per set
-            HStack(spacing: 12) {
-                Spacer()
-                ForEach(0..<match.team1Games.count, id: \.self) { i in
-                    let g2 = i < match.team2Games.count ? match.team2Games[i] : 0
-                    Text("\(match.team1Games[i])-\(g2)")
-                        .font(.system(size: layout.historyCardGameScore, weight: .medium))
-                        .foregroundColor(DimColor)
-                }
-                Spacer()
-            }
-
-            Spacer().frame(height: 12)
-            Divider().background(Color(white: 0.2))
-            Spacer().frame(height: 12)
-
-            // Stats row
-            HStack {
-                Spacer()
-                statItem(
-                    icon: "trophy.fill",
-                    label: "Winner",
-                    value: match.winnerName,
-                    valueColor: match.winner == 1 ? Team1Blue : Team2Red
+            // Team rows — ATP/WTA score-card style
+            VStack(spacing: 10) {
+                teamRow(
+                    name: match.team1Name,
+                    color: Team1Blue,
+                    games: match.team1Games,
+                    sets: match.team1Sets,
+                    isWinner: match.winner == 1,
+                    numSets: numSets,
+                    setColWidth: setColWidth,
+                    setsColWidth: setsColWidth
                 )
-                Spacer()
-                statItem(
+                teamRow(
+                    name: match.team2Name,
+                    color: Team2Red,
+                    games: match.team2Games,
+                    sets: match.team2Sets,
+                    isWinner: match.winner == 2,
+                    numSets: numSets,
+                    setColWidth: setColWidth,
+                    setsColWidth: setsColWidth
+                )
+            }
+
+            Spacer().frame(height: 16)
+            Divider().background(Color(white: 0.18))
+            Spacer().frame(height: 12)
+
+            // Stats row — icon + value pairs, left-aligned
+            HStack(spacing: 24) {
+                statChip(
                     icon: "timer",
-                    label: "Duration",
                     value: match.formattedDuration,
                     valueColor: .white
                 )
-                Spacer()
-
-                let totalPoints = match.team1PointsWon + match.team2PointsWon
                 if totalPoints > 0 {
-                    let t1Pct = (match.team1PointsWon * 100) / totalPoints
-                    statItem(
-                        icon: nil,
-                        label: "Points Won",
-                        value: "\(t1Pct)% - \(100 - t1Pct)%",
+                    statChip(
+                        icon: "chart.bar.fill",
+                        value: "\(t1Pct)% · \(100 - t1Pct)%",
                         valueColor: GoldColor
                     )
-                    Spacer()
                 }
+                Spacer()
             }
         }
         .padding(20)
         .background(ButtonBg)
         .clipShape(RoundedRectangle(cornerRadius: 16))
-        .sheet(isPresented: $showShareSheet) {
-            if let image = shareImage {
-                ShareSheet(items: [image])
+    }
+
+    private func teamRow(
+        name: String,
+        color: Color,
+        games: [Int],
+        sets: Int,
+        isWinner: Bool,
+        numSets: Int,
+        setColWidth: CGFloat,
+        setsColWidth: CGFloat
+    ) -> some View {
+        HStack(spacing: 10) {
+            Image(systemName: "trophy.fill")
+                .font(.system(size: layout.historyStatIcon))
+                .foregroundColor(GoldColor)
+                .opacity(isWinner ? 1 : 0)
+                .frame(width: layout.historyStatIcon)
+
+            Text(name)
+                .font(.system(size: layout.historyCardTeamName, weight: isWinner ? .bold : .semibold))
+                .foregroundColor(isWinner ? color : color.opacity(0.55))
+                .lineLimit(1)
+                .minimumScaleFactor(0.6)
+                .frame(maxWidth: .infinity, alignment: .leading)
+
+            HStack(spacing: 6) {
+                ForEach(0..<numSets, id: \.self) { i in
+                    Text(i < games.count ? "\(games[i])" : "–")
+                        .font(.system(size: layout.historyCardGameScore, weight: isWinner ? .bold : .medium))
+                        .foregroundColor(isWinner ? .white : DimColor)
+                        .monospacedDigit()
+                        .frame(width: setColWidth, alignment: .center)
+                }
             }
+
+            Text("\(sets)")
+                .font(.system(size: layout.historyCardScore, weight: .bold))
+                .foregroundColor(isWinner ? .white : DimColor.opacity(0.8))
+                .monospacedDigit()
+                .frame(width: setsColWidth, alignment: .trailing)
         }
     }
 
-    private func statItem(icon: String?, label: LocalizedStringKey, value: String, valueColor: Color) -> some View {
-        VStack(spacing: 2) {
-            if let icon {
-                Image(systemName: icon)
-                    .font(.system(size: layout.historyStatIcon))
-                    .foregroundColor(DimColor)
-                Spacer().frame(height: 4)
-            }
-            Text(label)
-                .font(.system(size: layout.historyStatLabel))
+    private func statChip(icon: String, value: String, valueColor: Color) -> some View {
+        HStack(spacing: 6) {
+            Image(systemName: icon)
+                .font(.system(size: layout.historyStatIcon))
                 .foregroundColor(DimColor)
             Text(value)
-                .font(.system(size: layout.historyStatValue, weight: .bold))
+                .font(.system(size: layout.historyStatValue, weight: .semibold))
                 .foregroundColor(valueColor)
+                .monospacedDigit()
         }
     }
 }

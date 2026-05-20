@@ -7,6 +7,16 @@ enum HapticService {
     private static let notification = UINotificationFeedbackGenerator()
     private static let selection = UISelectionFeedbackGenerator()
 
+    /// Warm up all feedback generators. Call once at app launch — removes the
+    /// 50–150 ms latency between the first user tap and the haptic being felt.
+    static func prepareAll() {
+        medium.prepare()
+        light.prepare()
+        heavy.prepare()
+        notification.prepare()
+        selection.prepare()
+    }
+
     static func scorePoint() {
         medium.impactOccurred()
     }

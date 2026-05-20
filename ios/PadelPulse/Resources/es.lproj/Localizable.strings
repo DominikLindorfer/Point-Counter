@@ -2,7 +2,11 @@
 "UNDO" = "DESHACER";
 "SWAP" = "CAMBIAR";
 "NEW MATCH" = "NUEVO PARTIDO";
+"Undo" = "Deshacer";
+"Swap sides" = "Cambiar lados";
+"New match" = "Nuevo partido";
 "TIEBREAK" = "TIEBREAK";
+"TB" = "TB";
 "Start New Match?" = "¿Nuevo partido?";
 "New Match" = "Nuevo partido";
 "Cancel" = "Cancelar";
@@ -23,12 +27,27 @@
 "ADVANTAGE" = "VENTAJA";
 "Sets to Win" = "Sets para ganar";
 "NO LIMIT" = "SIN LÍMITE";
+"Auto Side Swap" = "Cambio auto. de lado";
+"OFF" = "NO";
+"AFTER SET" = "TRAS SET";
 "Serving" = "Servicio";
+"SERVING" = "SAQUE";
 "Serve Side (L/R)" = "Lado de saque (I/D)";
 "Sound Effects" = "Efectos de sonido";
 "Camera" = "Cámara";
+"Language" = "Idioma";
+"Auto" = "Auto";
 "Match History" = "Historial";
+"Credits" = "Créditos";
 "Double tap to change" = "Pulsa dos veces para cambiar";
+
+/* CreditsView */
+"CREDITS" = "CRÉDITOS";
+"Based on" = "Basado en";
+"Point-Counter by Dominik Lindorfer" = "Point-Counter de Dominik Lindorfer";
+"Padel racket icon" = "Icono de pala de pádel";
+"\"padel\" by Rusma Ratri Handini from Noun Project (CC BY 3.0)" = "«padel» de Rusma Ratri Handini en Noun Project (CC BY 3.0)";
+"Made with love for padel." = "Hecho con amor por el pádel.";
 
 /* TeamPanelView */
 "GAMES" = "JUEGOS";
@@ -66,6 +85,10 @@
 "Serve from the right side" = "Saque desde la derecha";
 "Serve from the left side" = "Saque desde la izquierda";
 
+/* TeamPanelView serve glyph: I = Izquierda (left), D = Derecha (right). */
+"L" = "I";
+"R" = "D";
+
 /* MatchTimerView */
 "Match timer, %lld minutes %lld seconds" = "Tiempo de partido, %lld minutos %lld segundos";
 
@@ -76,6 +99,14 @@
 "Tap the gear icon for settings" = "Toca el icono de engranaje para los ajustes";
 "Tap SWAP to switch court sides" = "Toca CAMBIAR para intercambiar los lados de la pista";
 "GOT IT" = "ENTENDIDO";
+
+/* ServePickOverlayView (SWAP + Swap sides reused from ScoreBoardView section above) */
+"WHO SERVES FIRST?" = "¿QUIÉN SACA PRIMERO?";
+"Tap a team or press a remote button · Play/Pause flips sides" = "Toca un equipo o pulsa el mando · Play/Pause cambia los lados";
+"SKIP" = "OMITIR";
+"Skip serve pick" = "Omitir elección de saque";
+"%@, serve first" = "%@, saca primero";
+"Ask Who Serves" = "Preguntar quién saca";
 
 /* NameFieldView */
 "Max 16 characters" = "Máx. 16 caracteres";

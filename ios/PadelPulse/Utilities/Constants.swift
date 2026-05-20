@@ -39,16 +39,23 @@ struct LayoutMetrics {
     }
 
     // Score display — unclamped, dominates the screen
-    var scoreFont: CGFloat { 400 * scale }
-    var teamNameFont: CGFloat { max(18, 56 * scale) }
-    var servingBallSize: CGFloat { 28 * scale }
+    var scoreFont: CGFloat { 520 * scale }
+    var teamNameFont: CGFloat { max(16, 44 * scale) }
+    var servingBadgeFont: CGFloat { max(14, 32 * scale) }
+    var servingRacketSize: CGFloat { max(48, 92 * scale) }
+    // L/R glyph paired with the racket in the court-side corner. Sized to
+    // balance the top toolbar / games-box visual weight so both ends of the
+    // panel feel symmetric — readable from ~15m across the court.
+    var serveLetterFont: CGFloat { max(96, 180 * scale) }
+    var servePanelGlowWidth: CGFloat { max(4, 6 * scale) }
 
     // Games box — unclamped, dominates the screen
-    var gamesBoxWidth: CGFloat { 140 * scale }
+    var gamesBoxWidth: CGFloat { 180 * scale }
     var gamesBoxHeight: CGFloat { 170 * scale }
-    var gamesBoxCorner: CGFloat { 18 * scale }
+    var gamesBoxCorner: CGFloat { 22 * scale }
     var gamesLabelFont: CGFloat { 18 * scale }
-    var gamesNumberFont: CGFloat { 110 * scale }
+    var gamesNumberFont: CGFloat { 156 * scale }
+    var gamesBoxTopPadding: CGFloat { 32 * scale }
 
     // Toolbar
     var toolbarIconSize: CGFloat { max(16, 20 * scale) }
@@ -141,6 +148,13 @@ extension LayoutMetrics {
 }
 
 private struct LayoutMetricsKey: EnvironmentKey {
+    /// Fallback only — the real value is injected by `PadelPulseApp`'s
+    /// `GeometryReader` at runtime. This default fires in Xcode Previews and
+    /// any edge case where a view is rendered outside the geometry-aware root.
+    /// The reference size (iPad Pro 11" landscape, 1194×834) keeps
+    /// `scale ≈ 1.0` so preview layouts mirror the hand-tuned baseline.
+    /// Picking something device-adaptive here (e.g. UIScreen.main.bounds) is
+    /// tempting but backfires in previews, which don't run on a real screen.
     static let defaultValue = LayoutMetrics(screenWidth: 1194, screenHeight: 834)
 }
 

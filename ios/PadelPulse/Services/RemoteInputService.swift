@@ -16,11 +16,15 @@ final class RemoteInputService {
     var onUndo: (() -> Void)?
 
     private var audioSession: AVAudioSession?
+    private var silentPlayer: AVAudioPlayer?
+    private var keyboardConnectObserver: NSObjectProtocol?
+    private var interruptionObserver: NSObjectProtocol?
 
     func start() {
         setupAudioSession()
         setupRemoteCommands()
         setupGameController()
+        setupInterruptionObserver()
     }
 
     func stop() {
@@ -32,7 +36,62 @@ final class RemoteInputService {
         center.previousTrackCommand.isEnabled = false
         center.togglePlayPauseCommand.isEnabled = false
 
+        silentPlayer?.stop()
+        silentPlayer = nil
+
+        if let token = keyboardConnectObserver {
+            NotificationCenter.default.removeObserver(token)
+            keyboardConnectObserver = nil
+        }
+        if let token = interruptionObserver {
+            NotificationCenter.default.removeObserver(token)
+            interruptionObserver = nil
+        }
+
         try? AVAudioSession.sharedInstance().setActive(false)
+    }
+
+    /// Re-activates the audio session and silent loop after interruptions
+    /// (call returns, Siri, foregrounding from background).
+    func resumeSilentLoop() {
+        try? AVAudioSession.sharedInstance().setActive(true)
+        if let player = silentPlayer, !player.isPlaying {
+            player.play()
+        }
+    }
+
+    // MARK: - Audio session interruption handling
+
+    /// Siri, phone calls, and other foreground-audio apps interrupt our silent loop
+    /// without changing scenePhase. When iOS signals the interruption is over and
+    /// we should resume, reactivate the session so MPRemoteCommand events keep
+    /// flowing to us instead of whatever app grabbed the session during the call.
+    private func setupInterruptionObserver() {
+        interruptionObserver = NotificationCenter.default.addObserver(
+            forName: AVAudioSession.interruptionNotification,
+            object: AVAudioSession.sharedInstance(),
+            queue: .main
+        ) { [weak self] notification in
+            guard
+                let rawType = notification.userInfo?[AVAudioSessionInterruptionTypeKey] as? UInt,
+                let type = AVAudioSession.InterruptionType(rawValue: rawType)
+            else { return }
+
+            switch type {
+            case .began:
+                // iOS has deactivated our session. Nothing to do — resumeSilentLoop
+                // runs on .ended (and on scenePhase .active as a backstop).
+                break
+            case .ended:
+                let rawOptions = notification.userInfo?[AVAudioSessionInterruptionOptionKey] as? UInt ?? 0
+                let options = AVAudioSession.InterruptionOptions(rawValue: rawOptions)
+                if options.contains(.shouldResume) {
+                    self?.resumeSilentLoop()
+                }
+            @unknown default:
+                break
+            }
+        }
     }
 
     // MARK: - Layer 1: MPRemoteCommandCenter (Media Keys)
@@ -40,11 +99,21 @@ final class RemoteInputService {
     private func setupAudioSession() {
         do {
             let session = AVAudioSession.sharedInstance()
-            try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            try session.setCategory(.playback, mode: .default, options: [])
             try session.setActive(true)
             audioSession = session
 
-            // Set "Now Playing" info so iPadOS routes media keys to this app
+            // Silent audio loop is required for iOS to deliver MPRemoteCommand
+            // events — the app must be the active "Now Playing" source.
+            if let url = Bundle.main.url(forResource: "silence", withExtension: "m4a") {
+                let player = try AVAudioPlayer(contentsOf: url)
+                player.numberOfLoops = -1
+                player.volume = 0
+                player.prepareToPlay()
+                player.play()
+                silentPlayer = player
+            }
+
             MPNowPlayingInfoCenter.default().nowPlayingInfo = [
                 MPMediaItemPropertyTitle: "Padel Pulse",
                 MPMediaItemPropertyArtist: "Scoreboard"
@@ -59,19 +128,20 @@ final class RemoteInputService {
 
         center.nextTrackCommand.isEnabled = true
         center.nextTrackCommand.addTarget { [weak self] _ in
-            self?.onTeam1Score?()
+            // Handlers can fire on an arbitrary thread — @Observable mutations must be on main.
+            DispatchQueue.main.async { self?.onTeam1Score?() }
             return .success
         }
 
         center.previousTrackCommand.isEnabled = true
         center.previousTrackCommand.addTarget { [weak self] _ in
-            self?.onTeam2Score?()
+            DispatchQueue.main.async { self?.onTeam2Score?() }
             return .success
         }
 
         center.togglePlayPauseCommand.isEnabled = true
         center.togglePlayPauseCommand.addTarget { [weak self] _ in
-            self?.onUndo?()
+            DispatchQueue.main.async { self?.onUndo?() }
             return .success
         }
 
@@ -84,8 +154,8 @@ final class RemoteInputService {
     // MARK: - Layer 2: GCKeyboard (Hardware keyboard fallback)
 
     private func setupGameController() {
-        // Listen for keyboard connections
-        NotificationCenter.default.addObserver(
+        // Listen for keyboard connections. Store the token so stop() can unregister.
+        keyboardConnectObserver = NotificationCenter.default.addObserver(
             forName: .GCKeyboardDidConnect,
             object: nil,
             queue: .main
@@ -103,15 +173,17 @@ final class RemoteInputService {
     private func configureKeyboard(_ keyboard: GCKeyboard) {
         keyboard.keyboardInput?.keyChangedHandler = { [weak self] _, _, keyCode, pressed in
             guard pressed else { return }
-            switch keyCode {
-            case .upArrow, .keypadPlus:
-                self?.onTeam1Score?()
-            case .downArrow, .keypadHyphen:
-                self?.onTeam2Score?()
-            case .spacebar:
-                self?.onUndo?()
-            default:
-                break
+            DispatchQueue.main.async {
+                switch keyCode {
+                case .upArrow, .keypadPlus:
+                    self?.onTeam1Score?()
+                case .downArrow, .keypadHyphen:
+                    self?.onTeam2Score?()
+                case .spacebar:
+                    self?.onUndo?()
+                default:
+                    break
+                }
             }
         }
     }

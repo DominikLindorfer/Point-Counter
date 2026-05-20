@@ -88,13 +88,15 @@ The app works with cheap Bluetooth media controllers (like wrist-mounted remotes
 
 ### Button Mapping
 
-| Button | Android | iPadOS |
-|--------|---------|--------|
-| Volume Up | Team 1 scores | *(not available — OS restriction)* |
-| Volume Down | Team 2 scores | *(not available — OS restriction)* |
+Most Bluetooth media remotes send **Next / Previous Track** and **Play / Pause** — these work on both platforms:
+
+| Button | Android | iOS |
+|--------|---------|-----|
 | Next Track `>>` | Team 1 scores | Team 1 scores |
 | Previous Track `<<` | Team 2 scores | Team 2 scores |
 | Play / Pause | Undo | Undo |
+
+> **Android only:** Volume Up/Down also work as Team 1/Team 2 scoring buttons. iOS does not allow apps to intercept volume keys (OS restriction) — but this doesn't affect the media buttons above.
 
 > **Tip (Android):** If your controller sends different key codes, you can customize the mapping in `MainActivity.kt` — see the [KeyEvent docs](https://developer.android.com/reference/android/view/KeyEvent).
 

@@ -16,7 +16,10 @@ struct ConfettiView: View {
                     guard age >= 0 && age < particle.lifetime else { continue }
 
                     let progress = age / particle.lifetime
-                    let x = particle.startX + particle.driftX * sin(age * particle.wobbleFreq) * 40
+                    // startXFraction is 0...1; map to actual canvas width at render time
+                    // so confetti spans the screen on any device.
+                    let baseX = particle.startXFraction * size.width
+                    let x = baseX + particle.driftX * sin(age * particle.wobbleFreq) * 40
                     let y = particle.startY + age * particle.fallSpeed + age * age * 30 // gravity
                     let opacity = 1.0 - progress * progress
                     let rotation = Angle(degrees: age * particle.rotationSpeed)
@@ -54,7 +57,7 @@ struct ConfettiView: View {
                 Particle(
                     startTime: now + Double.random(in: 0...0.8),
                     lifetime: Double.random(in: 2.5...4.0),
-                    startX: CGFloat.random(in: 0...1200),
+                    startXFraction: CGFloat.random(in: 0...1),
                     startY: CGFloat.random(in: -80 ... -20),
                     fallSpeed: CGFloat.random(in: 80...160),
                     driftX: CGFloat.random(in: -1...1),
@@ -73,7 +76,7 @@ struct ConfettiView: View {
     struct Particle {
         let startTime: Double
         let lifetime: Double
-        let startX: CGFloat
+        let startXFraction: CGFloat  // 0...1, multiplied by canvas width at render
         let startY: CGFloat
         let fallSpeed: CGFloat
         let driftX: CGFloat

@@ -5,9 +5,34 @@ struct SettingsSidebarView: View {
     let vm: MatchViewModel
     let onClose: () -> Void
     var onShowHistory: () -> Void = {}
+    var onShowCredits: () -> Void = {}
 
     @Environment(\.layout) private var layout
-    @AppStorage("camera_overlay_enabled") private var cameraEnabled = false
+    @AppStorage(DefaultsKey.cameraOverlayEnabled) private var cameraEnabled = false
+    @AppStorage(DefaultsKey.askForServerBeforeMatch) private var askForServer = true
+    @AppStorage(LanguageService.storageKey) private var selectedLanguage = "system"
+
+    private var languageDisplayName: String {
+        switch selectedLanguage {
+        case "en": return "English"
+        case "de": return "Deutsch"
+        case "es": return "Español"
+        default: return "Auto"
+        }
+    }
+
+    private var languageBinding: Binding<String> {
+        Binding(
+            get: { selectedLanguage },
+            set: { new in
+                // Swizzle the bundle before updating @AppStorage so the .id-driven
+                // refresh on ContentView sees the new bundle on first render.
+                LanguageService.apply(languageCode: new)
+                selectedLanguage = new
+                HapticService.settingChanged()
+            }
+        )
+    }
 
     var body: some View {
         let team1Accent = vm.team1Color.contrastingTextColor
@@ -116,6 +141,17 @@ struct SettingsSidebarView: View {
 
                         Spacer().frame(height: 10)
 
+                        // Auto side-swap
+                        settingsRow(
+                            icon: "arrow.left.arrow.right.square",
+                            iconColor: vm.autoSwapMode == .off ? DimColor : GoldColor,
+                            label: "Auto Side Swap",
+                            value: vm.autoSwapMode == .off ? "OFF" : "AFTER SET",
+                            valueColor: vm.autoSwapMode == .off ? DimColor : GoldColor
+                        ) { vm.cycleAutoSwapMode() }
+
+                        Spacer().frame(height: 10)
+
                         // First serve
                         let serveName = vm.servingTeam == 1 ? vm.team1Name : vm.team2Name
                         let serveColor = vm.servingTeam == 1 ? team1Accent : team2Accent
@@ -131,75 +167,66 @@ struct SettingsSidebarView: View {
 
                         Spacer().frame(height: 10)
 
-                        // Serve side indicator toggle
-                        HStack {
-                            HStack(spacing: 12) {
-                                Image(systemName: "arrow.left.arrow.right")
-                                    .font(.system(size: layout.settingsRowIcon))
-                                    .foregroundColor(vm.showServeSide ? GoldColor : DimColor)
-                                Text("Serve Side (L/R)")
-                                    .font(.system(size: layout.settingsRowLabel))
-                                    .foregroundColor(.white)
-                            }
-                            Spacer()
-                            Toggle("", isOn: Binding(
+                        toggleRow(
+                            icon: "hand.raised.fill",
+                            label: "Ask Who Serves",
+                            isOn: Binding(
+                                get: { askForServer },
+                                set: { askForServer = $0; HapticService.settingChanged() }
+                            )
+                        )
+
+                        Spacer().frame(height: 10)
+
+                        toggleRow(
+                            icon: "arrow.left.arrow.right",
+                            label: "Serve Side (L/R)",
+                            isOn: Binding(
                                 get: { vm.showServeSide },
                                 set: { vm.showServeSide = $0; HapticService.settingChanged() }
-                            ))
-                            .labelsHidden()
-                            .tint(GoldColor)
-                        }
-                        .padding(16)
-                        .background(SettingsSurface)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                            )
+                        )
 
                         Spacer().frame(height: 10)
 
-                        // Sound effects toggle
-                        HStack {
-                            HStack(spacing: 12) {
-                                Image(systemName: SoundService.isMuted ? "speaker.slash.fill" : "speaker.wave.2.fill")
-                                    .font(.system(size: layout.settingsRowIcon))
-                                    .foregroundColor(SoundService.isMuted ? DimColor : GoldColor)
-                                Text("Sound Effects")
-                                    .font(.system(size: layout.settingsRowLabel))
-                                    .foregroundColor(.white)
-                            }
-                            Spacer()
-                            Toggle("", isOn: Binding(
+                        toggleRow(
+                            iconOn: "speaker.wave.2.fill",
+                            iconOff: "speaker.slash.fill",
+                            label: "Sound Effects",
+                            isOn: Binding(
                                 get: { !SoundService.isMuted },
                                 set: { SoundService.isMuted = !$0; HapticService.settingChanged() }
-                            ))
-                            .labelsHidden()
-                            .tint(GoldColor)
-                        }
-                        .padding(16)
-                        .background(SettingsSurface)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                            )
+                        )
 
                         Spacer().frame(height: 10)
 
-                        // Camera overlay toggle
-                        HStack {
-                            HStack(spacing: 12) {
-                                Image(systemName: cameraEnabled ? "video.fill" : "video.slash.fill")
-                                    .font(.system(size: layout.settingsRowIcon))
-                                    .foregroundColor(cameraEnabled ? GoldColor : DimColor)
-                                Text("Camera")
-                                    .font(.system(size: layout.settingsRowLabel))
-                                    .foregroundColor(.white)
-                            }
-                            Spacer()
-                            Toggle("", isOn: Binding(
+                        toggleRow(
+                            iconOn: "video.fill",
+                            iconOff: "video.slash.fill",
+                            label: "Camera",
+                            isOn: Binding(
                                 get: { cameraEnabled },
                                 set: { cameraEnabled = $0; HapticService.settingChanged() }
-                            ))
-                            .labelsHidden()
-                            .tint(GoldColor)
+                            )
+                        )
+
+                        Spacer().frame(height: 10)
+
+                        // Language switcher — Menu with Picker so users pick directly
+                        // instead of cycling through states blind.
+                        Menu {
+                            Picker(selection: languageBinding) {
+                                Text(verbatim: "Auto").tag("system")
+                                Text(verbatim: "English").tag("en")
+                                Text(verbatim: "Deutsch").tag("de")
+                                Text(verbatim: "Español").tag("es")
+                            } label: {
+                                Text("Language")
+                            }
+                        } label: {
+                            languageRowLabel
                         }
-                        .padding(16)
-                        .background(SettingsSurface)
-                        .clipShape(RoundedRectangle(cornerRadius: 12))
 
                         Spacer().frame(height: 28)
                         Divider().background(Color(white: 0.2))
@@ -222,6 +249,26 @@ struct SettingsSidebarView: View {
                             onClose()
                             onShowHistory()
                         }
+
+                        Spacer().frame(height: 10)
+
+                        // Credits
+                        HStack(spacing: 12) {
+                            Image(systemName: "heart.fill")
+                                .font(.system(size: layout.settingsRowIcon))
+                                .foregroundColor(GoldColor)
+                            Text("Credits")
+                                .font(.system(size: layout.settingsRowLabel))
+                                .foregroundColor(.white)
+                        }
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(16)
+                        .background(SettingsSurface)
+                        .clipShape(RoundedRectangle(cornerRadius: 12))
+                        .onTapGesture {
+                            onClose()
+                            onShowCredits()
+                        }
                     }
                     .padding(28)
                 }
@@ -239,6 +286,72 @@ struct SettingsSidebarView: View {
             }
         }
         .animation(.easeInOut(duration: 0.3), value: visible)
+    }
+
+    /// Settings-row styled label for the language Menu (mirrors settingsRow visually).
+    private var languageRowLabel: some View {
+        let active = selectedLanguage != "system"
+        return HStack {
+            HStack(spacing: 12) {
+                Image(systemName: "globe")
+                    .font(.system(size: layout.settingsRowIcon))
+                    .foregroundColor(active ? GoldColor : DimColor)
+                Text("Language")
+                    .font(.system(size: layout.settingsRowLabel))
+                    .foregroundColor(.white)
+            }
+            Spacer()
+            HStack(spacing: 8) {
+                Text(verbatim: languageDisplayName)
+                    .font(.system(size: layout.settingsRowValue, weight: .bold))
+                    .foregroundColor(active ? GoldColor : DimColor)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 4)
+                    .background(Color.white.opacity(0.08))
+                    .clipShape(RoundedRectangle(cornerRadius: 6))
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundColor(DimColor.opacity(0.5))
+            }
+        }
+        .padding(16)
+        .background(SettingsSurface)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
+    }
+
+    /// Single-icon toggle row (icon stays the same, color follows state).
+    private func toggleRow(
+        icon: String,
+        label: LocalizedStringKey,
+        isOn: Binding<Bool>
+    ) -> some View {
+        toggleRow(iconOn: icon, iconOff: icon, label: label, isOn: isOn)
+    }
+
+    /// Two-icon toggle row (icon swaps between on/off state).
+    private func toggleRow(
+        iconOn: String,
+        iconOff: String,
+        label: LocalizedStringKey,
+        isOn: Binding<Bool>
+    ) -> some View {
+        HStack {
+            HStack(spacing: 12) {
+                Image(systemName: isOn.wrappedValue ? iconOn : iconOff)
+                    .font(.system(size: layout.settingsRowIcon))
+                    .foregroundColor(isOn.wrappedValue ? GoldColor : DimColor)
+                Text(label)
+                    .font(.system(size: layout.settingsRowLabel))
+                    .foregroundColor(.white)
+            }
+            Spacer()
+            Toggle("", isOn: isOn)
+                .labelsHidden()
+                .tint(GoldColor)
+        }
+        .padding(16)
+        .background(SettingsSurface)
+        .clipShape(RoundedRectangle(cornerRadius: 12))
     }
 
     private func sectionHeader(_ title: String, color: Color) -> some View {

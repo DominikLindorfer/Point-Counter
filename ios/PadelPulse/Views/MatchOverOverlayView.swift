@@ -10,6 +10,7 @@ struct MatchOverOverlayView: View {
     let team2Accent: Color
 
     @Environment(\.layout) private var layout
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var trophyScale: CGFloat = 0
     @State private var trophyOffset: CGFloat = -80
     @State private var showTitle = false
@@ -31,9 +32,12 @@ struct MatchOverOverlayView: View {
                 .ignoresSafeArea()
                 .contentShape(Rectangle())
 
-            // Confetti layer
-            ConfettiView(colors: [GoldColor, winnerColor, .white, winnerColor.opacity(0.7)])
-                .ignoresSafeArea()
+            // Confetti layer — suppress entirely under Reduce Motion. The confetti
+            // uses continuous motion that can trigger vestibular discomfort.
+            if !reduceMotion {
+                ConfettiView(colors: [GoldColor, winnerColor, .white, winnerColor.opacity(0.7)])
+                    .ignoresSafeArea()
+            }
 
             VStack(spacing: 0) {
                 Image(systemName: "trophy.fill")
@@ -85,14 +89,7 @@ struct MatchOverOverlayView: View {
 
                 HStack(spacing: 16) {
                     Button {
-                        let match = SavedMatch(
-                            id: 0, timestamp: Int64(Date().timeIntervalSince1970 * 1000),
-                            team1Name: vm.team1Name, team2Name: vm.team2Name,
-                            team1Sets: state.team1Sets, team2Sets: state.team2Sets,
-                            team1Games: state.team1Games, team2Games: state.team2Games,
-                            winner: state.winner, durationMs: 0, goldenPoint: vm.goldenPoint,
-                            team1PointsWon: vm.team1PointsWon, team2PointsWon: vm.team2PointsWon
-                        )
+                        let match = vm.currentMatchSnapshot()
                         if let image = ShareImageRenderer.render(match: match) {
                             shareImage = image
                             showShareSheet = true
@@ -139,6 +136,20 @@ struct MatchOverOverlayView: View {
             }
         }
         .onAppear {
+            if reduceMotion {
+                // No motion: show everything instantly, skip the glow pulse, keep
+                // the trophy static at its final position. VoiceOver users and
+                // anyone with the accessibility setting on still get the full
+                // layout — they just don't get swept through it.
+                trophyScale = 1.0
+                trophyOffset = 0
+                showTitle = true
+                showWinner = true
+                showScores = true
+                showButtons = true
+                glowOpacity = 0.8
+                return
+            }
             // Trophy: fly in from above + spring scale
             withAnimation(.spring(response: 0.6, dampingFraction: 0.6)) {
                 trophyScale = 1.0

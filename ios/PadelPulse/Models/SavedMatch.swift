@@ -2,6 +2,10 @@ import Foundation
 
 /// A saved match record.
 struct SavedMatch: Codable, Identifiable {
+    /// Schema version for this record. Optional so legacy saves written before
+    /// this field existed decode as v1. Bump + add a migration in MatchStorage
+    /// when changing the shape of persisted fields.
+    var schemaVersion: Int? = 1
     var id: Int64
     let timestamp: Int64          // milliseconds since epoch
     let team1Name: String
@@ -16,12 +20,13 @@ struct SavedMatch: Codable, Identifiable {
     let team1PointsWon: Int
     let team2PointsWon: Int
 
-    /// Formatted date string for display.
+    /// Formatted date string for display — uses the user's current locale so
+    /// DE/ES see native ordering and separators (e.g. "21.04.2026, 14:32"
+    /// vs "Apr 21, 2026 at 2:32 PM"). `.formatted(date:time:)` builds its own
+    /// cached formatter per locale so we don't need a static one.
     var formattedDate: String {
         let date = Date(timeIntervalSince1970: Double(timestamp) / 1000.0)
-        let formatter = DateFormatter()
-        formatter.dateFormat = "MMM dd, yyyy  HH:mm"
-        return formatter.string(from: date)
+        return date.formatted(date: .abbreviated, time: .shortened)
     }
 
     /// Duration as formatted string (M:SS).

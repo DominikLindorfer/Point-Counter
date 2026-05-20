@@ -2,14 +2,33 @@ import Foundation
 import Observation
 import SwiftUI
 
-/// Codable replacement for (Int, Int) tuples in undo history.
-struct PointsPair: Codable, Equatable {
-    let team1: Int
-    let team2: Int
+/// Snapshot of all state needed to undo a single point.
+/// Captured *before* the point is applied so a pop fully restores prior state,
+/// including timer fields (so undoing the very first point resets the timer).
+struct UndoSnapshot: Codable, Equatable {
+    let state: MatchState
+    let servingTeam: Int
+    let team1PointsWon: Int
+    let team2PointsWon: Int
+    let matchStartTimeMs: Int64
+    let matchRunning: Bool
+    let pausedElapsedMs: Int64
+    // Optional for backwards-compat with snapshots persisted before sidesSwapped was tracked.
+    let sidesSwapped: Bool?
+}
+
+/// Auto side-swap behaviour. Remote buttons stay team-fixed; only the display rotates.
+enum AutoSwapMode: String, Codable {
+    case off
+    case afterSet
 }
 
 /// All state needed to restore an in-progress match.
 struct PersistedMatchState: Codable {
+    /// Schema version for this snapshot. Optional so legacy saves written before
+    /// this field existed decode as v1. Bump + add a migration when changing
+    /// the shape of persisted fields.
+    var schemaVersion: Int? = 1
     let state: MatchState
     let goldenPoint: Bool
     let sidesSwapped: Bool
@@ -25,9 +44,8 @@ struct PersistedMatchState: Codable {
     let team1PointsWon: Int
     let team2PointsWon: Int
     let pausedElapsedMs: Int64
-    let history: [MatchState]
-    let servingHistory: [Int]
-    let pointsHistory: [PointsPair]
+    let undoStack: [UndoSnapshot]
+    let autoSwapMode: AutoSwapMode?
 }
 
 private let funTeamNames = [
@@ -48,7 +66,7 @@ private let funTeamNames = [
 final class MatchViewModel {
     // Public state
     var state = MatchState()
-    var goldenPoint = false
+    var goldenPoint = true
     var sidesSwapped = false
     var setsToWin = 2
     var team1Name: String
@@ -56,22 +74,30 @@ final class MatchViewModel {
     var team1Color: Color = defaultTeam1Color
     var team2Color: Color = defaultTeam2Color
     var servingTeam = 1
+    /// True when a fresh match is waiting for the user to pick who serves first.
+    /// While true, the ServePickOverlay is visible and the remote/tap handlers
+    /// route team presses into `pickServingTeam` instead of scoring a point.
+    var needsServePick = false
     var showServeSide = true
     var matchStartTimeMs: Int64 = 0
     var matchRunning = false
     var team1PointsWon = 0
     var team2PointsWon = 0
     var matchHistory: [SavedMatch] = []
+    var autoSwapMode: AutoSwapMode {
+        didSet { UserDefaults.standard.set(autoSwapMode.rawValue, forKey: DefaultsKey.autoSwapMode) }
+    }
 
-    // Undo stacks — not observed by views
-    @ObservationIgnored private var history: [MatchState] = []
-    @ObservationIgnored private var servingHistory: [Int] = []
-    @ObservationIgnored private var pointsHistory: [PointsPair] = []
+    // Undo stack — mutations are mirrored into `undoCount` so SwiftUI can observe canUndo.
+    @ObservationIgnored private var undoStack: [UndoSnapshot] = [] {
+        didSet { undoCount = undoStack.count }
+    }
     @ObservationIgnored private var pausedElapsedMs: Int64 = 0
 
+    private(set) var undoCount = 0
     private let storage: MatchStorage
 
-    var canUndo: Bool { !history.isEmpty }
+    var canUndo: Bool { undoCount > 0 }
 
     init(storage: MatchStorage) {
         self.storage = storage
@@ -79,41 +105,78 @@ final class MatchViewModel {
         self.team1Name = names.0
         self.team2Name = names.1
         self.matchHistory = storage.loadAll()
+        let raw = UserDefaults.standard.string(forKey: DefaultsKey.autoSwapMode) ?? AutoSwapMode.afterSet.rawValue
+        self.autoSwapMode = AutoSwapMode(rawValue: raw) ?? .afterSet
+        self.needsServePick = Self.shouldAskForServer()
+    }
+
+    /// Default `askForServerBeforeMatch` to true when the key has never been written.
+    /// `UserDefaults.bool(forKey:)` alone returns false for missing keys, which would
+    /// silently disable the overlay for every existing install on first launch after upgrade.
+    private static func shouldAskForServer() -> Bool {
+        let defaults = UserDefaults.standard
+        if defaults.object(forKey: DefaultsKey.askForServerBeforeMatch) == nil { return true }
+        return defaults.bool(forKey: DefaultsKey.askForServerBeforeMatch)
     }
 
     private static func randomTeamNames() -> (String, String) {
-        var shuffled = funTeamNames.shuffled()
+        guard funTeamNames.count >= 2 else { return ("TEAM 1", "TEAM 2") }
+        let shuffled = funTeamNames.shuffled()
         return (shuffled[0], shuffled[1])
     }
 
     func scorePoint(team: Int) {
         if state.isMatchOver { return }
+
+        // Snapshot full pre-point state so undo can restore everything,
+        // including timer fields (so undo of the very first point resets the timer).
+        undoStack.append(UndoSnapshot(
+            state: state,
+            servingTeam: servingTeam,
+            team1PointsWon: team1PointsWon,
+            team2PointsWon: team2PointsWon,
+            matchStartTimeMs: matchStartTimeMs,
+            matchRunning: matchRunning,
+            pausedElapsedMs: pausedElapsedMs,
+            sidesSwapped: sidesSwapped
+        ))
+
         if !matchRunning {
             matchStartTimeMs = Int64(Date().timeIntervalSince1970 * 1000)
             matchRunning = true
         }
 
-        // Push current state to undo stacks
-        history.append(state)
-        servingHistory.append(servingTeam)
-        pointsHistory.append(PointsPair(team1: team1PointsWon, team2: team2PointsWon))
-
         if team == 1 { team1PointsWon += 1 } else { team2PointsWon += 1 }
 
+        let wasInTiebreak = state.isTiebreak
         let oldGames = state.team1Games[state.currentSet] + state.team2Games[state.currentSet]
+        let oldCurrentSet = state.currentSet
         state = PadelScoring.scorePoint(state: state, team: team, goldenPoint: goldenPoint, setsToWin: setsToWin)
 
-        let newGames: Int
-        if !state.isMatchOver {
-            newGames = state.team1Games[state.currentSet] + state.team2Games[state.currentSet]
+        let gameJustWon: Bool
+        if state.isMatchOver {
+            gameJustWon = true
         } else {
-            newGames = oldGames + 1
+            let newGames = state.team1Games[state.currentSet] + state.team2Games[state.currentSet]
+            gameJustWon = newGames != oldGames
         }
-        if newGames != oldGames {
+
+        if gameJustWon {
             servingTeam = servingTeam == 1 ? 2 : 1
             HapticService.gameWon()
             SoundService.playGameWon()
+            if !state.isMatchOver, autoSwapMode == .afterSet, state.currentSet > oldCurrentSet {
+                sidesSwapped.toggle()
+            }
         } else {
+            // Inside a tiebreak the server alternates after the 1st point and
+            // then every two points (per ITF rule): switch on odd point totals.
+            if wasInTiebreak {
+                let totalTBPoints = state.team1Points + state.team2Points
+                if totalTBPoints.isMultiple(of: 2) == false {
+                    servingTeam = servingTeam == 1 ? 2 : 1
+                }
+            }
             HapticService.scorePoint()
             SoundService.playPointScored()
         }
@@ -128,6 +191,13 @@ final class MatchViewModel {
     func toggleGoldenPoint() { goldenPoint.toggle() }
     func swapSides() { sidesSwapped.toggle() }
 
+    func cycleAutoSwapMode() {
+        switch autoSwapMode {
+        case .off: autoSwapMode = .afterSet
+        case .afterSet: autoSwapMode = .off
+        }
+    }
+
     func cycleSetsToWin() {
         switch setsToWin {
         case 0: setsToWin = 1
@@ -141,26 +211,42 @@ final class MatchViewModel {
     func updateTeam2Name(_ name: String) { team2Name = name }
     func updateTeam1Color(_ color: Color) { team1Color = color }
     func updateTeam2Color(_ color: Color) { team2Color = color }
-    func updateServingTeam(_ team: Int) { servingTeam = team }
+    func updateServingTeam(_ team: Int) {
+        servingTeam = team
+        // An explicit pick from settings also resolves the pre-match prompt.
+        needsServePick = false
+    }
+
+    /// Pre-match server pick — sets the serving team without scoring a point
+    /// and dismisses the serve-pick overlay. Used by the overlay's tap and by
+    /// the remote/keyboard handlers while `needsServePick` is true.
+    func pickServingTeam(_ team: Int) {
+        servingTeam = team
+        needsServePick = false
+        HapticService.settingChanged()
+    }
+
+    /// Dismiss the pre-match serve-pick overlay without changing `servingTeam`
+    /// (keeps whatever default/last-set value was there).
+    func dismissServePick() {
+        needsServePick = false
+    }
 
     func undo() {
-        guard !history.isEmpty else { return }
+        guard let snap = undoStack.popLast() else { return }
         HapticService.undo()
-        state = history.removeLast()
-        if !servingHistory.isEmpty {
-            servingTeam = servingHistory.removeLast()
-        }
-        if !pointsHistory.isEmpty {
-            let pair = pointsHistory.removeLast()
-            team1PointsWon = pair.team1
-            team2PointsWon = pair.team2
-        }
+        state = snap.state
+        servingTeam = snap.servingTeam
+        team1PointsWon = snap.team1PointsWon
+        team2PointsWon = snap.team2PointsWon
+        matchStartTimeMs = snap.matchStartTimeMs
+        matchRunning = snap.matchRunning
+        pausedElapsedMs = snap.pausedElapsedMs
+        if let swapped = snap.sidesSwapped { sidesSwapped = swapped }
     }
 
     func resetMatch() {
-        history.removeAll()
-        servingHistory.removeAll()
-        pointsHistory.removeAll()
+        undoStack.removeAll()
         state = MatchState()
         servingTeam = 1
         matchStartTimeMs = 0
@@ -168,20 +254,19 @@ final class MatchViewModel {
         team1PointsWon = 0
         team2PointsWon = 0
         pausedElapsedMs = 0
-        let names = Self.randomTeamNames()
-        team1Name = names.0
-        team2Name = names.1
+        needsServePick = Self.shouldAskForServer()
         clearInProgressMatch()
     }
 
-    private func saveMatch() {
-        let duration = matchStartTimeMs > 0
-            ? Int64(Date().timeIntervalSince1970 * 1000) - matchStartTimeMs
-            : 0
-
-        let match = SavedMatch(
+    /// Build a SavedMatch from the current view-model state. Shared between
+    /// `saveMatch()` (auto-persist on match over) and the overlay's share action.
+    /// If `durationMs` is nil, derives it from `matchStartTimeMs`.
+    func currentMatchSnapshot(durationMs: Int64? = nil) -> SavedMatch {
+        let now = Int64(Date().timeIntervalSince1970 * 1000)
+        let derivedDuration = matchStartTimeMs > 0 ? now - matchStartTimeMs : 0
+        return SavedMatch(
             id: 0,
-            timestamp: Int64(Date().timeIntervalSince1970 * 1000),
+            timestamp: now,
             team1Name: team1Name,
             team2Name: team2Name,
             team1Sets: state.team1Sets,
@@ -189,12 +274,15 @@ final class MatchViewModel {
             team1Games: state.team1Games,
             team2Games: state.team2Games,
             winner: state.winner,
-            durationMs: duration,
+            durationMs: durationMs ?? derivedDuration,
             goldenPoint: goldenPoint,
             team1PointsWon: team1PointsWon,
             team2PointsWon: team2PointsWon
         )
-        _ = storage.save(match)
+    }
+
+    private func saveMatch() {
+        _ = storage.save(currentMatchSnapshot())
         matchHistory = storage.loadAll()
         clearInProgressMatch()
     }
@@ -211,11 +299,9 @@ final class MatchViewModel {
 
     // MARK: - Match State Persistence
 
-    private static let inProgressKey = "in_progress_match"
-
     func saveInProgressMatch() {
         // Only save if there's an active match worth restoring
-        guard matchRunning || !history.isEmpty || state.team1Points > 0 || state.team2Points > 0 else {
+        guard matchRunning || !undoStack.isEmpty || state.team1Points > 0 || state.team2Points > 0 else {
             clearInProgressMatch()
             return
         }
@@ -237,19 +323,27 @@ final class MatchViewModel {
             team1PointsWon: team1PointsWon,
             team2PointsWon: team2PointsWon,
             pausedElapsedMs: pausedElapsedMs,
-            history: history,
-            servingHistory: servingHistory,
-            pointsHistory: pointsHistory
+            undoStack: undoStack,
+            autoSwapMode: autoSwapMode
         )
 
         if let data = try? JSONEncoder().encode(persisted) {
-            UserDefaults.standard.set(data, forKey: Self.inProgressKey)
+            UserDefaults.standard.set(data, forKey: DefaultsKey.inProgressMatch)
         }
     }
 
     func restoreInProgressMatch() {
-        guard let data = UserDefaults.standard.data(forKey: Self.inProgressKey),
-              let persisted = try? JSONDecoder().decode(PersistedMatchState.self, from: data) else {
+        guard let data = UserDefaults.standard.data(forKey: DefaultsKey.inProgressMatch) else {
+            return
+        }
+        let persisted: PersistedMatchState
+        do {
+            persisted = try JSONDecoder().decode(PersistedMatchState.self, from: data)
+        } catch {
+            // Quarantine so the corrupt snapshot isn't lost silently, then clear
+            // the key so the next launch starts clean instead of re-trying forever.
+            MatchStorage.quarantine(data: data, label: "in_progress_match", error: error)
+            UserDefaults.standard.removeObject(forKey: DefaultsKey.inProgressMatch)
             return
         }
 
@@ -262,32 +356,33 @@ final class MatchViewModel {
         team1Color = Color(rgb: persisted.team1ColorRGB)
         team2Color = Color(rgb: persisted.team2ColorRGB)
         servingTeam = persisted.servingTeam
+        // A restored match has at least one scored point (per the save-guard in
+        // saveInProgressMatch), so the server is already decided — skip the overlay.
+        needsServePick = false
         showServeSide = persisted.showServeSide
         team1PointsWon = persisted.team1PointsWon
         team2PointsWon = persisted.team2PointsWon
-        history = persisted.history
-        servingHistory = persisted.servingHistory
-        pointsHistory = persisted.pointsHistory
+        undoStack = persisted.undoStack
+        if let restored = persisted.autoSwapMode { autoSwapMode = restored }
 
-        // Restore timer state
+        // Restore timer state. Always land in "paused" — PadelPulseApp's scenePhase .active
+        // handler calls resumeTimer(), which recomputes matchStartTimeMs from now - pausedElapsedMs.
+        matchStartTimeMs = persisted.matchStartTimeMs
+        matchRunning = false
         if persisted.matchRunning {
-            // Recalculate start time from elapsed
+            // Legacy saves (before .inactive pauseTimer) may have recorded a live startTime.
+            // Treat wall-clock delta as elapsed — fresh installs with the pause-first fix won't hit this.
             let elapsed = Int64(Date().timeIntervalSince1970 * 1000) - persisted.matchStartTimeMs
-            let wasElapsed = persisted.pausedElapsedMs > 0 ? persisted.pausedElapsedMs : elapsed
-            pausedElapsedMs = wasElapsed
-            // Resume as paused — PadelPulseApp's scenePhase .active will call resumeTimer()
-            matchRunning = false
+            pausedElapsedMs = persisted.pausedElapsedMs > 0 ? persisted.pausedElapsedMs : elapsed
         } else {
             pausedElapsedMs = persisted.pausedElapsedMs
-            matchStartTimeMs = persisted.matchStartTimeMs
-            matchRunning = false
         }
 
         clearInProgressMatch()
     }
 
     func clearInProgressMatch() {
-        UserDefaults.standard.removeObject(forKey: Self.inProgressKey)
+        UserDefaults.standard.removeObject(forKey: DefaultsKey.inProgressMatch)
     }
 
     func pauseTimer() {
@@ -297,7 +392,10 @@ final class MatchViewModel {
     }
 
     func resumeTimer() {
-        guard pausedElapsedMs > 0 else { return }
+        // Resume only if there's a paused match to resume. Previously this gated on
+        // pausedElapsedMs > 0, which missed sub-millisecond pauses and restored
+        // sessions where the elapsed value happened to round to 0.
+        guard !matchRunning, matchStartTimeMs > 0 else { return }
         matchStartTimeMs = Int64(Date().timeIntervalSince1970 * 1000) - pausedElapsedMs
         matchRunning = true
         pausedElapsedMs = 0

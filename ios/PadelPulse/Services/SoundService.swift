@@ -4,8 +4,8 @@ import Foundation
 /// Lightweight sound effects using system sounds. No bundled audio files needed.
 enum SoundService {
     static var isMuted: Bool {
-        get { UserDefaults.standard.bool(forKey: "sound_muted") }
-        set { UserDefaults.standard.set(newValue, forKey: "sound_muted") }
+        get { UserDefaults.standard.bool(forKey: DefaultsKey.soundMuted) }
+        set { UserDefaults.standard.set(newValue, forKey: DefaultsKey.soundMuted) }
     }
 
     static func playPointScored() {

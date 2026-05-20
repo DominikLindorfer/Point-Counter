@@ -2,7 +2,11 @@
 "UNDO" = "UNDO";
 "SWAP" = "SWAP";
 "NEW MATCH" = "NEW MATCH";
+"Undo" = "Undo";
+"Swap sides" = "Swap sides";
+"New match" = "New match";
 "TIEBREAK" = "TIEBREAK";
+"TB" = "TB";
 "Start New Match?" = "Start New Match?";
 "New Match" = "New Match";
 "Cancel" = "Cancel";
@@ -23,12 +27,27 @@
 "ADVANTAGE" = "ADVANTAGE";
 "Sets to Win" = "Sets to Win";
 "NO LIMIT" = "NO LIMIT";
+"Auto Side Swap" = "Auto Side Swap";
+"OFF" = "OFF";
+"AFTER SET" = "AFTER SET";
 "Serving" = "Serving";
+"SERVING" = "SERVING";
 "Serve Side (L/R)" = "Serve Side (L/R)";
 "Sound Effects" = "Sound Effects";
 "Camera" = "Camera";
+"Language" = "Language";
+"Auto" = "Auto";
 "Match History" = "Match History";
+"Credits" = "Credits";
 "Double tap to change" = "Double tap to change";
+
+/* CreditsView */
+"CREDITS" = "CREDITS";
+"Based on" = "Based on";
+"Point-Counter by Dominik Lindorfer" = "Point-Counter by Dominik Lindorfer";
+"Padel racket icon" = "Padel racket icon";
+"\"padel\" by Rusma Ratri Handini from Noun Project (CC BY 3.0)" = "\"padel\" by Rusma Ratri Handini from Noun Project (CC BY 3.0)";
+"Made with love for padel." = "Made with love for padel.";
 
 /* TeamPanelView */
 "GAMES" = "GAMES";
@@ -66,6 +85,10 @@
 "Serve from the right side" = "Serve from the right side";
 "Serve from the left side" = "Serve from the left side";
 
+/* TeamPanelView serve glyph (court-side L/R letter next to the racket). Localized so Spanish reads as I/D (Izquierda/Derecha). */
+"L" = "L";
+"R" = "R";
+
 /* MatchTimerView */
 "Match timer, %lld minutes %lld seconds" = "Match timer, %lld minutes %lld seconds";
 
@@ -76,6 +99,14 @@
 "Tap the gear icon for settings" = "Tap the gear icon for settings";
 "Tap SWAP to switch court sides" = "Tap SWAP to switch court sides";
 "GOT IT" = "GOT IT";
+
+/* ServePickOverlayView (SWAP + Swap sides reused from ScoreBoardView section above) */
+"WHO SERVES FIRST?" = "WHO SERVES FIRST?";
+"Tap a team or press a remote button · Play/Pause flips sides" = "Tap a team or press a remote button · Play/Pause flips sides";
+"SKIP" = "SKIP";
+"Skip serve pick" = "Skip serve pick";
+"%@, serve first" = "%@, serve first";
+"Ask Who Serves" = "Ask Who Serves";
 
 /* NameFieldView */
 "Max 16 characters" = "Max 16 characters";

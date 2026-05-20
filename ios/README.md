@@ -14,6 +14,10 @@ Native iOS scoreboard for padel & tennis. Universal app for iPhone and iPad, lan
 </p>
 
 <p align="center">
+  <img src="docs/serve-pick-overlay.png" alt="Padel Pulse — pre-match serve pick + side swap" width="720" />
+</p>
+
+<p align="center">
   <img src="docs/settings-panel.png" alt="Padel Pulse — settings panel" width="720" />
 </p>
 
@@ -27,6 +31,34 @@ open PadelPulse.xcodeproj            # Build & run in Xcode 16+ for iPad
 ```
 
 Requires iOS 17.0+. Universal app (iPhone + iPad), landscape-only. Camera features require a real device.
+
+### On-device install (USB)
+
+Signing is pinned in `project.yml` (`DEVELOPMENT_TEAM` + `CODE_SIGN_STYLE: Automatic`), so xcodegen regenerations don't wipe it.
+
+**One-command redeploy** (auto-detects the paired iPad, regenerates, builds, installs, launches):
+
+```bash
+./ios/scripts/deploy.sh
+# or, once symlinked to ~/bin/padelpulse-deploy:
+padelpulse-deploy
+```
+
+Needed on a free-tier developer account because app signatures expire every 7 days — just plug the iPad in, unlock it, run the script. `~2 min` end-to-end.
+
+Manual equivalent (if the script breaks or for a different device):
+
+```bash
+# With iPad connected via USB and unlocked, find its ID:
+xcrun devicectl list devices
+
+# Build + install + launch (replace <DEVICE_ID>):
+xcodebuild -project PadelPulse.xcodeproj -scheme PadelPulse \
+  -destination 'id=<DEVICE_ID>' -configuration Debug -allowProvisioningUpdates build
+xcrun devicectl device install app --device <DEVICE_ID> \
+  ~/Library/Developer/Xcode/DerivedData/PadelPulse-*/Build/Products/Debug-iphoneos/PadelPulse.app
+xcrun devicectl device process launch --device <DEVICE_ID> com.padelpulse.app
+```
 
 ## Features
 
@@ -42,7 +74,7 @@ Requires iOS 17.0+. Universal app (iPhone + iPad), landscape-only. Camera featur
 - **Giant score display** — readable from across the court
 - **Team customization** — custom names + 8 color presets (Navy, Crimson, Forest, Purple, Teal, Amber, Graphite, Rose)
 - **Fun random team names** — 30 padel-themed names on each new match
-- **Serve indicator** — L/R side with pulse animation, auto-rotates each game
+- **Serve indicator** — big gold **L/R letter + racket icon** paired in the court-side corner of the serving panel, plus a pulsing gold border around the whole panel (readable from across the court)
 - **Compact set scores** — completed sets as pills in the top-right corner
 - **Match timer** — elapsed time from first point
 - **Swap sides** — mirror teams when switching court ends
@@ -54,15 +86,17 @@ Requires iOS 17.0+. Universal app (iPhone + iPad), landscape-only. Camera featur
 - **Animated match-over** — confetti particles, staggered entrance, winner glow, trophy fly-in
 - **Share as image** — rendered 600x315 score card via `ImageRenderer`
 - **Onboarding overlay** — first-launch hints, dismissed permanently
+- **Serve-pick overlay** — before every fresh match, tap a team tile or press its Bluetooth-remote button to set the first server from the court (toggleable in settings)
 - **Camera overlay** — optional PiP camera (opt-in via settings)
 
 ### Input
 - **Touch** — tap left/right panel to score
-- **Bluetooth remote** — Next/Prev Track for scoring, Play/Pause for undo
-- **iPad keyboard** — Cmd+Z (undo), Cmd+N (new match), Cmd+S (swap), Cmd+, (settings), Arrow keys + Space via GCKeyboard
+- **Bluetooth remote** — Next/Prev Track for scoring, Play/Pause for undo. While the serve-pick overlay is up, the team buttons pick the first server and Play/Pause flips sides (match the iPad's left/right to reality) — full pre-match setup without walking back to the iPad.
+- **iPad keyboard** — Cmd+Z (undo), Cmd+N (new match), Cmd+Shift+S (swap), Cmd+, (settings), Arrow keys + Space via GCKeyboard
 
 ### Localization
 - English, German, Spanish (~95 strings each)
+- Runtime language switcher — Auto / EN / DE / ES via Menu in settings, no app restart
 
 ## Architecture
 
@@ -78,26 +112,31 @@ PadelPulse/
 ├── Views/
 │   ├── ScoreBoardView.swift              # Root view — panels, toolbar, set pills, overlays
 │   ├── TeamPanelView.swift               # Team half — giant score, GAMES box, team name
-│   ├── SettingsSidebarView.swift         # Slide-in settings — pill badges, chevrons, toggles
+│   ├── SettingsSidebarView.swift         # Slide-in settings — pill badges, toggles, language Menu
 │   ├── MatchHistoryView.swift            # History cards + share (text & image)
 │   ├── MatchOverOverlayView.swift        # Confetti, staggered entrance, winner glow, share
 │   ├── OnboardingOverlayView.swift       # First-launch hints
+│   ├── ServePickOverlayView.swift        # Pre-match "who serves first?" picker (remote-aware)
 │   ├── CameraOverlayView.swift           # AVFoundation camera + recording
-│   ├── MatchTimerView.swift              # Timer pill
-│   ├── ServeSideIndicatorView.swift      # L/R serve indicator with pulse
+│   ├── MatchTimerView.swift              # Match timer pill
+│   ├── WallClockView.swift               # Current time-of-day pill (HH:mm)
+│   ├── CreditsView.swift                 # Upstream repo + icon attribution
 │   └── Components/
-│       ├── ColorSwatchPicker.swift       # 8-color inline preset picker
+│       ├── ColorSwatchPicker.swift       # 8-color inline preset picker (cached RGB)
 │       ├── ConfettiView.swift            # Canvas + TimelineView particle animation
 │       ├── MatchScoreCardView.swift      # 600x315 share card
 │       ├── NameFieldView.swift           # Team name text field
+│       ├── PadelRacketView.swift         # SVG asset, template-tinted to gold (paired with L/R glyph)
 │       └── SetScorePill.swift            # Set score display pill
 ├── Services/
-│   ├── CameraService.swift               # AVCaptureSession management
-│   ├── RemoteInputService.swift          # MPRemoteCommandCenter + GCKeyboard
+│   ├── CameraService.swift               # AVCaptureSession management (serial session queue)
+│   ├── LanguageService.swift             # Runtime locale override (bundle swizzle + Environment locale)
+│   ├── RemoteInputService.swift          # MPRemoteCommandCenter + GCKeyboard (main-thread hops)
 │   └── SoundService.swift                # AudioServicesPlaySystemSound + mute toggle
 ├── Utilities/
 │   ├── Constants.swift                   # Colors + LayoutMetrics (50+ scaled properties)
-│   ├── HapticService.swift               # UIImpactFeedbackGenerator wrappers
+│   ├── DefaultsKeys.swift                # Central registry of every UserDefaults key
+│   ├── HapticService.swift               # UIImpactFeedbackGenerator wrappers (+ prepareAll)
 │   └── ShareImageRenderer.swift          # ImageRenderer → UIImage
 └── Resources/
     ├── Assets.xcassets/                  # AppIcon, LaunchLogo, DarkBg, GoldColor
@@ -110,26 +149,25 @@ PadelPulse/
 
 ```
 +----------------------------+----------------------------+
-| [<-][<>][cam][new]         |            01:23  [gear]   |
+| [<-][<>][cam][new]         |     14:32  01:23  [gear]   |
 |                            |             S1 6:0  S2 4:3 |
 |                            |                            |
 |   +-------+                |                +-------+   |
 |   | GAMES |                |                | GAMES |   |
 |   |   3   |                |                |   2   |   |
 |   +-------+                |                +-------+   |
-|                            |                            |
+|        CHIQUITAS           |       COURT JESTERS        |
 |            30              |              15            |
 |                            |                            |
-|       CHIQUITAS            |        COURT JESTERS       |
+|  L🏸                       |                            |
 +----------------------------+----------------------------+
-|               <-  RIGHT  ->                             |
-+----------------------------+----------------------------+
+     ↑ gold pulsing border around the serving panel
 ```
 
 - **Top-left:** icon-only toolbar (Undo, Swap, Camera*, New Match) — 44x44pt touch targets
-- **Top-right:** Timer + Settings (same row), completed set pills below
-- **Center:** two team panels with giant score, GAMES box at inner corner
-- **Bottom:** team names, serve side indicator
+- **Top-right:** Wall clock + Match timer + Settings (same row), completed set pills below
+- **Center:** two team panels — team name above giant score, GAMES box at inner corner
+- **Serve side:** big gold **L/R letter + racket icon** paired in the court-side corner of the serving panel (L = deuce-side / left, R = ad-side / right; Spanish renders as **I/D** — Izquierda/Derecha), plus a pulsing gold border with rounded outer corners around the whole serving panel. Reduce Motion mutes the pulse.
 
 *Camera button only visible when enabled in settings.
 
