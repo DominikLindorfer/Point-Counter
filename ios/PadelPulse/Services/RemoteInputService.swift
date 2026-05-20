@@ -1,0 +1,118 @@
+import AVFoundation
+import MediaPlayer
+import GameController
+
+/// Captures Bluetooth media remote and keyboard input for courtside scoring.
+///
+/// Layer 1: MPRemoteCommandCenter — handles Next/Previous/PlayPause from media remotes
+/// Layer 2: GCKeyboard — handles hardware keyboard input as fallback
+///
+/// Note: Volume keys CANNOT be intercepted on iPadOS (OS restriction).
+/// The Android app maps Volume Up/Down to scoring, but on iPadOS only
+/// media keys (Next Track, Previous Track, Play/Pause) are available.
+final class RemoteInputService {
+    var onTeam1Score: (() -> Void)?
+    var onTeam2Score: (() -> Void)?
+    var onUndo: (() -> Void)?
+
+    private var audioSession: AVAudioSession?
+
+    func start() {
+        setupAudioSession()
+        setupRemoteCommands()
+        setupGameController()
+    }
+
+    func stop() {
+        let center = MPRemoteCommandCenter.shared()
+        center.nextTrackCommand.removeTarget(nil)
+        center.previousTrackCommand.removeTarget(nil)
+        center.togglePlayPauseCommand.removeTarget(nil)
+        center.nextTrackCommand.isEnabled = false
+        center.previousTrackCommand.isEnabled = false
+        center.togglePlayPauseCommand.isEnabled = false
+
+        try? AVAudioSession.sharedInstance().setActive(false)
+    }
+
+    // MARK: - Layer 1: MPRemoteCommandCenter (Media Keys)
+
+    private func setupAudioSession() {
+        do {
+            let session = AVAudioSession.sharedInstance()
+            try session.setCategory(.playback, mode: .default, options: [.mixWithOthers])
+            try session.setActive(true)
+            audioSession = session
+
+            // Set "Now Playing" info so iPadOS routes media keys to this app
+            MPNowPlayingInfoCenter.default().nowPlayingInfo = [
+                MPMediaItemPropertyTitle: "Padel Pulse",
+                MPMediaItemPropertyArtist: "Scoreboard"
+            ]
+        } catch {
+            print("RemoteInputService: Audio session setup failed: \(error)")
+        }
+    }
+
+    private func setupRemoteCommands() {
+        let center = MPRemoteCommandCenter.shared()
+
+        center.nextTrackCommand.isEnabled = true
+        center.nextTrackCommand.addTarget { [weak self] _ in
+            self?.onTeam1Score?()
+            return .success
+        }
+
+        center.previousTrackCommand.isEnabled = true
+        center.previousTrackCommand.addTarget { [weak self] _ in
+            self?.onTeam2Score?()
+            return .success
+        }
+
+        center.togglePlayPauseCommand.isEnabled = true
+        center.togglePlayPauseCommand.addTarget { [weak self] _ in
+            self?.onUndo?()
+            return .success
+        }
+
+        // Disable other commands so they don't interfere
+        center.playCommand.isEnabled = false
+        center.pauseCommand.isEnabled = false
+        center.stopCommand.isEnabled = false
+    }
+
+    // MARK: - Layer 2: GCKeyboard (Hardware keyboard fallback)
+
+    private func setupGameController() {
+        // Listen for keyboard connections
+        NotificationCenter.default.addObserver(
+            forName: .GCKeyboardDidConnect,
+            object: nil,
+            queue: .main
+        ) { [weak self] notification in
+            guard let keyboard = notification.object as? GCKeyboard else { return }
+            self?.configureKeyboard(keyboard)
+        }
+
+        // Configure already-connected keyboard
+        if let keyboard = GCKeyboard.coalesced {
+            configureKeyboard(keyboard)
+        }
+    }
+
+    private func configureKeyboard(_ keyboard: GCKeyboard) {
+        keyboard.keyboardInput?.keyChangedHandler = { [weak self] _, _, keyCode, pressed in
+            guard pressed else { return }
+            switch keyCode {
+            case .upArrow, .keypadPlus:
+                self?.onTeam1Score?()
+            case .downArrow, .keypadHyphen:
+                self?.onTeam2Score?()
+            case .spacebar:
+                self?.onUndo?()
+            default:
+                break
+            }
+        }
+    }
+}

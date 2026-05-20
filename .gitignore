@@ -22,3 +22,12 @@ local.properties
 .env
 playstorekey
 /Screenshots
+
+# Xcode / iOS
+ios/PadelPulse.xcodeproj/xcuserdata/
+ios/PadelPulse.xcodeproj/project.xcworkspace/xcuserdata/
+ios/DerivedData/
+xcuserdata/
+*.xcuserstate
+*.xcscmblueprint
+*.xccheckout
